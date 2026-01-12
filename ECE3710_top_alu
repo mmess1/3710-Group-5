@@ -1,4 +1,4 @@
-module top_alu_fpga(
+module ECE3710_top_alu(
     input  wire        CLOCK_50,
     input  wire [9:0]  SW,
     input  wire [3:0]  KEY,      // active-low on DE1-SoC
