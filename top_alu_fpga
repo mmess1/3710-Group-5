@@ -1,0 +1,110 @@
+module top_alu_fpga(
+    input  wire        CLOCK_50,
+    input  wire [9:0]  SW,
+    input  wire [3:0]  KEY,      // active-low on DE1-SoC
+    output wire [9:0]  LEDR,
+    output wire [6:0]  HEX0,
+    output wire [6:0]  HEX1,
+    output wire [6:0]  HEX2,
+    output wire [6:0]  HEX3,
+    output wire [6:0]  HEX4,
+    output wire [6:0]  HEX5
+);
+
+    // WAIT opcode (NOP)
+    localparam [7:0] WAIT = 8'b0000_0000;
+
+    // Stored inputs
+    reg [15:0] Rdest_reg  = 16'h0000;
+    reg [15:0] Rsrc_reg   = 16'h0000;
+    reg [7:0]  Opcode_reg = 8'h05; // default ADD
+
+    // ALU combinational outputs
+    wire [15:0] alu_result;
+    wire [4:0]  alu_flags;
+
+    ALU3710 alu (
+        .Rdest   (Rdest_reg),
+        .Rsrc_Imm(Rsrc_reg),
+        .Opcode  (Opcode_reg),
+        .Result  (alu_result),
+        .Flags   (alu_flags)
+    );
+
+    // Latched outputs for display (to support WAIT hold)
+    reg [15:0] Result_lat = 16'h0000;
+    reg [4:0]  Flags_lat  = 5'b0;
+
+    // Simple edge-detect for buttons (optional but helps)
+    reg key0_prev = 1'b1;
+    reg key1_prev = 1'b1;
+
+    wire key0_fall = (key0_prev == 1'b1) && (KEY[0] == 1'b0); // press
+    wire key1_fall = (key1_prev == 1'b1) && (KEY[1] == 1'b0); // press
+
+    always @(posedge CLOCK_50) begin
+        key0_prev <= KEY[0];
+        key1_prev <= KEY[1];
+
+        // KEY1: load selected byte (SW[9:8]) from SW[7:0]
+        if (key1_fall) begin
+            case (SW[9:8])
+                2'b00: Rdest_reg[7:0]   <= SW[7:0];
+                2'b01: Rdest_reg[15:8]  <= SW[7:0];
+                2'b10: Rsrc_reg[7:0]    <= SW[7:0];
+                2'b11: Rsrc_reg[15:8]   <= SW[7:0];
+            endcase
+        end
+        if ((key0_prev == 1'b1) && (KEY[2] == 1'b0)) begin
+            Opcode_reg <= SW[7:0];
+        end
+
+        // KEY0: execute/latch outputs (WAIT must NOT change outputs)
+        if (key0_fall) begin
+            if (Opcode_reg != WAIT) begin
+                Result_lat <= alu_result;
+                Flags_lat  <= alu_flags;
+            end
+            // else: hold previous Result_lat / Flags_lat
+        end
+    end
+
+    // Show flags on LEDs: LEDR[4:0] = {L,C,F,Z,N}
+    assign LEDR[4:0] = Flags_lat;
+    assign LEDR[9:5] = 5'b0;
+
+    // 7-seg hex decoder (active-low segments on DE1-SoC)
+    function automatic [6:0] hex7(input [3:0] x);
+        begin
+            case (x)
+                4'h0: hex7 = 7'b1000000;
+                4'h1: hex7 = 7'b1111001;
+                4'h2: hex7 = 7'b0100100;
+                4'h3: hex7 = 7'b0110000;
+                4'h4: hex7 = 7'b0011001;
+                4'h5: hex7 = 7'b0010010;
+                4'h6: hex7 = 7'b0000010;
+                4'h7: hex7 = 7'b1111000;
+                4'h8: hex7 = 7'b0000000;
+                4'h9: hex7 = 7'b0010000;
+                4'hA: hex7 = 7'b0001000;
+                4'hB: hex7 = 7'b0000011;
+                4'hC: hex7 = 7'b1000110;
+                4'hD: hex7 = 7'b0100001;
+                4'hE: hex7 = 7'b0000110;
+                4'hF: hex7 = 7'b0001110;
+            endcase
+        end
+    endfunction
+
+    // Display Result_lat on HEX0..HEX3
+    assign HEX0 = hex7(Result_lat[3:0]);
+    assign HEX1 = hex7(Result_lat[7:4]);
+    assign HEX2 = hex7(Result_lat[11:8]);
+    assign HEX3 = hex7(Result_lat[15:12]);
+
+    // Display Opcode_reg on HEX4..HEX5
+    assign HEX4 = hex7(Opcode_reg[3:0]);
+    assign HEX5 = hex7(Opcode_reg[7:4]);
+
+endmodule
