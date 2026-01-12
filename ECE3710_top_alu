@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 
-// =============================================================
 // DE1-SoC top-level for ECE3710 ALU demo
 //
 // Inputs (board):
@@ -19,9 +18,8 @@
 //   HEX5..HEX4 : Opcode_reg (8-bit)  as 2 hex digits
 //   LEDR[4:0]  : Flags_reg [4:0]
 //   LEDR[9:5]  : Opcode_reg[4:0] (quick view)
-// =============================================================
 
-module ECE3710_top_de1soc (
+module ECE3710_top (
     input  wire        CLOCK_50,
     input  wire [9:0]  SW,
     input  wire [3:0]  KEY,
@@ -34,14 +32,10 @@ module ECE3710_top_de1soc (
     output wire [6:0]  HEX5
 );
 
-    // -------------------------
     // Reset (KEYs are active-low)
-    // -------------------------
     wire reset_n = KEY[0];
 
-    // -------------------------
     // Button pulses (falling-edge detect on KEY1/2/3)
-    // -------------------------
     wire load_data_pulse;
     wire load_op_pulse;
     wire exec_pulse;
@@ -50,9 +44,7 @@ module ECE3710_top_de1soc (
     key_fall_pulse u_p2 (.clk(CLOCK_50), .reset_n(reset_n), .key_n(KEY[2]), .pulse(load_op_pulse));
     key_fall_pulse u_p3 (.clk(CLOCK_50), .reset_n(reset_n), .key_n(KEY[3]), .pulse(exec_pulse));
 
-    // -------------------------
     // Input registers you "load" from switches
-    // -------------------------
     reg [15:0] Rdest_reg;
     reg [15:0] Rsrc_reg;
     reg [7:0]  Opcode_reg;
@@ -68,9 +60,7 @@ module ECE3710_top_de1soc (
     // Must match your ALU's WAIT opcode
     localparam [7:0] WAIT = 8'b0000_0000;
 
-    // -------------------------
     // Instantiate your ALU (combinational)
-    // -------------------------
     ECE3710_alu dut (
         .Rdest    (Rdest_reg),
         .Rsrc_Imm (Rsrc_reg),
@@ -79,9 +69,7 @@ module ECE3710_top_de1soc (
         .Flags    (alu_flags)
     );
 
-    // -------------------------
     // Loading/executing logic
-    // -------------------------
     // SW usage:
     //   SW[7:0]  = data byte to load
     //   SW[9:8]  = which byte to load when KEY1 pressed:
@@ -127,16 +115,12 @@ module ECE3710_top_de1soc (
         end
     end
 
-    // -------------------------
     // LEDs: show Flags + low bits of opcode
-    // -------------------------
     assign LEDR[4:0] = Flags_reg;
     assign LEDR[9:5] = Opcode_reg[4:0];
 
-    // -------------------------
     // 7-seg helper (active-low segments, common DE1-style)
     // If your digits appear inverted, change "assign HEXx = ..." to "~hex7(...)"
-    // -------------------------
     function [6:0] hex7;
         input [3:0] x;
         begin
@@ -174,10 +158,8 @@ module ECE3710_top_de1soc (
 
 endmodule
 
-// =============================================================
 // Simple falling-edge pulse generator for active-low KEY buttons
 // (sync + falling-edge detect; minimal debounce)
-// =============================================================
 module key_fall_pulse (
     input  wire clk,
     input  wire reset_n,
