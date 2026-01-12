@@ -52,9 +52,7 @@ module ECE3710_tb_alu;
 
     localparam [7:0] WAIT  = 8'b0000_0000;
 
-    // -------------------------
     // Instantiate ALU (NO parameters)
-    // -------------------------
     ECE3710_alu uut (
         .Rsrc_Imm(Rsrc_Imm),
         .Rdest   (Rdest),
@@ -63,9 +61,7 @@ module ECE3710_tb_alu;
         .Result  (Result)
     );
 
-    // -------------------------
     // Helper task: apply inputs then wait for combinational settle
-    // -------------------------
     task apply;
         input [7:0]  op;
         input [15:0] a;
@@ -85,9 +81,7 @@ module ECE3710_tb_alu;
         Rsrc_Imm = 16'h0000;
         #1;
 
-        // -------------------------
         // ADD TEST
-        // -------------------------
         #1; $display("ADD TEST"); #1;
         apply(ADD, 16'd32, 16'd5);
         if (Result !== 16'd37) begin
@@ -112,9 +106,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ADD Z FLAG PASSING"); #1;
 
-        // -------------------------
         // ADDU TEST
-        // -------------------------
         #1; $display("ADDU TEST"); #1;
         apply(ADDU, 16'd32, 16'd5);
         if (Result !== 16'd37) begin
@@ -149,9 +141,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ADDU C FLAG PASSING"); #1;
 
-        // -------------------------
         // ADDI TEST
-        // -------------------------
         #1; $display("ADDI TEST"); #1;
         apply(ADDI, 16'd32, 16'd5);
         if (Result !== 16'd37) begin
@@ -181,9 +171,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ADDI F FLAG PASSING"); #1;
 
-        // -------------------------
         // ADDUI TEST
-        // -------------------------
         #1; $display("ADDUI TEST"); #1;
         apply(ADDUI, 16'd32, 16'd5);
         if (Result !== 16'd37) begin
@@ -198,9 +186,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ADDUI PASSING"); #1;
 
-        // -------------------------
         // ADDCI TEST (allow either +0 or +1 behavior)
-        // -------------------------
         #1; $display("ADDCI TEST"); #1;
         apply(ADDCI, 16'd32, 16'd5);
         if ((Result !== 16'd37) && (Result !== 16'd38)) begin
@@ -220,9 +206,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ADDC PASSING"); #1;
 
-        // -------------------------
         // MOV TEST
-        // -------------------------
         #1; $display("MOV TEST"); #1;
         apply(MOV, 16'h1234, 16'hBEEF);
         if (Result !== 16'hBEEF) begin
@@ -252,9 +236,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("MOVI PASSING"); #1;
 
-        // -------------------------
         // MUL TEST
-        // -------------------------
         #1; $display("MUL TEST"); #1;
         apply(MUL, 16'd7, 16'd3);
         if (Result !== 16'd21) begin
@@ -284,9 +266,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("MULI PASSING"); #1;
 
-        // -------------------------
         // SUB TEST
-        // -------------------------
         #1; $display("SUB TEST"); #1;
         apply(SUB, 16'd32, 16'd5);
         if (Result !== 16'd27) begin
@@ -351,9 +331,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("SUBCI PASSING"); #1;
 
-        // -------------------------
         // AND TEST
-        // -------------------------
         #1; $display("AND TEST"); #1;
         apply(AND, 16'h00FF, 16'h0F0F);
         if (Result !== 16'h000F) begin
@@ -383,9 +361,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("AND Z FLAG PASSING"); #1;
 
-        // -------------------------
         // OR TEST
-        // -------------------------
         #1; $display("OR TEST"); #1;
         apply(OR, 16'h00F0, 16'h0F00);
         if (Result !== 16'h0FF0) begin
@@ -400,9 +376,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("OR PASSING"); #1;
 
-        // -------------------------
         // XOR TEST
-        // -------------------------
         #1; $display("XOR TEST"); #1;
         apply(XOR, 16'h0F0F, 16'hAAAA);
         if (Result !== 16'hA5A5) begin
@@ -417,9 +391,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("XOR PASSING"); #1;
 
-        // -------------------------
         // NOT TEST
-        // -------------------------
         #1; $display("NOT TEST"); #1;
         apply(NOT, 16'h00F0, 16'h0000);
         if (Result !== 16'hFF0F) begin
@@ -434,9 +406,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("NOT PASSING"); #1;
 
-        // -------------------------
         // CMP TEST (flags only)
-        // -------------------------
         #1; $display("CMP TEST"); #1;
         apply(CMP, 16'd3, 16'd10);
         if (Flags[4] !== 1'b1) begin
@@ -476,9 +446,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("CMPI PASSING"); #1;
 
-        // -------------------------
         // LSH TEST
-        // -------------------------
         #1; $display("LSH TEST"); #1;
         apply(LSH, 16'h0006, 16'd2);
         if (Result !== 16'h0018) begin
@@ -508,9 +476,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("LSHI PASSING"); #1;
 
-        // -------------------------
         // RSH TEST
-        // -------------------------
         #1; $display("RSH TEST"); #1;
         apply(RSH, 16'h0080, 16'd3);
         if (Result !== 16'h0010) begin
@@ -540,9 +506,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("RSHI PASSING"); #1;
 
-        // -------------------------
         // ARSH TEST
-        // -------------------------
         #1; $display("ARSH TEST"); #1;
         apply(ARSH, 16'hFFF6, 16'd3); // -10 >>> 3 = -2 = 0xFFFE
         if (Result !== 16'hFFFE) begin
@@ -572,9 +536,7 @@ module ECE3710_tb_alu;
         end
         #1; $display("ARSHI PASSING"); #1;
 
-        // -------------------------
         // WAIT TEST (NOP) — leave as “sanity only” (no strict check)
-        // -------------------------
         #1; $display("WAIT TEST"); #1;
         apply(ADD, 16'd1, 16'd1);
         apply(WAIT, 16'hBEEF, 16'hDEAD);
