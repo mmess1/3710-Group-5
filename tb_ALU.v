@@ -57,7 +57,7 @@ module tb_ALU;
 	// Look into for-loops and $stop in Verilog if you want to create self-checking testbenches as I demonstrated -- 
 	// though that is notrequired. Also, don't forget to include just a bit of delay time (#1;) for a display.
 
-    ALU #(.BIT_WIDTH(BIT_WIDTH),
+    ECE3710_alu #(.BIT_WIDTH(BIT_WIDTH),
           .OPCODE_WIDTH(OPCODE_WIDTH),
           .FLAG_WIDTH(FLAG_WIDTH)
          )
@@ -75,6 +75,7 @@ module tb_ALU;
         Opcode = ADD;
 		  Rsrc_Imm = 16'd5;
 		  Rdest = 16'd32;
+          #1;
         if(Result != 16'd37) begin
 				#1; $display("Failure -- Incorrect result"); #1;
 				#1; $display("Expect: %d, Actual: %d", Result, Rsrc_Imm + Rdest); #1;
