@@ -1,3 +1,33 @@
+//////////////////////////////////////////////////////////////////////////////////
+
+// Company: 
+
+// Engineer:  Aliou Tippett, Abdulrahman Almutairi, Megan Genetti, Mechal Alali
+
+// 
+
+// Create Date:    01/7/2026
+
+// Design Name: 
+
+// Module Name:    alu 
+
+// Project Name:  Lab assignment 1: Design of the ALU.
+
+// Target Devices: FIX ME
+
+// Description: FIX ME
+
+//
+
+// Dependencies: 
+
+//
+
+//////////////////////////////////////////////////////////////////////////////////
+
+// IMPORTANT - chage this name to the name of whatever the file is called
+
 `timescale 1ps/1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company:
@@ -13,7 +43,7 @@
 //                 Flags[4]=L, Flags[3]=C, Flags[2]=F, Flags[1]=Z, Flags[0]=N
 //////////////////////////////////////////////////////////////////////////////////
 
-module ALU3710(
+module ECE3710_alu(
     input  wire [15:0] Rdest,     // input A
     input  wire [15:0] Rsrc_Imm,   // input B or immediate  (TB name)
     input  wire [7:0]  Opcode,
