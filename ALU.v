@@ -1,256 +1,364 @@
-`timescale 1ps/1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+
+// Company: 
+
 // Engineer:  Aliou Tippett, Abdulrahman Almutairi, Megan Genetti, Mechal Alali
-//
+
+// 
+
 // Create Date:    01/7/2026
-// Design Name:
-// Module Name:    ECE3710_alu
-// Project Name:   Lab assignment 1: Design of the ALU.
+
+// Design Name: 
+
+// Module Name:    alu 
+
+// Project Name:  Lab assignment 1: Design of the ALU.
+
 // Target Devices: FIX ME
-// Description:    16-bit combinational ALU for CR16 baseline (+ extensions)
-//                 FLAGS bit mapping (matches tb):
-//                 FLAGS[4]=L, FLAGS[3]=C, FLAGS[2]=F, FLAGS[1]=Z, FLAGS[0]=N
+
+// Description: FIX ME
+
+//
+
+// Dependencies: 
+
+//
+
 //////////////////////////////////////////////////////////////////////////////////
+
+// IMPORTANT - chage this name to the name of whatever the file is called
 
 module ECE3710_alu(
-    input  wire [15:0] Rdest,   // input A
-    input  wire [15:0] Rsrc,     // input B or immediate
-    input  wire [7:0]  Opcode,
-    output reg  [15:0] Result,
-    output reg  [4:0]  FLAGS
+
+    input  wire [15:0] Rdest, // input A
+
+    input  wire [15:0] Rsrc,   // input B, or imm
+
+    input  wire [7:0] Opcode,   
+
+    output reg  [15:0] Result,     // will be set to Rdst outside ALU
+
+    output reg  [4:0] FLAGS         // 0000 --> {C, L, F, Z, N} --> { FLAGS[3], FLAGS[2], FLAGS[1], FLAGS[0] }
+
 );
 
-    // Opcodes (must match tb)
-    localparam [7:0] ADD   = 8'b0000_0101;
-    localparam [7:0] ADDU  = 8'b0000_0110;
-    localparam [7:0] ADDC  = 8'b0000_0111;
 
-    localparam [7:0] ADDI  = 8'b0101_0000;
-    localparam [7:0] ADDUI = 8'b0110_0000;
-    localparam [7:0] ADDCI = 8'b0111_0000;
+parameter [7:0] ADD =       8'bxxxx_0101;
 
-    localparam [7:0] MOV   = 8'b0000_1101;
-    localparam [7:0] MOVI  = 8'b1101_0000;
+parameter [7:0] ADDU =      8'bxxxx_0110;
 
-    localparam [7:0] MUL   = 8'b0000_1110;
-    localparam [7:0] MULI  = 8'b1110_0000;
+parameter [7:0] ADDC =      8'bxxxx_0111;
 
-    localparam [7:0] SUB   = 8'b0000_1001;
-    localparam [7:0] SUBC  = 8'b0000_1010;
-    localparam [7:0] SUBI  = 8'b1001_0000;
-    localparam [7:0] SUBCI = 8'b1010_0000;
+parameter [15:0] ADDI =     4'b0101_xxxx;
 
-    localparam [7:0] CMP   = 8'b0000_1011;
-    localparam [7:0] CMPI  = 8'b1011_0000;
+parameter [15:0] ADDUI =    4'b0110_xxxx;
 
-    localparam [7:0] AND   = 8'b0000_0001;
-    localparam [7:0] OR    = 8'b0000_0010;
-    localparam [7:0] XOR   = 8'b0000_0011;
-    localparam [7:0] NOT   = 8'b0000_0100;
+parameter [15:0] ADDCI =    4'b0111_xxxx;
 
-    localparam [7:0] LSH   = 8'b0000_1100;
-    localparam [7:0] LSHI  = 8'b1100_0000;
+parameter [15:0]  MOV =     8'bxxxx_1101;
 
-    localparam [7:0] RSH   = 8'b0000_1000;
-    localparam [7:0] RSHI  = 8'b1000_0000;
+parameter [15:0]  MOVI =    4'b1101_xxxx;
 
-    localparam [7:0] ARSH  = 8'b0000_1111;
-    localparam [7:0] ARSHI = 8'b1111_0000;
+parameter [7:0] MUL =       8'bxxxx_1110;
 
-    localparam [7:0] WAIT  = 8'b0000_0000;
+parameter [15:0] MULI =     8'b1110_xxxx;
 
-    reg  [16:0] tmp17;
-    reg  [31:0] prod32;
-    reg         carry_out;
+parameter [7:0] SUB =       8'bxxxx_1001;
 
-    always @* begin
-        // Safe defaults (prevents latching)
-        Result = 16'h0000;
-        FLAGS  = 5'bx_xxxx;   // {L,C,F,Z,N} default don't-care unless set below
+parameter [15:0] SUBC =     8'bxxxx_1010;
 
-        case (Opcode)
+parameter [15:0] SUBI =     8'b1001_xxxx;
 
-            // -------------------------
-            // SIGNED ADD (no U): set F overflow, C forced 0 per writeup note
-            // -------------------------
-            ADD, ADDI: begin
+parameter [15:0] SUBCI =    8'b1010_xxxx;
+
+parameter [15:0] CMP =      8'bxxxx_1011;
+
+parameter [15:0] CMPI =     8'b1011_xxxx;
+
+parameter [7:0]  OR =       8'bxxxx_0010;
+
+parameter [15:0]  AND =     8'bxxxx_0001;
+
+parameter [15:0]  XOR =     8'bxxxx_0011;
+
+parameter [7:0]  NOT =      8'bxxxx_0100;
+
+parameter [7:0]  LSH =      8'bxxxx_1100;
+
+
+parameter [15:0] LSHI =     8'b1100_xxxx;
+
+
+parameter [7:0]  RSH =      8'bxxxx_1000;
+
+
+parameter [15:0] RSHI =     8'b1000_xxxx;
+
+
+parameter [7:0]  ARSH =     8'bxxxx_1111;
+
+
+parameter [15:0] ARSHI =    8'b1111_xxxx;
+
+
+
+parameter [7:0]  WAIT =     8'bxxxx_0000;  // Use WAIT opcode as NOP
+
+
+reg use_carry;
+
+reg is_signed;
+
+reg [31:0] prod; // larger value for mul
+reg [16:0] temp;  // 17 bits variable to detect barrow
+
+
+always @(Rsrc, Rdest, Opcode)
+
+begin
+
+
+    Result = 16'b0000_0000_0000_0000; // clear the result
+
+	 FLAGS = 5'b0;
+
+    /* =========================
+
+        * ALU Status Flags
+
+        *
+
+        * C (Carry): Set to 1 by ADDU, ADDC, or SUBC if a carry out (for addition) 
+
+        * or borrow (for subtraction) occurs. Cleared otherwise.
+
+        *
+
+        * L (Low): Set by comparison operations (CMP, CMPI). Set to 1 if Rdest < Rsrc when interpreted as UNSIGNED numbers.
+
+        *
+
+        * F (Overflow): Set by signed arithmetic operations (ADD, SUB, ADDI, SUBI) 
+
+        *   if a signed overflow occurs. Cleared otherwise.
+
+        *
+
+        * Z (Zero): Set by any operation that produces a result of 0 (AND, OR, XOR, arithmetic operations, CMP). 
+
+        *   Not limited to comparison operations.
+
+        *
+
+        * N (Negative): Set by comparison operations (CMP, CMPI). Set to 1 if Rdest < Rsrc when interpreted as SIGNED numbers.
+
+        * =========================
+
+    */
+
+
+    // note all have the same oppcode: ADD, ADDU, OR, SUB, CMP, SUBC, AND, XOR, MOV
+
+    // Flags = 0000 --> {C, L, F, Z, N}
+
+    casex (Opcode)
+
+
+        ADD, ADDU, ADDUI,ADDC, ADDI, ADDCI: begin        // Result = Rsrc + Rdst/(imm) + carry?
+
+            use_carry = (Opcode == ADDC) || (Opcode == ADDCI);   // include carry if needed
+
+            is_signed = (Opcode == ADD) || (Opcode == ADDI || ADDC);   // signed add
+            
+
+
+            // Compute result first --> incase carry is need (use old carry)
+
+            if (!is_signed) begin
+
                 Result = $signed(Rdest) + $signed(Rsrc);
 
-                FLAGS[4] = (Rdest < Rsrc); // L (recommended extension)
-                FLAGS[3] = 1'b0;           // C forced 0 for signed ops (per writeup note)
-                FLAGS[2] = ((Rdest[15] == Rsrc[15]) && (Result[15] != Rdest[15])); // F overflow
-                FLAGS[1] = (Result == 16'h0000); // Z
-                FLAGS[0] = Result[15];           // N
+            end else begin
+
+                Result = Rdest + Rsrc + (use_carry ? FLAGS[3] : 1'b0); // maybe add carry
+
             end
 
-            // -------------------------
-            // UNSIGNED ADD (U): set C carry-out, F = 0
-            // -------------------------
-            ADDU, ADDUI: begin
-                tmp17     = {1'b0, Rdest} + {1'b0, Rsrc};
-                Result    = tmp17[15:0];
-                carry_out = tmp17[16];
+            // Set flags after computing Result
 
-                FLAGS[4] = (Rdest < Rsrc);     // L (recommended extension)
-                FLAGS[3] = carry_out;          // C
-                FLAGS[2] = 1'b0;               // F = 0 for unsigned add
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
+            FLAGS[3] = (Result < Rdest);    // C: carry (unsigned)
+
+            FLAGS[2] = (~Rdest[15] & ~Rsrc[15] & Result[15]) |   // F: signed overflow
+
+                       ( Rdest[15] &  Rsrc[15] & ~Result[15]);
+
+            FLAGS[1] = (Result == 16'b0000_0000_0000_0000);   // Z: zero
+
+            FLAGS[0] = Result[15];          // N: negative/sign bit
+
+        end
+
+
+        MUL, MULI: begin                        // Result = Rsrc * Rdst/(imm)
+
+
+           prod = Rsrc * Rdest;          // multiply
+
+            Result = prod[15:0];            // keep lower 16 bits
+
+            FLAGS[4] = |prod[31:16];        // C: upper bits nonzero -> overflow/carry
+
+            FLAGS[1] = (Result == 16'b0);   // Z: result is zero
+
+            FLAGS[0] = Result[15];          // N: sign bit of result
+
+        end
+
+        SUB, SUBC, SUBI, SUBCI: begin           // Result = Rdst - Rsrc/(imm)
+
+
+            use_carry = (Opcode == SUBC) || (Opcode == SUBCI); // only care for SUBC and SUBCI
+
+            // NOTE since Result = Rdst - Rsrc --> only need to exted Rdst
+
+            temp = {1'b0, Rdest} - Rsrc - (use_carry ? FLAGS[3] : 1'b0);           // extend 1 bit to detect borrow
+
+
+
+            if (Opcode != MULI && Opcode != MUL) begin
+
+                Result = temp[15:0];    // only write the lower 16 bits for non-multiply instructions
+
             end
 
-            // -------------------------
-            // ADD with carry (no carry-in available in this ALU-alone lab)
-            // TB allows either +0 or +1; we use carry-in = 0.
-            // -------------------------
-            ADDC, ADDCI: begin
-                tmp17     = {1'b0, Rdest} + {1'b0, Rsrc} + 17'd0;
-                Result    = tmp17[15:0];
-                carry_out = tmp17[16];
+            // NOTE: MUL and MULI onyl set flags and dont set result
 
-                FLAGS[4] = (Rdest < Rsrc);
-                FLAGS[3] = carry_out;
-                FLAGS[2] = 1'b0;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
+            FLAGS[4] = temp[16];           // C: borrow occurred if high bit is 1
+
+            FLAGS[1] = (Result == 16'b0);  // Z: zero flag
+
+            FLAGS[0] = Result[15];         // N: negative/sign bit
+
+        end 
+
+        AND, OR, XOR: begin
+
+            if (Opcode == AND) begin
+
+                Result = Rdest & Rsrc;  // bitwise AND
+
+            end else if (Opcode == OR) begin
+
+                Result = Rdest | Rsrc;  // bitwise OR
+
+            end else if (Opcode == XOR) begin
+
+                Result = Rdest ^ Rsrc;  // bitwise XOR
+
             end
 
-            // -------------------------
-            // MOV / MOVI
-            // -------------------------
-            MOV, MOVI: begin
-                Result  = Rsrc;
-                FLAGS[4] = 1'bx;                 // L unused
-                FLAGS[3] = 1'bx;                 // C unused
-                FLAGS[2] = 1'bx;                 // F unused
-                FLAGS[1] = (Result == 16'h0000); // Z
-                FLAGS[0] = Result[15];           // N
-            end
+            // Set flags --> NOTE: overflow, carry, L not used
 
-            // -------------------------
-            // MUL / MULI (lower 16 bits result)
-            // -------------------------
-            MUL, MULI: begin
-                prod32 = Rdest * Rsrc;
-                Result = prod32[15:0];
+            FLAGS[1] = (Result == 16'b0);  // Z: zero flag
 
-                FLAGS[4] = 1'bx;              // L unused
-                FLAGS[3] = |prod32[31:16];    // C as "upper bits nonzero"
-                FLAGS[2] = 1'bx;              // F unused
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+            FLAGS[0] = Result[15];         // N: negative/sign bit
 
-            // -------------------------
-            // SIGNED SUB / SUBI: set F overflow, C forced 0 per writeup note
-            // -------------------------
-            SUB, SUBI: begin
-                Result = $signed(Rdest) - $signed(Rsrc);
+        end
 
-                FLAGS[4] = (Rdest < Rsrc); // L (recommended extension)
-                FLAGS[3] = 1'b0;           // C forced 0 for signed ops (per writeup note)
-                FLAGS[2] = ((Rdest[15] != Rsrc[15]) && (Result[15] != Rdest[15])); // F overflow
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+        CMP, CMPI: begin                       // Compare Rdest and Rsrc/(imm) --> set flags only
 
-            // -------------------------
-            // SUBC / SUBCI: treat as unsigned borrow form (no borrow-in available; use 0)
-            // TB allows either outcome in its "shape" checks.
-            // -------------------------
-            SUBC, SUBCI: begin
-                tmp17  = {1'b0, Rdest} - {1'b0, Rsrc} - 17'd0;
-                Result = tmp17[15:0];
 
-                FLAGS[4] = (Rdest < Rsrc);
-                FLAGS[3] = tmp17[16];          // C as borrow-out
-                FLAGS[2] = 1'b0;               // F not used here
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+            FLAGS[4] = (Rdest < Rsrc);                 // L: unsigned less-than
 
-            // -------------------------
-            // AND / OR / XOR
-            // -------------------------
-            AND: begin
-                Result  = Rdest & Rsrc;
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
 
-            OR: begin
-                Result  = Rdest | Rsrc;
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+            FLAGS[1] = (Rdest == Rsrc);                // Z: equal
 
-            XOR: begin
-                Result  = Rdest ^ Rsrc;
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
 
-            // -------------------------
-            // NOT
-            // -------------------------
-            NOT: begin
-                Result  = ~Rdest;
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+            FLAGS[0] = ($signed(Rdest) < $signed(Rsrc)); // N: signed less-than
 
-            // -------------------------
-            // Shifts
-            // -------------------------
-            LSH, LSHI: begin
-                Result  = Rdest << Rsrc[3:0];
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
 
-            RSH, RSHI: begin
-                Result  = Rdest >> Rsrc[3:0];
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+        end
 
-            ARSH, ARSHI: begin
-                Result  = $signed(Rdest) >>> Rsrc[3:0];
-                FLAGS[4] = 1'bx; FLAGS[3] = 1'bx; FLAGS[2] = 1'bx;
-                FLAGS[1] = (Result == 16'h0000);
-                FLAGS[0] = Result[15];
-            end
+        NOT: begin                              // Result = ~Rdest
 
-            // -------------------------
-            // Compare (flags only; Result not used by ISA)
-            // -------------------------
-            CMP, CMPI: begin
-                Result  = Rdest; // deterministic (no latch)
-                FLAGS[4] = (Rdest < Rsrc);                 // L unsigned less-than
-                FLAGS[3] = 1'bx;                           // C unused
-                FLAGS[2] = 1'bx;                           // F unused
-                FLAGS[1] = (Rdest == Rsrc);                // Z equal
-                FLAGS[0] = ($signed(Rdest) < $signed(Rsrc)); // N signed less-than
-            end
 
-            // -------------------------
-            // WAIT/NOP: decoder should ignore writing state; outputs can be don't-care/pass-through
-            // -------------------------
-            WAIT: begin
-                Result = Rdest;
-                FLAGS  = 5'bx_xxxx;
-            end
+            Result = ~Rdest;                    // bitwise NOT
 
-            default: begin
-                Result = 16'h0000;
-                FLAGS  = 5'b00000;
-            end
-        endcase
-    end
+
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+
+
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+
+        end
+
+        LSH, LSHI: begin                        // Result = Rdest << shift_amount
+
+
+            Result = Rdest << Rsrc[3:0];        // logical shift left
+
+
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+
+
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+
+
+        end
+
+        RSH, RSHI: begin                        // Result = Rdest >> shift_amount
+
+
+            Result = Rdest >> Rsrc[3:0];        // logical shift right
+
+
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+
+
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+
+
+        end
+
+        ARSH, ARSHI: begin                      // Result = arithmetic shift right
+
+
+            Result = $signed(Rdest) >>> Rsrc[3:0]; // arithmetic shift right (sign-extend)
+
+
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+
+
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+
+
+        end
+
+
+
+
+
+        WAIT: begin                             // NOP (use WAIT opcode in ISA)
+
+
+            Result = Rdest;                     // do not modify destination
+
+
+            // NOTE: NOP should not change flags
+
+
+        end
+
+
+        default: begin
+
+            Result = 16'b0000_0000_0000_0000;                 // safty clear result
+
+            FLAGS  = 5'b00000;             // Safty clear all flags
+
+        end
+
+    endcase
+
+end
 endmodule
