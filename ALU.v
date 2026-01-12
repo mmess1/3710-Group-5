@@ -48,6 +48,20 @@ parameter [15:0]  AND =     8'bxxxx_0001;
 
 parameter [15:0]  XOR =     8'bxxxx_0011;
 
+parameter [7:0]  NOT =      8'bxxxx_0100;
+
+parameter [7:0]  LSH =      8'bxxxx_1100;
+parameter [15:0] LSHI =     8'b1100_xxxx;
+
+parameter [7:0]  RSH =      8'bxxxx_1000;
+parameter [15:0] RSHI =     8'b1000_xxxx;
+
+parameter [7:0]  ARSH =     8'bxxxx_1111;
+parameter [15:0] ARSHI =    8'b1111_xxxx;
+
+parameter [7:0]  WAIT =     8'bxxxx_0000;  // Use WAIT opcode as NOP
+
+
 
 always @(Rsrc, Rdest, Opcode)
 begin
@@ -136,6 +150,41 @@ begin
             // Set flags --> NOTE: overflow, carry, L not used
             FLAGS[1] = (Result == 16'b0);  // Z: zero flag
             FLAGS[0] = Result[15];         // N: negative/sign bit
+        end
+
+        CMP, CMPI: begin                       // Compare Rdest and Rsrc/(imm) --> set flags only
+            FLAGS[4] = (Rdest < Rsrc);                 // L: unsigned less-than
+            FLAGS[1] = (Rdest == Rsrc);                // Z: equal
+            FLAGS[0] = ($signed(Rdest) < $signed(Rsrc)); // N: signed less-than
+        end
+
+        NOT: begin                              // Result = ~Rdest
+            Result = ~Rdest;                    // bitwise NOT
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+        end
+
+        LSH, LSHI: begin                        // Result = Rdest << shift_amount
+            Result = Rdest << Rsrc[3:0];        // logical shift left
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+        end
+
+        RSH, RSHI: begin                        // Result = Rdest >> shift_amount
+            Result = Rdest >> Rsrc[3:0];        // logical shift right
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+        end
+
+        ARSH, ARSHI: begin                      // Result = arithmetic shift right
+            Result = $signed(Rdest) >>> Rsrc[3:0]; // arithmetic shift right (sign-extend)
+            FLAGS[1] = (Result == 16'b0);       // Z: zero flag
+            FLAGS[0] = Result[15];              // N: negative/sign bit
+        end
+
+        WAIT: begin                             // NOP (use WAIT opcode in ISA)
+            Result = Rdest;                     // do not modify destination
+            // NOTE: NOP should not change flags
         end
 
         default: begin
