@@ -1,6 +1,6 @@
 `timescale 1ps/1ps
 
-module tb_ALU;
+module ECE3710_tb_ALU;
     parameter BIT_WIDTH    = 16;
     parameter OPCODE_WIDTH =  8;
     parameter FLAG_WIDTH   =  5;
