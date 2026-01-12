@@ -1,33 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-
-// Company: 
-
-// Engineer:  Aliou Tippett, Abdulrahman Almutairi, Megan Genetti, Mechal Alali
-
-// 
-
-// Create Date:    01/7/2026
-
-// Design Name: 
-
-// Module Name:    alu 
-
-// Project Name:  Lab assignment 1: Design of the ALU.
-
-// Target Devices: FIX ME
-
-// Description: FIX ME
-
-//
-
-// Dependencies: 
-
-//
-
-//////////////////////////////////////////////////////////////////////////////////
-
-// IMPORTANT - chage this name to the name of whatever the file is called
-
 `timescale 1ps/1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company:
@@ -104,9 +74,7 @@ module ECE3710_alu(
 
         case (Opcode)
 
-            // -------------------------
             // SIGNED ADD: set F overflow, C forced 0 per writeup note
-            // -------------------------
             ADD, ADDI: begin
                 Result = $signed(Rdest) + $signed(Rsrc);
 
@@ -117,9 +85,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];           // N
             end
 
-            // -------------------------
             // UNSIGNED ADD: set C carry-out, F = 0
-            // -------------------------
             ADDU, ADDUI: begin
                 tmp17     = {1'b0, Rdest} + {1'b0, Rsrc};
                 Result    = tmp17[15:0];
@@ -132,9 +98,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // ADD with carry (no carry-in available in this lab, use 0)
-            // -------------------------
             ADDC, ADDCI: begin
                 tmp17     = {1'b0, Rdest} + {1'b0, Rsrc} + 17'd0;
                 Result    = tmp17[15:0];
@@ -147,9 +111,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // MOV / MOVI
-            // -------------------------
             MOV, MOVI: begin
                 Result  = Rsrc;
                 Flags[4] = 1'b0;
@@ -159,9 +121,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // MUL / MULI (lower 16 bits result)
-            // -------------------------
             MUL, MULI: begin
                 prod32 = Rdest * Rsrc;
                 Result = prod32[15:0];
@@ -173,9 +133,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // SIGNED SUB: set F overflow, C forced 0 per writeup note
-            // -------------------------
             SUB, SUBI: begin
                 Result = $signed(Rdest) - $signed(Rsrc);
 
@@ -186,9 +144,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // SUBC / SUBCI: unsigned form (no borrow-in available; use 0)
-            // -------------------------
             SUBC, SUBCI: begin
                 tmp17  = {1'b0, Rdest} - {1'b0, Rsrc} - 17'd0;
                 Result = tmp17[15:0];
@@ -200,9 +156,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // AND / OR / XOR / NOT
-            // -------------------------
             AND: begin
                 Result  = Rdest & Rsrc;
                 Flags[1] = (Result == 16'h0000);
@@ -227,9 +181,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // Shifts
-            // -------------------------
             LSH, LSHI: begin
                 Result  = Rdest << Rsrc[3:0];
                 Flags[1] = (Result == 16'h0000);
@@ -248,9 +200,7 @@ module ECE3710_alu(
                 Flags[0] = Result[15];
             end
 
-            // -------------------------
             // Compare (flags only; Result not used by ISA)
-            // -------------------------
             CMP, CMPI: begin
                 Result  = Rdest; // deterministic
                 Flags[4] = (Rdest < Rsrc);                       // L unsigned less-than
@@ -260,9 +210,7 @@ module ECE3710_alu(
                 Flags[0] = ($signed(Rdest) < $signed(Rsrc));     // N signed less-than (per your TB)
             end
 
-            // -------------------------
             // WAIT/NOP: combinational ALU can't "hold previous" without state.
-            // -------------------------
             WAIT: begin
                 Result = Rdest;
                 Flags  = Flags; // harmless; effectively don't-care in comb logic
