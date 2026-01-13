@@ -1,225 +1,183 @@
-`timescale 1ps/1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:  Aliou Tippett, Abdulrahman Almutairi, Megan Genetti, Mechal Alali
-//
-// Create Date:    01/7/2026
-// Design Name:
-// Module Name:    ALU3710
-// Project Name:   Lab assignment 1: Design of the ALU.
-// Target Devices: FIX ME
-// Description:    16-bit combinational ALU for CR16 baseline (+ extensions)
-//                 FLAGS bit mapping (matches tb):
-//                 Flags[4]=L, Flags[3]=C, Flags[2]=F, Flags[1]=Z, Flags[0]=N
-//////////////////////////////////////////////////////////////////////////////////
+`timescale 1ns/1ps
 
-module ECE3710_alu(
-    input  wire [15:0] Rdest,     // input A
-    input  wire [15:0] Rsrc_Imm,   // input B or immediate  (TB name)
-    input  wire [7:0]  Opcode,
-    output reg  [15:0] Result,
-    output reg  [4:0]  Flags       // TB name
+// DE1-SoC top-level for ECE3710 ALU demo
+//
+// Inputs (board):
+//   SW[9:0]   : use SW[7:0] as "data byte", SW[9:8] as byte select
+//   KEY[0]    : reset (active-low)
+//   KEY[1]    : LOAD_DATA   (active-low pulse)
+//   KEY[2]    : LOAD_OPCODE (active-low pulse)
+//   KEY[3]    : EXECUTE     (active-low pulse)
+//
+// Internal registers:
+//   Rdest_reg (16), Rsrc_reg (16), Opcode_reg (8)
+//   Result_reg (16), Flags_reg (5)
+//
+// Outputs:
+//   HEX3..HEX0 : Result_reg (16-bit) as 4 hex digits
+//   HEX5..HEX4 : Opcode_reg (8-bit)  as 2 hex digits
+//   LEDR[4:0]  : Flags_reg [4:0]
+//   LEDR[9:5]  : Opcode_reg[4:0] (quick view)
+
+module ECE3710_top (
+    input  wire        CLOCK_50,
+    input  wire [9:0]  SW,
+    input  wire [3:0]  KEY,
+    output wire [9:0]  LEDR,
+    output wire [6:0]  HEX0,
+    output wire [6:0]  HEX1,
+    output wire [6:0]  HEX2,
+    output wire [6:0]  HEX3,
+    output wire [6:0]  HEX4,
+    output wire [6:0]  HEX5
 );
 
-    // Opcodes (must match tb)
-    localparam [7:0] ADD   = 8'b0000_0101;
-    localparam [7:0] ADDU  = 8'b0000_0110;
-    localparam [7:0] ADDC  = 8'b0000_0111;
+    // Reset (KEYs are active-low)
+    wire reset_n = KEY[0];
 
-    localparam [7:0] ADDI  = 8'b0101_0000;
-    localparam [7:0] ADDUI = 8'b0110_0000;
-    localparam [7:0] ADDCI = 8'b0111_0000;
+    // Button pulses (falling-edge detect on KEY1/2/3)
+    wire load_data_pulse;
+    wire load_op_pulse;
+    wire exec_pulse;
 
-    localparam [7:0] MOV   = 8'b0000_1101;
-    localparam [7:0] MOVI  = 8'b1101_0000;
+    key_fall_pulse u_p1 (.clk(CLOCK_50), .reset_n(reset_n), .key_n(KEY[1]), .pulse(load_data_pulse));
+    key_fall_pulse u_p2 (.clk(CLOCK_50), .reset_n(reset_n), .key_n(KEY[2]), .pulse(load_op_pulse));
+    key_fall_pulse u_p3 (.clk(CLOCK_50), .reset_n(reset_n), .key_n(KEY[3]), .pulse(exec_pulse));
 
-    localparam [7:0] MUL   = 8'b0000_1110;
-    localparam [7:0] MULI  = 8'b1110_0000;
+    // Input registers you "load" from switches
+    reg [15:0] Rdest_reg;
+    reg [15:0] Rsrc_reg;
+    reg [7:0]  Opcode_reg;
 
-    localparam [7:0] SUB   = 8'b0000_1001;
-    localparam [7:0] SUBC  = 8'b0000_1010;
-    localparam [7:0] SUBI  = 8'b1001_0000;
-    localparam [7:0] SUBCI = 8'b1010_0000;
+    // Latched outputs for stable demo + proper WAIT/NOP behavior
+    reg [15:0] Result_reg;
+    reg [4:0]  Flags_reg;
 
-    localparam [7:0] CMP   = 8'b0000_1011;
-    localparam [7:0] CMPI  = 8'b1011_0000;
+    // Your ALU combinational outputs
+    wire [15:0] alu_result;
+    wire [4:0]  alu_flags;
 
-    localparam [7:0] AND   = 8'b0000_0001;
-    localparam [7:0] OR    = 8'b0000_0010;
-    localparam [7:0] XOR   = 8'b0000_0011;
-    localparam [7:0] NOT   = 8'b0000_0100;
+    // Must match your ALU's WAIT opcode
+    localparam [7:0] WAIT = 8'b0000_0000;
 
-    localparam [7:0] LSH   = 8'b0000_1100;
-    localparam [7:0] LSHI  = 8'b1100_0000;
+    // Instantiate your ALU (combinational)
+    ECE3710_alu dut (
+        .Rdest    (16'd2),
+        .Rsrc_Imm (16'd5),
+        .Opcode   (Opcode_reg),
+        .Result   (alu_result),
+        .Flags    (alu_flags)
+    );
 
-    localparam [7:0] RSH   = 8'b0000_1000;
-    localparam [7:0] RSHI  = 8'b1000_0000;
+    // Loading/executing logic
+    // SW usage:
+    //   SW[7:0]  = data byte to load
+    //   SW[9:8]  = which byte to load when KEY1 pressed:
+    //              2'b00 -> Rdest[7:0]
+    //              2'b01 -> Rdest[15:8]
+    //              2'b10 -> Rsrc [7:0]
+    //              2'b11 -> Rsrc [15:8]
+    wire [1:0] byte_sel = SW[9:8];
 
-    localparam [7:0] ARSH  = 8'b0000_1111;
-    localparam [7:0] ARSHI = 8'b1111_0000;
+    always @(posedge CLOCK_50 or negedge reset_n) begin
+        if (!reset_n) begin
+            Rdest_reg  <= 16'h0000;
+            Rsrc_reg   <= 16'h0000;
+            Opcode_reg <= 8'h00;
 
-    localparam [7:0] WAIT  = 8'b0000_0000;
-
-    reg  [16:0] tmp17;
-    reg  [31:0] prod32;
-    reg         carry_out;
-
-    // Alias to keep your original variable naming style in the body
-    wire [15:0] Rsrc = Rsrc_Imm;
-
-    always @* begin
-        // Safe defaults (prevents latching)
-        Result = 16'h0000;
-        Flags  = 5'b0_0_0_0_0;
-
-        case (Opcode)
-
-            // SIGNED ADD: set F overflow, C forced 0 per writeup note
-            ADD, ADDI: begin
-                Result = $signed(Rdest) + $signed(Rsrc);
-
-                Flags[4] = (Rdest < Rsrc); // L (recommended extension)
-                Flags[3] = 1'b0;           // C forced 0 for signed ops
-                Flags[2] = ((Rdest[15] == Rsrc[15]) && (Result[15] != Rdest[15])); // F overflow
-                Flags[1] = (Result == 16'h0000); // Z
-                Flags[0] = Result[15];           // N
+            Result_reg <= 16'h0000;
+            Flags_reg  <= 5'b00000;
+        end else begin
+            // Load operand bytes
+            if (load_data_pulse) begin
+                case (byte_sel)
+                    2'b00: Rdest_reg[7:0]   <= SW[7:0];
+                    2'b01: Rdest_reg[15:8]  <= SW[7:0];
+                    2'b10: Rsrc_reg[7:0]    <= SW[7:0];
+                    2'b11: Rsrc_reg[15:8]   <= SW[7:0];
+                    default: ;
+                endcase
             end
 
-            // UNSIGNED ADD: set C carry-out, F = 0
-            ADDU, ADDUI: begin
-                tmp17     = {1'b0, Rdest} + {1'b0, Rsrc};
-                Result    = tmp17[15:0];
-                carry_out = tmp17[16];
-
-                Flags[4] = (Rdest < Rsrc);
-                Flags[3] = carry_out;
-                Flags[2] = 1'b0;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
+            // Load opcode
+            if (load_op_pulse) begin
+                Opcode_reg <= SW[7:0];
             end
 
-            // ADD with carry (no carry-in available in this lab, use 0)
-            ADDC, ADDCI: begin
-                tmp17     = {1'b0, Rdest} + {1'b0, Rsrc} + 17'd0;
-                Result    = tmp17[15:0];
-                carry_out = tmp17[16];
-
-                Flags[4] = (Rdest < Rsrc);
-                Flags[3] = carry_out;
-                Flags[2] = 1'b0;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
+            // Execute: latch ALU outputs (WAIT/NOP holds previous)
+            if (exec_pulse) begin
+                if (Opcode_reg != WAIT) begin
+                    Result_reg <= alu_result;
+                    Flags_reg  <= alu_flags;
+                end
+                // else: hold Result_reg/Flags_reg
             end
+        end
+    end
 
-            // MOV / MOVI
-            MOV, MOVI: begin
-                Result  = Rsrc;
-                Flags[4] = 1'b0;
-                Flags[3] = 1'b0;
-                Flags[2] = 1'b0;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
+    // LEDs: show Flags + low bits of opcode
+    assign LEDR[4:0] = Flags_reg;
+    //assign LEDR[9:5] = Opcode_reg[4:0];
 
-            // MUL / MULI (lower 16 bits result)
-            MUL, MULI: begin
-                prod32 = Rdest * Rsrc;
-                Result = prod32[15:0];
+    // 7-seg helper (active-low segments, common DE1-style)
+    // If your digits appear inverted, change "assign HEXx = ..." to "~hex7(...)"
+    function [6:0] hex7;
+        input [3:0] x;
+        begin
+            case (x)
+                4'h0: hex7 = 7'b1000000;
+                4'h1: hex7 = 7'b1111001;
+                4'h2: hex7 = 7'b0100100;
+                4'h3: hex7 = 7'b0110000;
+                4'h4: hex7 = 7'b0011001;
+                4'h5: hex7 = 7'b0010010;
+                4'h6: hex7 = 7'b0000010;
+                4'h7: hex7 = 7'b1111000;
+                4'h8: hex7 = 7'b0000000;
+                4'h9: hex7 = 7'b0010000;
+                4'hA: hex7 = 7'b0001000;
+                4'hB: hex7 = 7'b0000011;
+                4'hC: hex7 = 7'b1000110;
+                4'hD: hex7 = 7'b0100001;
+                4'hE: hex7 = 7'b0000110;
+                4'hF: hex7 = 7'b0001110;
+                default: hex7 = 7'b1111111;
+            endcase
+        end
+    endfunction
 
-                Flags[4] = 1'b0;
-                Flags[3] = |prod32[31:16];    // C = upper bits nonzero
-                Flags[2] = 1'b0;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
+    // Result on HEX3..HEX0
+    assign HEX0 = hex7(Result_reg[3:0]);
+    assign HEX1 = hex7(Result_reg[7:4]);
+    assign HEX2 = hex7(Result_reg[11:8]);
+    assign HEX3 = hex7(Result_reg[15:12]);
 
-            // SIGNED SUB: set F overflow, C forced 0 per writeup note
-            SUB, SUBI: begin
-                Result = $signed(Rdest) - $signed(Rsrc);
+    // Opcode on HEX5..HEX4
+    assign HEX4 = hex7(Opcode_reg[3:0]);
+    assign HEX5 = hex7(Opcode_reg[7:4]);
 
-                Flags[4] = (Rdest < Rsrc);
-                Flags[3] = 1'b0;
-                Flags[2] = ((Rdest[15] != Rsrc[15]) && (Result[15] != Rdest[15])); // F overflow
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
+endmodule
 
-            // SUBC / SUBCI: unsigned form (no borrow-in available; use 0)
-            SUBC, SUBCI: begin
-                tmp17  = {1'b0, Rdest} - {1'b0, Rsrc} - 17'd0;
-                Result = tmp17[15:0];
+// Simple falling-edge pulse generator for active-low KEY buttons
+// (sync + falling-edge detect; minimal debounce)
+module key_fall_pulse (
+    input  wire clk,
+    input  wire reset_n,
+    input  wire key_n,    // active-low button input
+    output reg  pulse
+);
+    reg [2:0] sync;
+    reg       prev;
 
-                Flags[4] = (Rdest < Rsrc);
-                Flags[3] = tmp17[16];          // borrow-out (your original choice)
-                Flags[2] = 1'b0;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            // AND / OR / XOR / NOT
-            AND: begin
-                Result  = Rdest & Rsrc;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            OR: begin
-                Result  = Rdest | Rsrc;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            XOR: begin
-                Result  = Rdest ^ Rsrc;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            NOT: begin
-                Result  = ~Rdest;
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            // Shifts
-            LSH, LSHI: begin
-                Result  = Rdest << Rsrc[3:0];
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            RSH, RSHI: begin
-                Result  = Rdest >> Rsrc[3:0];
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            ARSH, ARSHI: begin
-                Result  = $signed(Rdest) >>> Rsrc[3:0];
-                Flags[1] = (Result == 16'h0000);
-                Flags[0] = Result[15];
-            end
-
-            // Compare (flags only; Result not used by ISA)
-            CMP, CMPI: begin
-                Result  = Rdest; // deterministic
-                Flags[4] = (Rdest < Rsrc);                       // L unsigned less-than
-                Flags[3] = 1'b0;
-                Flags[2] = 1'b0;
-                Flags[1] = (Rdest == Rsrc);                      // Z equal
-                Flags[0] = ($signed(Rdest) < $signed(Rsrc));     // N signed less-than (per your TB)
-            end
-
-            // WAIT/NOP: combinational ALU can't "hold previous" without state.
-            WAIT: begin
-                Result = Rdest;
-                Flags  = Flags; // harmless; effectively don't-care in comb logic
-            end
-
-            default: begin
-                Result = 16'h0000;
-                Flags  = 5'b00000;
-            end
-        endcase
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            sync  <= 3'b111;
+            prev  <= 1'b1;
+            pulse <= 1'b0;
+        end else begin
+            sync <= {sync[1:0], key_n};   // synchronize
+            pulse <= (prev == 1'b1) && (sync[2] == 1'b0); // falling edge
+            prev <= sync[2];
+        end
     end
 endmodule
