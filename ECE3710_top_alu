@@ -62,8 +62,8 @@ module ECE3710_top (
 
     // Instantiate your ALU (combinational)
     ECE3710_alu dut (
-        .Rdest    (Rdest_reg),
-        .Rsrc_Imm (Rsrc_reg),
+        .Rdest    (16'd2),
+        .Rsrc_Imm (16'd5),
         .Opcode   (Opcode_reg),
         .Result   (alu_result),
         .Flags    (alu_flags)
@@ -117,7 +117,7 @@ module ECE3710_top (
 
     // LEDs: show Flags + low bits of opcode
     assign LEDR[4:0] = Flags_reg;
-    assign LEDR[9:5] = Opcode_reg[4:0];
+    //assign LEDR[9:5] = Opcode_reg[4:0];
 
     // 7-seg helper (active-low segments, common DE1-style)
     // If your digits appear inverted, change "assign HEXx = ..." to "~hex7(...)"
