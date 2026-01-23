@@ -22,18 +22,18 @@
 
 module Register(D_in, wEnable, reset, clk, r
     );
-	 input [3:0] D_in;
-	 input clk, wEnable, reset;
-	 output reg [3:0] r;
+	 input [15:0] Result;
+	 input clk, w_Enable, reset;
+	 output reg [15:0] r;
 	 
  always @( posedge clk )
 	begin
 	if (reset) r <= 4'b0000;
 	else
 		begin			
-			if (wEnable)
+			if (w_Enable)
 				begin
-					r <= D_in;
+					r <= Result;
 				end
 			else
 				begin
@@ -53,14 +53,14 @@ endmodule
 /********/
 module RegBank(ALUBus, r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, regEnable, clk, reset);
 	input clk, reset;
-	input [3:0] ALUBus;
+	input [15:0] ALUBus;
 	input [15:0] regEnable;
-	output [3:0] r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15;
+	output [15:0] r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15;
 
 	
 Register Inst0(
-	.D_in(ALUBus),
-	.wEnable(regEnable[0]),
+	.Result(ALUBus),
+	.w_Enable(regEnable[0]),
 	.reset(reset), 
 	.clk(clk),
 	.r(r0));
@@ -79,7 +79,3 @@ Register Inst12(ALUBus, regEnable[12], reset, clk, r12);
 Register Inst13(ALUBus, regEnable[13], reset, clk, r13);
 Register Inst14(ALUBus, regEnable[14], reset, clk, r14);
 Register Inst15(ALUBus, regEnable[15], reset, clk, r15); 
-
-endmodule
-/**************/
-
