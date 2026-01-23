@@ -1,7 +1,7 @@
 module mux_16to1(
     input [15:0] in0, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15,
     input [3:0] sel,
-    output reg [15:0] out
+	output reg [15:0] out
 );
     always @(*) begin
         case(sel)
@@ -21,6 +21,23 @@ module mux_16to1(
 				4'b1101: out = in13;
 				4'b1110: out = in14;
 				4'b1111: out = in15;
+				default: out = 16'b0;
+				
+        endcase
+    end
+
+endmodule
+
+
+module mux_2to1(
+	input [15:0] in0,in1
+	input [1:0] sel,
+    output reg [15:0] out
+);
+    always @(*) begin
+        case(sel)
+            2'b00: out = in0;  
+            2'b01: out = in1;  
 				default: out = 16'b0;
 				
         endcase
