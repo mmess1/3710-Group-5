@@ -19,7 +19,7 @@
 //   LEDR[4:0]  : Flags_reg [4:0]
 //   LEDR[9:5]  : Opcode_reg[4:0] (quick view)
 
-module ECE3710_top (
+module top_alu (
     input  wire        CLOCK_50,
     input  wire [9:0]  SW,
     input  wire [3:0]  KEY,
@@ -61,7 +61,7 @@ module ECE3710_top (
     localparam [7:0] WAIT = 8'b0000_0000;
 
     // Instantiate your ALU (combinational)
-    ECE3710_alu dut (
+    alu dut (
         .Rdest    (16'd2),
         .Rsrc_Imm (16'd5),
         .Opcode   (Opcode_reg),

@@ -1,6 +1,6 @@
 `timescale 1ps/1ps
 
-module ECE3710_tb_casex_alu;
+module tb_casex_alu;
 
     // Keep these as localparams; your ALU is fixed-width anyway.
     localparam BIT_WIDTH    = 16;
@@ -66,7 +66,7 @@ module ECE3710_tb_casex_alu;
     localparam [7:0] RSHI_PAT  = 8'b1000_xxxx;
 
     // Instantiate ALU (NO parameters)
-    ECE3710_alu uut (
+    alu uut (
         .Rsrc_Imm(Rsrc_Imm),
         .Rdest   (Rdest),
         .Opcode  (Opcode),

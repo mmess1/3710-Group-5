@@ -13,7 +13,7 @@
 //                 Flags[4]=L, Flags[3]=C, Flags[2]=F, Flags[1]=Z, Flags[0]=N
 //////////////////////////////////////////////////////////////////////////////////
 
-module ECE3710_alu(
+module alu(
     input  wire [15:0] Rdest,     // input A
     input  wire [15:0] Rsrc_Imm,   // input B or immediate  (TB name)
     input  wire [7:0]  Opcode,
