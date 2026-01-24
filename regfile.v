@@ -20,11 +20,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module Register(D_in, wEnable, reset, clk, r
-    );
-	 input [15:0] Result;
-	 input clk, w_Enable, reset;
-	 output reg [15:0] r;
+module Register (
+   	 input [15:0] Result,
+	 input clk, w_Enable, reset,
+	 output reg [15:0] r
+);
 	 
  always @( posedge clk )
 	begin
@@ -79,3 +79,5 @@ Register Inst12(ALUBus, regEnable[12], reset, clk, r12);
 Register Inst13(ALUBus, regEnable[13], reset, clk, r13);
 Register Inst14(ALUBus, regEnable[14], reset, clk, r14);
 Register Inst15(ALUBus, regEnable[15], reset, clk, r15); 
+
+endmodule
