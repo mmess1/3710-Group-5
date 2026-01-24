@@ -30,7 +30,7 @@ endmodule
 
 
 module mux_2to1(
-	input [15:0] in0,in1
+	input [15:0] in0,in1,
 	input [1:0] sel,
     output reg [15:0] out
 );
