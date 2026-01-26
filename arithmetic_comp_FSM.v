@@ -30,9 +30,15 @@ module arithmetic_comp_FSM #(
     localparam s_pass = 4'd11;
     localparam s_fail = 4'd12;
     localparam s_final = 4'd13;
+	 
+	 localparam s_and_r9  = 5'd14;
+localparam s_or_r10  = 5'd15;
+localparam s_xor_r11 = 5'd16;
+localparam s_not_r12 = 5'd17;
 
-    reg [3:0] PS; // Present State
-    reg [3:0] NS; // Next State
+
+    reg [4:0] PS; // Present State
+    reg [4:0] NS; // Next State
 
     localparam [7:0] ADD   = 8'b0000_0101;
     localparam [7:0] ADDU  = 8'b0000_0110;
@@ -89,12 +95,18 @@ module arithmetic_comp_FSM #(
             end
 
             s_load_r6: NS = s_load_r7;
-            s_load_r7: NS = s_addu_r8;
-            s_addu_r8: NS = s_pass;
+				s_load_r7:  NS = s_addu_r8;
+				s_addu_r8:  NS = s_and_r9;
+
+				s_and_r9:   NS = s_or_r10;
+				s_or_r10:   NS = s_xor_r11;
+				s_xor_r11:  NS = s_not_r12;
+				s_not_r12:  NS = s_pass;
 
             s_pass: NS = s_final;
             s_fail: NS = s_final;
             s_final: NS = s_final;
+				
             default: NS = s_init;
         endcase
     end
@@ -144,7 +156,7 @@ module arithmetic_comp_FSM #(
             s_add_r2: begin
                 Rsrc_mux_sel = 4'd1;       // R1
                 Rdest_mux_sel = 4'd0;       // R0
-                Imm_mux_sel = 1'b0;       // use register
+                Imm_mux_sel = 1'b0;       //register
                 Imm_val = 16'd0;
                 Opcode = ADD;
                 Reg_File_En = 16'b0000_0000_0000_0100; //R2
@@ -154,7 +166,7 @@ module arithmetic_comp_FSM #(
             s_sub_r3: begin
                 Rsrc_mux_sel = 4'd0;       // R0
                 Rdest_mux_sel = 4'd1;       // R1
-                Imm_mux_sel = 1'b0;       // use register
+                Imm_mux_sel = 1'b0;       //register
                 Imm_val = 16'd0;
                 Opcode = SUB;
                 Reg_File_En = 16'b0000_0000_0000_1000; //R3
@@ -164,7 +176,7 @@ module arithmetic_comp_FSM #(
             s_subi_r4: begin
                 Rsrc_mux_sel = 4'd0;       // don't-care (imm used)
                 Rdest_mux_sel = 4'd0;       // R0 as left operand
-                Imm_mux_sel = 1'b1;       // use immediate
+                Imm_mux_sel = 1'b1;       //immediate
                 Imm_val = 16'h7FFF;
                 Opcode = SUBI;
                 Reg_File_En = 16'b0000_0000_0001_0000; //R4
@@ -174,7 +186,7 @@ module arithmetic_comp_FSM #(
             s_cmp_r0_r1: begin
                 Rsrc_mux_sel = 4'd1;       // R1
                 Rdest_mux_sel = 4'd0;       // R0
-                Imm_mux_sel = 1'b0;       // use register
+                Imm_mux_sel = 1'b0;       //register
                 Imm_val = 16'd0;
                 Opcode = CMP;
                 Reg_File_En = 16'b0000_0000_0000_0000; // no write
@@ -184,7 +196,7 @@ module arithmetic_comp_FSM #(
             s_cmpi_r4_0: begin
                 Rsrc_mux_sel = 4'd0;       // don't-care (imm used)
                 Rdest_mux_sel = 4'd4;       // R4
-                Imm_mux_sel = 1'b1;       // use immediate
+                Imm_mux_sel = 1'b1;       //immediate
                 Imm_val = 16'h0000;
                 Opcode = CMPI;
                 Reg_File_En = 16'b0000_0000_0000_0000; // no write
@@ -217,8 +229,48 @@ module arithmetic_comp_FSM #(
                 Imm_mux_sel = 1'b0;
                 Imm_val = 16'd0;
                 Opcode = ADDU;
-                Reg_File_En = 16'b0000_0001_0000_0000; // enable R8
+                Reg_File_En = 16'b0000_0001_0000_0000; //R8
             end
+				
+				// R9 = R6 AND R7  (FFFF & 0001 = 0001)
+				s_and_r9: begin
+					 Rsrc_mux_sel  = 4'd7;       // R7
+					 Rdest_mux_sel = 4'd6;       // R6
+					 Imm_mux_sel   = 1'b0;
+					 Imm_val       = 16'd0;
+					 Opcode        = AND;
+					 Reg_File_En   = 16'b0000_0010_0000_0000; // R9
+				end
+
+				// R10 = R0 OR R1  (7FFF | 0001 = 7FFF)
+				s_or_r10: begin
+					 Rsrc_mux_sel  = 4'd1;       // R1
+					 Rdest_mux_sel = 4'd0;       // R0
+					 Imm_mux_sel   = 1'b0;
+					 Imm_val       = 16'd0;
+					 Opcode        = OR;
+					 Reg_File_En   = 16'b0000_0100_0000_0000; // R10
+				end
+
+				// R11 = R7 XOR R7  (0001 ^ 0001 = 0000)
+				s_xor_r11: begin
+					 Rsrc_mux_sel  = 4'd7;       // R7
+					 Rdest_mux_sel = 4'd7;       // R7
+					 Imm_mux_sel   = 1'b0;
+					 Imm_val       = 16'd0;
+					 Opcode        = XOR;
+					 Reg_File_En   = 16'b0000_1000_0000_0000; // R11
+				end
+
+				// R12 = NOT R4   (~0000 = FFFF)
+				s_not_r12: begin
+					 Rsrc_mux_sel  = 4'd0;       // don't care
+					 Rdest_mux_sel = 4'd4;       // R4
+					 Imm_mux_sel   = 1'b0;
+					 Imm_val       = 16'd0;
+					 Opcode        = NOT;
+					 Reg_File_En   = 16'b0001_0000_0000_0000; // R12
+				end
 
             // PASS: R15 = 16'h1111
             s_pass: begin
@@ -227,7 +279,7 @@ module arithmetic_comp_FSM #(
                 Imm_mux_sel = 1'b1;
                 Imm_val = 16'h1111;
                 Opcode = MOVI;
-                Reg_File_En = 16'b1000_0000_0000_0000; // enable R15
+                Reg_File_En = 16'b1000_0000_0000_0000; //R15
             end
 
             // FAIL: R15 = 16'hDEAD
@@ -237,7 +289,7 @@ module arithmetic_comp_FSM #(
                 Imm_mux_sel = 1'b1;
                 Imm_val = 16'hDEAD;
                 Opcode = MOVI;
-                Reg_File_En = 16'b1000_0000_0000_0000; // enable R15
+                Reg_File_En = 16'b1000_0000_0000_0000; //R15
             end
 
             // FINAL: hold
@@ -335,17 +387,19 @@ delete wave *
 add wave sim:/tb_arithmetic_comp/Clk
 add wave sim:/tb_arithmetic_comp/Rst
 
+add wave -divider "FSM Status"
 add wave sim:/tb_arithmetic_comp/dut/FSM/PS
 add wave sim:/tb_arithmetic_comp/dut/FSM/NS
+
+add wave -divider "Control Signals"
 add wave sim:/tb_arithmetic_comp/dut/FSM/Opcode
 add wave sim:/tb_arithmetic_comp/dut/FSM/Imm_mux_sel
 add wave sim:/tb_arithmetic_comp/dut/FSM/Imm_val
 add wave sim:/tb_arithmetic_comp/dut/FSM/Rdest_mux_sel
 add wave sim:/tb_arithmetic_comp/dut/FSM/Rsrc_mux_sel
 add wave sim:/tb_arithmetic_comp/dut/FSM/Reg_File_En
-
 add wave sim:/tb_arithmetic_comp/dut/Flags
-
+add wave -divider "Registers"
 add wave sim:/tb_arithmetic_comp/dut/DP/r0
 add wave sim:/tb_arithmetic_comp/dut/DP/r1
 add wave sim:/tb_arithmetic_comp/dut/DP/r2
@@ -354,6 +408,10 @@ add wave sim:/tb_arithmetic_comp/dut/DP/r4
 add wave sim:/tb_arithmetic_comp/dut/DP/r6
 add wave sim:/tb_arithmetic_comp/dut/DP/r7
 add wave sim:/tb_arithmetic_comp/dut/DP/r8
+add wave sim:/tb_arithmetic_comp/dut/DP/r9
+add wave sim:/tb_arithmetic_comp/dut/DP/r10
+add wave sim:/tb_arithmetic_comp/dut/DP/r11
+add wave sim:/tb_arithmetic_comp/dut/DP/r12
 add wave sim:/tb_arithmetic_comp/dut/DP/r15
 
 run 300ns
