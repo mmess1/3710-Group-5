@@ -1,4 +1,4 @@
-module Shift_Add_Acc_FSM #(
+module arithmetic_comp_FSM #(
                            parameter BIT_WIDTH    = 16,
                            parameter OPCODE_WIDTH =  8,
                            parameter FLAG_WIDTH   =  5,
@@ -17,29 +17,32 @@ module Shift_Add_Acc_FSM #(
                           );
 
     localparam s_init = 4'd0; // Initial state
-    localparam s_set_multiplicand = 4'd1; 
-    localparam s_set_multiplier = 4'd2;
-    localparam s_check_multiplier = 4'd3;
-    localparam s_get_lsb = 4'd4;
-    localparam s_check_lsb = 4'd5;
-    localparam s_add_acc = 4'd6;
-    localparam s_shift_multiplicand = 4'd7;
-    localparam s_shift_multiplier = 4'd8;
-    localparam s_final = 4'd9;
+    localparam s_load_r0 = 4'd1;
+    localparam s_load_r1 = 4'd2;
+    localparam s_add_r2 = 4'd3;
+    localparam s_sub_r3 = 4'd4;
+    localparam s_subi_r4 = 4'd5;
+    localparam s_cmp_r0_r1 = 4'd6;
+    localparam s_cmpi_r4_0 = 4'd7;
+    localparam s_load_r6 = 4'd8;
+    localparam s_load_r7 = 4'd9;
+    localparam s_addu_r8 = 4'd10;
+    localparam s_pass = 4'd11;
+    localparam s_fail = 4'd12;
+    localparam s_final = 4'd13;
 
     reg [3:0] PS; // Present State
     reg [3:0] NS; // Next State
 
-    localparam ADD   = 8'b0000_0101;
-    localparam ADDI  = 8'b0101_xxxx;
-    localparam ADDU  = 8'b0000_0110;
+    localparam [7:0] ADD   = 8'b0000_0101;
+    localparam [7:0] ADDU  = 8'b0000_0110;
     localparam ADDUI = 8'b0110_xxxx;
     localparam ADDC  = 8'b0000_0111;
     localparam ADDCI = 8'b0111_xxxx;
-    localparam SUB   = 8'b0000_1001;
-    localparam SUBI  = 8'b1001_xxxx;
-    localparam CMP   = 8'b0000_1011;
-    localparam CMPI  = 8'b1011_xxxx;
+    localparam [7:0] SUB   = 8'b0000_1001;
+    localparam [7:0] SUBI  = 8'b1001_0000;
+    localparam [7:0] CMP   = 8'b0000_1011;
+    localparam [7:0] CMPI  = 8'b1011_0000;
     localparam AND   = 8'b0000_0001;
     localparam ANDI  = 8'b0001_xxxx;
     localparam OR    = 8'b0000_0010;
@@ -53,178 +56,308 @@ module Shift_Add_Acc_FSM #(
     localparam RSH   = 8'b1000_100x;
     localparam RSHI  = 8'b1000_101x;
     localparam NOT   = 8'b0000_0100;
-    localparam NOP   = 8'b0000_0000;
+    localparam [7:0] NOP   = 8'b0000_0000;
+
+
+
+    localparam [7:0] MOV   = 8'b0000_1101;
+    localparam [7:0] MOVI  = 8'b1101_0000;
 
 
     // Init PS to the inital state or next state
-	always@(posedge Clk, negedge Rst) begin
-		if(~Rst)
-			PS <= s_init;
-		else
-			PS <= NS;
-	end
+    always @(posedge Clk, negedge Rst) begin
+        if (~Rst)
+            PS <= s_init;
+        else
+            PS <= NS;
+    end
 
     // Set Next State
-	always@(PS) begin
-		case(PS)
+    always @(*) begin
+        case (PS)
+            s_init: NS = s_load_r0;
+            s_load_r0: NS = s_load_r1;
+            s_load_r1: NS = s_add_r2;
+            s_add_r2: NS = s_sub_r3;
+            s_sub_r3: NS = s_subi_r4;
+            s_subi_r4: NS = s_cmp_r0_r1;
+            s_cmp_r0_r1: NS = s_cmpi_r4_0;
+
+            s_cmpi_r4_0: begin
+                if (Flags[1] == 1'b1) NS = s_load_r6;
+                else                  NS = s_fail;
+            end
+
+            s_load_r6: NS = s_load_r7;
+            s_load_r7: NS = s_addu_r8;
+            s_addu_r8: NS = s_pass;
+
+            s_pass: NS = s_final;
+            s_fail: NS = s_final;
+            s_final: NS = s_final;
+            default: NS = s_init;
+        endcase
+    end
+
+   // Set Outputs
+    always @(*) begin
+        Rsrc_mux_sel =  4'dx;
+        Rdest_mux_sel =  4'dx;
+        Imm_mux_sel =  1'bx;
+        Imm_val = 16'dx;
+        Opcode =  8'dx;
+        Reg_File_En = 16'dx;
+
+        case (PS)
+
+            // INIT
             s_init: begin
-               NS = s_set_multiplicand; 
+                Rsrc_mux_sel = 4'd0;
+                Rdest_mux_sel = 4'd0;
+                Imm_mux_sel = 1'b0;
+                Imm_val = 16'd0;
+                Opcode = NOP;
+                Reg_File_En = 16'b0000_0000_0000_0000;
             end
-            s_set_multiplicand: begin
-                NS = s_set_multiplier;
+
+            // R0 = 16'h7FFF
+            s_load_r0: begin
+                Rsrc_mux_sel = 4'd0;
+                Rdest_mux_sel = 4'd0;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'h7FFF;
+                Opcode = MOVI;
+                Reg_File_En = 16'b0000_0000_0000_0001; //R0
             end
-            s_set_multiplier: begin
-                NS = s_check_multiplier;
+
+            // R1 = 16'h0001
+            s_load_r1: begin
+                Rsrc_mux_sel = 4'd1;
+                Rdest_mux_sel = 4'd1;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'h0001;
+                Opcode = MOVI;
+                Reg_File_En = 16'b0000_0000_0000_0010; //R1
             end
-            s_check_multiplier: begin
-                if (~Flags[3]) begin
-                    NS = s_get_lsb;
-                end
-                else begin
-                    NS = s_final;
-                end
+
+            // R2 = R0 + R1  (signed ADD, overflow test)
+            s_add_r2: begin
+                Rsrc_mux_sel = 4'd1;       // R1
+                Rdest_mux_sel = 4'd0;       // R0
+                Imm_mux_sel = 1'b0;       // use register
+                Imm_val = 16'd0;
+                Opcode = ADD;
+                Reg_File_En = 16'b0000_0000_0000_0100; //R2
             end
-            s_get_lsb: begin
-                NS = s_check_lsb;
+
+            // R3 = R1 - R0  (signed SUB, negative test)
+            s_sub_r3: begin
+                Rsrc_mux_sel = 4'd0;       // R0
+                Rdest_mux_sel = 4'd1;       // R1
+                Imm_mux_sel = 1'b0;       // use register
+                Imm_val = 16'd0;
+                Opcode = SUB;
+                Reg_File_En = 16'b0000_0000_0000_1000; //R3
             end
-            s_check_lsb: begin
-                if (~Flags[3]) begin
-                    NS = s_add_acc;
-                end
-                else begin
-                    NS = s_shift_multiplicand;
-                end
+
+            // R4 = R0 - 16'h7FFF  (SUBI => should become 0)
+            s_subi_r4: begin
+                Rsrc_mux_sel = 4'd0;       // don't-care (imm used)
+                Rdest_mux_sel = 4'd0;       // R0 as left operand
+                Imm_mux_sel = 1'b1;       // use immediate
+                Imm_val = 16'h7FFF;
+                Opcode = SUBI;
+                Reg_File_En = 16'b0000_0000_0001_0000; //R4
             end
-            s_add_acc: begin
-                NS = s_shift_multiplicand;
+
+            // CMP R0 ? R1 (flags only, no write)
+            s_cmp_r0_r1: begin
+                Rsrc_mux_sel = 4'd1;       // R1
+                Rdest_mux_sel = 4'd0;       // R0
+                Imm_mux_sel = 1'b0;       // use register
+                Imm_val = 16'd0;
+                Opcode = CMP;
+                Reg_File_En = 16'b0000_0000_0000_0000; // no write
             end
-            s_shift_multiplicand: begin
-                NS = s_shift_multiplier;
+
+            // CMPI R4 ? 0 (flags only, branches on Z)
+            s_cmpi_r4_0: begin
+                Rsrc_mux_sel = 4'd0;       // don't-care (imm used)
+                Rdest_mux_sel = 4'd4;       // R4
+                Imm_mux_sel = 1'b1;       // use immediate
+                Imm_val = 16'h0000;
+                Opcode = CMPI;
+                Reg_File_En = 16'b0000_0000_0000_0000; // no write
             end
-            s_shift_multiplier: begin
-                NS = s_check_multiplier;
+
+            // R6 = 0xFFFF
+            s_load_r6: begin
+                Rsrc_mux_sel = 4'd6;
+                Rdest_mux_sel = 4'd6;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'hFFFF;
+                Opcode = MOVI;
+                Reg_File_En = 16'b0000_0000_0100_0000; // enable R6
             end
+
+            // R7 = 0x0001
+            s_load_r7: begin
+                Rsrc_mux_sel = 4'd7;
+                Rdest_mux_sel = 4'd7;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'h0001;
+                Opcode = MOVI;
+                Reg_File_En = 16'b0000_0000_1000_0000; // enable R7
+            end
+
+            // R8 = R6 + R7 (ADDU => expect 0 with Carry=1)
+            s_addu_r8: begin
+                Rsrc_mux_sel = 4'd7;       // R7
+                Rdest_mux_sel = 4'd6;       // R6
+                Imm_mux_sel = 1'b0;
+                Imm_val = 16'd0;
+                Opcode = ADDU;
+                Reg_File_En = 16'b0000_0001_0000_0000; // enable R8
+            end
+
+            // PASS: R15 = 16'h1111
+            s_pass: begin
+                Rsrc_mux_sel = 4'd15;
+                Rdest_mux_sel = 4'd15;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'h1111;
+                Opcode = MOVI;
+                Reg_File_En = 16'b1000_0000_0000_0000; // enable R15
+            end
+
+            // FAIL: R15 = 16'hDEAD
+            s_fail: begin
+                Rsrc_mux_sel = 4'd15;
+                Rdest_mux_sel = 4'd15;
+                Imm_mux_sel = 1'b1;
+                Imm_val = 16'hDEAD;
+                Opcode = MOVI;
+                Reg_File_En = 16'b1000_0000_0000_0000; // enable R15
+            end
+
+            // FINAL: hold
             s_final: begin
-                NS = s_final;
+                Rsrc_mux_sel = 4'd0;
+                Rdest_mux_sel = 4'd0;
+                Imm_mux_sel = 1'b0;
+                Imm_val = 16'd0;
+                Opcode = NOP;
+                Reg_File_En = 16'b0000_0000_0000_0000;
             end
-			default: NS = s_init;
-		endcase
-	end
-	
-    // Set Outputs
-	always@(PS)begin
-        Rsrc_mux_sel  =  4'dx; 
-        Rdest_mux_sel =  4'dx; 
-        Imm_mux_sel   =  1'bx;
-        Imm_val       = 16'bx;
-        Opcode        =  8'bx; 
-        Reg_File_En   = 16'bx;
 
-		case(PS)
-            s_init: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'dx; 
-                Imm_mux_sel   =  1'bx;
-                Imm_val       = 16'dx;
-                Opcode        =  8'bx; 
-                Reg_File_En   = 16'dx;
-            end
-            s_set_multiplicand: begin
-                Rsrc_mux_sel  =   4'd0; 
-                Rdest_mux_sel =   4'd0; 
-                Imm_mux_sel   =   1'b1;
+        endcase
+    end
 
-                // 1st Test Values
-                // Imm_val       = 16'd11;
-                
-                // 2nd Test Values
-                // Imm_val       = 16'd8;
-                
-                // 3rd Test Values
-                // Imm_val       = 16'd7;
-
-                // Waveform Screenshot values
-                Imm_val       = 16'd6;
-                
-                Opcode        =  ADDUI; 
-                Reg_File_En   =  16'b0000000000000001;
-            end
-            s_set_multiplier: begin
-                Rsrc_mux_sel  =   4'd1; 
-                Rdest_mux_sel =   4'd1; 
-                Imm_mux_sel   =   1'b1;
-
-                // 1st Test Values
-                //Imm_val       =  16'd8;
-                
-                // 2nd Test Values
-                // Imm_val       =  16'd7;
-
-                // 3rd Test Values
-                // Imm_val       =  16'd40;
-
-                // Waveform Screenshot values
-                Imm_val       =  16'd5;
-
-                Opcode        =  ADDUI; 
-                Reg_File_En   =  16'b0000000000000010;
-            end
-            s_check_multiplier: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'd1; 
-                Imm_mux_sel   =  1'b1;
-                Imm_val       = 16'd0;
-                Opcode        =  CMPI; 
-                Reg_File_En   = 16'bx;
-            end
-            s_get_lsb: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'd1; 
-                Imm_mux_sel   =  1'b1;
-                Imm_val       = 16'd1;
-                Opcode        =   AND; 
-                Reg_File_En   = 16'dx;
-            end
-            s_check_lsb: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'dx; 
-                Imm_mux_sel   =  1'bx;
-                Imm_val       = 16'dx;
-                Opcode        =   NOP; 
-                Reg_File_En   = 16'dx;
-            end
-            s_add_acc: begin
-                Rsrc_mux_sel  =  4'd0; 
-                Rdest_mux_sel =  4'd2; 
-                Imm_mux_sel   =  1'b0;
-                Imm_val       = 16'dx;
-                Opcode        =  ADDU; 
-                Reg_File_En   = 16'b0000000000000100;
-            end
-            s_shift_multiplicand: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'd0; 
-                Imm_mux_sel   =  1'b1;
-                Imm_val       = 16'd1;
-                Opcode        =  LSHI; 
-                Reg_File_En   = 16'b0000000000000001;
-            end
-            s_shift_multiplier: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'd1; 
-                Imm_mux_sel   =  1'b1;
-                Imm_val       = 16'd1;
-                Opcode        =  RSHI; 
-                Reg_File_En   = 16'b0000000000000010;
-            end
-            s_final: begin
-                Rsrc_mux_sel  =  4'dx; 
-                Rdest_mux_sel =  4'dx; 
-                Imm_mux_sel   =  1'bx;
-                Imm_val       = 16'dx;
-                Opcode        =   NOP; 
-                Reg_File_En   = 16'dx;
-            end
-		endcase
-	end
 endmodule
+
+module arithmetic_comp_FSM_TOP (
+    input  wire Clk,
+    input  wire Rst
+);
+
+    wire [3:0]  Rsrc_mux_sel;
+    wire [3:0]  Rdest_mux_sel;
+    wire        Imm_mux_sel;
+    wire [15:0] Imm_val;
+    wire [7:0]  Opcode;
+    wire [15:0] Reg_File_En;
+
+    wire [4:0]  Flags;
+
+    wire reset_hi = ~Rst;
+
+    arithmetic_comp_FSM FSM (
+        .Clk(Clk),
+        .Rst(Rst),
+        .Flags(Flags),
+
+        .Rsrc_mux_sel(Rsrc_mux_sel),
+        .Rdest_mux_sel(Rdest_mux_sel),
+        .Imm_mux_sel(Imm_mux_sel),
+        .Imm_val(Imm_val),
+        .Opcode(Opcode),
+        .Reg_File_En(Reg_File_En)
+    );
+
+    data_path DP (
+        .clk(Clk),
+        .reset(reset_hi),
+
+        .wEnable(Reg_File_En),
+        .Imm_in(Imm_val),
+        .opcode(Opcode),
+
+        .Rdest_select(Rdest_mux_sel),
+        .Rsrc_select(Rsrc_mux_sel),
+        .Imm_select(Imm_mux_sel),
+
+        .Flags_out(Flags)
+    );
+
+endmodule
+
+`timescale 1ns/1ps
+
+module tb_arithmetic_comp;
+
+    reg Clk;
+    reg Rst;
+
+    arithmetic_comp_FSM_TOP dut (
+        .Clk(Clk),
+        .Rst(Rst)
+    );
+
+    initial begin
+        Clk = 0;
+        forever #5 Clk = ~Clk;
+    end
+
+    initial begin
+        Rst = 0;       // ACTIVE-LOW reset asserted
+        #20;
+        Rst = 1;       // release reset
+        #500;
+        $stop;
+    end
+
+endmodule
+
+/*
+restart -f
+delete wave *
+
+add wave sim:/tb_arithmetic_comp/Clk
+add wave sim:/tb_arithmetic_comp/Rst
+
+add wave sim:/tb_arithmetic_comp/dut/FSM/PS
+add wave sim:/tb_arithmetic_comp/dut/FSM/NS
+add wave sim:/tb_arithmetic_comp/dut/FSM/Opcode
+add wave sim:/tb_arithmetic_comp/dut/FSM/Imm_mux_sel
+add wave sim:/tb_arithmetic_comp/dut/FSM/Imm_val
+add wave sim:/tb_arithmetic_comp/dut/FSM/Rdest_mux_sel
+add wave sim:/tb_arithmetic_comp/dut/FSM/Rsrc_mux_sel
+add wave sim:/tb_arithmetic_comp/dut/FSM/Reg_File_En
+
+add wave sim:/tb_arithmetic_comp/dut/Flags
+
+add wave sim:/tb_arithmetic_comp/dut/DP/r0
+add wave sim:/tb_arithmetic_comp/dut/DP/r1
+add wave sim:/tb_arithmetic_comp/dut/DP/r2
+add wave sim:/tb_arithmetic_comp/dut/DP/r3
+add wave sim:/tb_arithmetic_comp/dut/DP/r4
+add wave sim:/tb_arithmetic_comp/dut/DP/r6
+add wave sim:/tb_arithmetic_comp/dut/DP/r7
+add wave sim:/tb_arithmetic_comp/dut/DP/r8
+add wave sim:/tb_arithmetic_comp/dut/DP/r15
+
+run 300ns
+*/
+
+
+
