@@ -4,6 +4,7 @@ module data_path(
    input wire [7:0] opcode, 
    input wire [3:0] Rdest_select, Rsrc_select,
 	input wire Imm_select
+	    output wire [4:0] Flags_out
 );
 	 
 	  wire [15:0] RegBank_out;
