@@ -22,13 +22,13 @@
 
 module Register (
    	 input [15:0] Result,
-	 input clk, w_Enable, reset,
+	 input w_Enable, reset, clk,
 	 output reg [15:0] r
 );
 	 
  always @( posedge clk )
 	begin
-	if (reset) r <= 4'b0000;
+	if (reset) r <= 16'h0000;
 	else
 		begin			
 			if (w_Enable)

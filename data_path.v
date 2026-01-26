@@ -1,8 +1,8 @@
-
 module data_path(
 	input wire clk, reset,
    input [15:0] wEnable, Imm_in,
-   input wire [7:0] opcode, Rdest_select, Rsrc_select,
+   input wire [7:0] opcode, 
+   input wire [3:0] Rdest_select, Rsrc_select,
 	input wire Imm_select
 );
 	 
@@ -32,7 +32,7 @@ module data_path(
 		wire[15:0] Rsrc_mux_out;
 		
 		wire [15:0] alu_bus;
-		wire [5:0] flags;
+		wire [4:0] flags;
 	 
 		 
 	 
@@ -40,6 +40,7 @@ RegBank RegBank (
     .clk    (clk),
     .regEnable(wEnable),
     .reset  (reset),
+    .ALUBus (alu_bus),
 
     .r0     (r0),
     .r1     (r1),
@@ -62,28 +63,6 @@ RegBank RegBank (
 
 mux_16to1 Rdest_mux (
     .sel (Rdest_select),
-
-    .in0  (r0),
-    .in1  (r1),
-    .in2  (r2),
-    .in3  (r3),
-    .in4  (r4),
-    .in5  (r5),
-    .in6  (r6),
-    .in7  (r7),
-    .in8  (r8),
-    .in9  (r9),
-    .in10 (r10),
-    .in11 (r11),
-    .in12 (r12),
-    .in13 (r13),
-    .in14 (r14),
-    .in15 (r15)
-);
-
-mux_16to1 Rsrc_mux (
-    .sel (Rscst_select),
-
     .in0  (r0),
     .in1  (r1),
     .in2  (r2),
@@ -100,8 +79,29 @@ mux_16to1 Rsrc_mux (
     .in13 (r13),
     .in14 (r14),
     .in15 (r15),
-	 
-	 .out(Rsrc_mux_out)
+    .out(Rdest_mux_out)
+
+);
+
+mux_16to1 Rsrc_mux (
+    .sel (Rsrc_select),
+    .in0  (r0),
+    .in1  (r1),
+    .in2  (r2),
+    .in3  (r3),
+    .in4  (r4),
+    .in5  (r5),
+    .in6  (r6),
+    .in7  (r7),
+    .in8  (r8),
+    .in9  (r9),
+    .in10 (r10),
+    .in11 (r11),
+    .in12 (r12),
+    .in13 (r13),
+    .in14 (r14),
+    .in15 (r15),
+    .out(Rsrc_mux_out)
 );
 
  mux_2to1 Rsrc_Imm_mux (
