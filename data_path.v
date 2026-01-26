@@ -3,8 +3,8 @@ module data_path(
    input [15:0] wEnable, Imm_in,
    input wire [7:0] opcode, 
    input wire [3:0] Rdest_select, Rsrc_select,
-	input wire Imm_select
-	    output wire [4:0] Flags_out
+	input wire Imm_select,
+	output wire [4:0] Flags_out
 );
 	 
 	  wire [15:0] RegBank_out;
@@ -34,9 +34,8 @@ module data_path(
 		
 		wire [15:0] alu_bus;
 		wire [4:0] flags;
-	 
-		 
-	 
+
+			 
 RegBank RegBank (
     .clk    (clk),
     .regEnable(wEnable),
@@ -81,7 +80,6 @@ mux_16to1 Rdest_mux (
     .in14 (r14),
     .in15 (r15),
     .out(Rdest_mux_out)
-
 );
 
 mux_16to1 Rsrc_mux (
@@ -107,8 +105,8 @@ mux_16to1 Rsrc_mux (
 
  mux_2to1 Rsrc_Imm_mux (
     .sel (Imm_select),
-    .in0  (Imm_in),
-    .in1  (Rsrc_mux_out),
+    .in0  (Rsrc_mux_out),
+    .in1  (Imm_in),
 	 .out(Rsrc_Imm_mux_out)
 );
 
@@ -117,7 +115,7 @@ mux_16to1 Rsrc_mux (
         .Rsrc_Imm (Rsrc_Imm_mux_out),
         .Opcode   (opcode),
         .Result   (alu_bus),
-        .Flags    (flags)
+        .Flags    (Flags_out)
 );
 
 endmodule
