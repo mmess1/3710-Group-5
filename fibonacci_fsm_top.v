@@ -22,13 +22,20 @@ module fibonacci_fsm_top (
 	 
 	wire [15:0] r5;
    wire [4:0]  Flags;
+	
+	//clock div
+	 wire clk_slow;
 
-   // wire reset_hi = ~Rst;
+    clock_divider #(.DIV(5_000_000)) u_div (
+        .clk_in (CLOCK_50),
+        .reset  (Rst),
+        .clk_out(clk_slow)
+    );
 	 
 	 
 
     fibonacci_fsm fibfsm (
-        .clk(CLOCK_50),
+        .clk(clk_slow),
         .reset(Rst),
         .Flags_out(Flags),
 
@@ -41,7 +48,7 @@ module fibonacci_fsm_top (
     );
 	 
     data_path dap (
-        .clk(CLOCK_50),
+        .clk(clk_slow),
         .reset(Rst),
 
         .wEnable(Reg_File_En),
@@ -87,4 +94,26 @@ module fibonacci_fsm_top (
     assign HEX3 = hex7(r5[15:12]);
 	 
 		 
+endmodule
+
+module clock_divider #(parameter integer DIV = 5_000_000) (
+    input  wire clk_in,
+    input  wire reset,
+    output reg  clk_out
+);
+    integer cnt;
+
+    always @(posedge clk_in or negedge reset) begin
+        if (!reset) begin
+            cnt     <= 0;
+            clk_out <= 1'b0;
+        end else begin
+            if (cnt == DIV-1) begin
+                cnt     <= 0;
+                clk_out <= ~clk_out;
+            end else begin
+                cnt <= cnt + 1;
+            end
+        end
+    end
 endmodule

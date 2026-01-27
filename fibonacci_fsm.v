@@ -35,8 +35,8 @@ module fibonacci_fsm (
 	localparam [15:0] N_VALUE = 16'd10;
 	
 	// Update state registers on every clock cycle
-	always @(posedge clk) begin
-		if (reset) // check for reset button
+	always @(posedge clk or negedge reset) begin
+		if (!reset) // check for reset button
 			PS <= RESET;
 		else
 			PS <= NS;

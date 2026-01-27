@@ -4,7 +4,9 @@ module data_path(
    input wire [7:0] opcode, 
    input wire [3:0] Rdest_select, Rsrc_select,
 	input wire Imm_select,
-	output wire [4:0] Flags_out
+	output wire [4:0] Flags_out,
+	output wire [15:0] r5
+
 );
 	 
 	  wire [15:0] RegBank_out;
@@ -14,8 +16,7 @@ module data_path(
 		wire [15:0] r2;
 		wire [15:0] r3;
 		wire [15:0] r4;
-		wire [15:0] r5;
-
+		
 		wire [15:0] r6;
 		wire [15:0] r7;
 		wire [15:0] r8;
@@ -105,8 +106,8 @@ mux_16to1 Rsrc_mux (
 
  mux_2to1 Rsrc_Imm_mux (
     .sel (Imm_select),
-    .in0  (Rsrc_mux_out),
-    .in1  (Imm_in),
+    .in0  (Imm_in),
+    .in1  (Rsrc_mux_out),
 	 .out(Rsrc_Imm_mux_out)
 );
 
