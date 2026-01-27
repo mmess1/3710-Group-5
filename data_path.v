@@ -105,10 +105,10 @@ mux_16to1 Rsrc_mux (
 );
 
  mux_2to1 Rsrc_Imm_mux (
-    .sel (Imm_select),
-    .in0  (Imm_in),
-    .in1  (Rsrc_mux_out),
-	 .out(Rsrc_Imm_mux_out)
+	.in0 (Rsrc_mux_out),
+	.in1 (Imm_in),
+	.sel (Imm_select),
+	.out(Rsrc_Imm_mux_out)
 );
 
  alu alu(

@@ -96,7 +96,7 @@ module fibonacci_fsm_top (
 		 
 endmodule
 
-module clock_divider #(parameter integer DIV = 5_000_000) (
+module clock_divider #(parameter integer DIV = 3_000_000) (
     input  wire clk_in,
     input  wire reset,
     output reg  clk_out

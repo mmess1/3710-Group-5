@@ -321,8 +321,6 @@ module arithmetic_comp_FSM_TOP (
 
     wire [4:0]  Flags;
 
-    wire reset_hi = ~Rst;
-
     arithmetic_comp_FSM FSM (
         .Clk(Clk),
         .Rst(Rst),
@@ -338,7 +336,7 @@ module arithmetic_comp_FSM_TOP (
 
     data_path DP (
         .clk(Clk),
-        .reset(reset_hi),
+        .reset(Rst),
 
         .wEnable(Reg_File_En),
         .Imm_in(Imm_val),
@@ -416,6 +414,3 @@ add wave sim:/tb_arithmetic_comp/dut/DP/r15
 
 run 300ns
 */
-
-
-

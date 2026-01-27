@@ -36,8 +36,8 @@ module mux_2to1(
 );
     always @(*) begin
         case(sel)
-            1'b0: out = in0;  
-            1'b1: out = in1;  
+            2'b00: out = in0;  
+            2'b01: out = in1;  
 				default: out = 16'b0;
 				
         endcase

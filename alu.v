@@ -37,9 +37,7 @@ module alu(
     localparam [7:0] MULI  = 8'b1110_0000;
 
     localparam [7:0] SUB   = 8'b0000_1001;
-    localparam [7:0] SUBC  = 8'b0000_1010;
     localparam [7:0] SUBI  = 8'b1001_0000;
-    localparam [7:0] SUBCI = 8'b1010_0000;
 
     localparam [7:0] CMP   = 8'b0000_1011;
     localparam [7:0] CMPI  = 8'b1011_0000;
