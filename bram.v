@@ -2,7 +2,7 @@
 // True Dual Port RAM with single clock
 
 module bram
-#(parameter DATA_WIDTH=16, parameter ADDR_WIDTH=10)
+#(parameter DATA_WIDTH=16, parameter ADDR_WIDTH=10, parameter DATA_FILE="")
 (
 	input [(DATA_WIDTH-1):0] data_a, data_b,
 	input [(ADDR_WIDTH-1):0] addr_a, addr_b,
@@ -17,12 +17,16 @@ module bram
 	begin
 		for(i=0;i<1024;i=i+1)
 			ram[i] = i[15:0]; 
+
+		if (DATA_FILE != "")
+    	$readmemh(DATA_FILE, ram);
 	end
+
 
 	// Port A 
 	always @ (posedge clk)
 	begin
-		if (en_b) 
+		if (en_a) 
 			if (we_a) 
 			begin
 				ram[addr_a] <= data_a;
