@@ -42,7 +42,9 @@ module bram_FSM #(
         case (PS)
             s_init:  NS = s_1;
             s_1:   NS = s_2;
-            s_2:   NS = s_final;
+            s_2:   NS = ...;
+
+            ...
             s_final: NS = s_final;
             default: NS = s_init;
         endcase
