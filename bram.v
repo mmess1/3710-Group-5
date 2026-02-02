@@ -16,7 +16,7 @@ module bram
 	initial
 	begin
 		for(i=0;i<512;i=i+1)
-			ram[i] = i[15:0]; 
+			ram[i] = 0;
 
 		if (DATA_FILE != "")
     	$readmemh(DATA_FILE, ram);
