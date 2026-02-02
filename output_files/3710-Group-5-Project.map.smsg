@@ -1,0 +1,6 @@
+Info (10281): Verilog HDL Declaration information at fibonacci_fsm.v(3): object "reset" differs only in case from object "RESET" in the same scope File: C:/Users/mmess/3710-Group-5/LAB2-tbs/fibonacci_fsm.v Line: 3
+Warning (10273): Verilog HDL warning at arithmetic_comp_FSM.v(116): extended using "x" or "z" File: C:/Users/mmess/3710-Group-5/LAB2-tbs/arithmetic_comp_FSM.v Line: 116
+Warning (10273): Verilog HDL warning at arithmetic_comp_FSM.v(117): extended using "x" or "z" File: C:/Users/mmess/3710-Group-5/LAB2-tbs/arithmetic_comp_FSM.v Line: 117
+Warning (10273): Verilog HDL warning at arithmetic_comp_FSM.v(119): extended using "x" or "z" File: C:/Users/mmess/3710-Group-5/LAB2-tbs/arithmetic_comp_FSM.v Line: 119
+Warning (10273): Verilog HDL warning at arithmetic_comp_FSM.v(120): extended using "x" or "z" File: C:/Users/mmess/3710-Group-5/LAB2-tbs/arithmetic_comp_FSM.v Line: 120
+Warning (10273): Verilog HDL warning at arithmetic_comp_FSM.v(121): extended using "x" or "z" File: C:/Users/mmess/3710-Group-5/LAB2-tbs/arithmetic_comp_FSM.v Line: 121

@@ -1,0 +1,7 @@
+
+State Machine - |bram_FSM_TOP|bram_FSM:FSM|PS
+Name PS.s_final PS.s_write PS.s_read PS.s_init 
+PS.s_init 0 0 0 0 
+PS.s_read 0 0 1 1 
+PS.s_write 0 1 0 1 
+PS.s_final 1 0 0 1 
