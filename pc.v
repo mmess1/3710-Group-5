@@ -3,15 +3,15 @@ module pc(
 	input wire rst;
 	input wire clk;
 	
-	output wire[31:0] pc_count;
+	output wire[15:0] pc_count;
 	);
 	
 
-   always @(posedge clk, posedge rst) begin
-		if (rst)
-			pc_count <= 32'd0;
+   always @(posedge clk, negedge rst) begin
+		if (!rst)
+			pc_count <= 16'd0;
 		else if (pc_en)
-			pc_count <= pc_count + 32'd1;
+			pc_count <= pc_count + 16'd1;
 		end
 	end
 endmodule
