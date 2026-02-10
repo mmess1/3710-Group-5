@@ -46,6 +46,11 @@ localparam [15:0] ARSH  = 16'b0000_xxxx_1111_xxxx;
 localparam [15:0] ARSHI = 16'b1111_xxxx_xxxx_xxxx;
 localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 
+
+// load store;
+localparam [15:0] LOAD 16'b0100_xxxx_0000_xxxx;
+localparam [15:0] STOR 16'b0100_xxxx_0100_xxxx;
+
 /*************************************************************************
                         Decoder Logic:
 *************************************************************************/
