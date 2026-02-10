@@ -1,9 +1,9 @@
 module pc(
-	input wire pc_en;
-	input wire rst;
-	input wire clk;
+	input wire pc_en,
+	input wire rst,
+	input wire clk,
 	
-	output wire[15:0] pc_count;
+	output reg[15:0] pc_count
 	);
 	
 
@@ -12,6 +12,6 @@ module pc(
 			pc_count <= 16'd0;
 		else if (pc_en)
 			pc_count <= pc_count + 16'd1;
-		end
+		
 	end
 endmodule
