@@ -3,15 +3,15 @@ module decode_fsm (
     input  wire        reset,     // active-low reset
 
     // instruction set coming from hard-coded values in top-level module
-    input  wire [15:0]  instr_set;  
+    input  wire [15:0] instr_set,
 
     // FSM outputs (match slide names)
-    output reg         pc_en,       // PCe
-    output reg         w_en,         // write enable
-    output reg  [3:0]  rsrc,
-    output reg  [3:0]  rdest,
-    output reg  [7:0]  opcode,
-    output reg         imm_sel,     // R/I
+   output reg         pc_en,       // PC enable
+   output reg         w_en,         // write enable
+   output reg  [3:0]  rsrc,        // source register
+   output reg  [3:0]  rdest,       // destination register
+   output reg  [7:0]  opcode,      // opcode
+   output reg         imm_sel      // Immediate select (R/I type)
 );
 
     // state encoding
@@ -33,54 +33,77 @@ module decode_fsm (
     always @(*) begin
         NS = PS;
         case (PS)
-            S0_FETCH:   NS = S1_DECODE;
-
-            S1_DECODE: 	NS = S2_EXECUTE; 
-
-            S2_EXECUTE: NS = S0_FETCH;
-
+            S0_FETCH:   NS = S1_DECODE;    // Move to decode state
+            S1_DECODE: 	NS = S2_EXECUTE;  // Move to execute state
+            S2_EXECUTE: NS = S0_FETCH;    // Back to fetch state
             default:    NS = S0_FETCH;
         endcase
     end
-	 
-	 
-    // Output logic 
+
+    // Decoder Module Instantiation
+   wire [15:0] wEnable;
+   wire [15:0] Imm_in;
+   wire [7:0]  decoded_opcode;
+   wire [3:0]  decoded_Rdest, decoded_Rsrc_Imm;
+  wire        decoded_Imm_sel;
+  reg decoder_en;
+
+    decoder u_decoder (
+        .instr_set(instr_set),
+        .clk(clk),
+        .reset(reset),
+        .wEnable(wEnable),
+        .Imm_in(Imm_in),
+        .opcode(decoded_opcode),
+        .Rdest(decoded_Rdest),
+        .Rsrc_Imm(decoded_Rsrc_Imm),
+        .Imm_select(decoded_Imm_sel)
+    );
+
+    // Output logic (based on FSM state)
     always @(*) begin
-        // set defaults
-		  pc_en   = 1'b0;
-		  w_en	 = 1'b0;
+        // Default values
+		  
+        pc_en   = 1'b0;
+        w_en    = 1'b0;
         rsrc    = 4'b0000;
         rdest   = 4'b0000;
         opcode  = 8'h00;
         imm_sel = 1'b0;
-
+		  decoder_en = 1'b0;
 
         case (PS)
             S0_FETCH: begin
-					 // does nothing
+                // Does nothing during fetch state
                 pc_en   = 1'b0;
-                w_en     = 1'b0;
+                w_en    = 1'b0;
             end
 
             S1_DECODE: begin
-                pc_en   = 1'b0;
-					 
-					 decoder u_decoder(
-						.instr_set(instr_set),
-						.clk(clk),
-						.reset(reset),
-						.wEnable(w_en),
-						.Imm_select(imm_sel)
-						.opcode(opcode),
-						.Rdest(rdest),
-						.Rsrc_Imm(rsrc),
-					);
-
+                // Decode instruction; `pc_en` and `w_en` stay low
+                // `rsrc`, `rdest`, `opcode`, and `imm_sel` are set by the decoder
+               
+					 decoder_en = 1'b1;
+					rsrc    = decoded_Rsrc_Imm;
+                rdest   = decoded_Rdest;
+                opcode  = decoded_opcode;
+                imm_sel = decoded_Imm_sel;
             end
 
             S2_EXECUTE: begin
-                pc_en   = 1'b1;          //  PC increments
-					 w_en		= 1'b1;			  // 	write to reg file
+                // Execute state: Enable PC increment and writing to registers
+                pc_en   = 1'b1;  // PC increments
+                w_en    = 1'b1;  // Write to register file
+            end
+
+            default: begin
+                // Default case (failsafe)
+                pc_en   = 1'b0;
+                w_en    = 1'b0;
+                rsrc    = 4'b0000;
+                rdest   = 4'b0000;
+                opcode  = 8'h00;
+                imm_sel = 1'b0;
             end
         endcase
     end

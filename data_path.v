@@ -4,12 +4,12 @@ module data_path(
    input wire [7:0] opcode, 
    input wire [3:0] Rdest_select, Rsrc_select,
 	input wire Imm_select,
-	output wire [4:0] Flags_out,
-	output wire [15:0] r5
+	//output wire [4:0] Flags_out,
+	output wire [15:0] data_out
 
 );
 	 
-	  wire [15:0] RegBank_out;
+	   wire [15:0] RegBank_out;
 
 		wire [15:0] r0;
 		wire [15:0] r1;
@@ -33,8 +33,8 @@ module data_path(
 		wire[15:0] Rsrc_Imm_mux_out;
 		wire[15:0] Rsrc_mux_out;
 		
-		wire [15:0] alu_bus;
-		wire [4:0] flags;
+		// wire [15:0] alu_bus;
+		wire [4:0] Flags_out;
 
 			 
 RegBank RegBank (
@@ -115,7 +115,7 @@ mux_16to1 Rsrc_mux (
         .Rdest(Rdest_mux_out),
         .Rsrc_Imm (Rsrc_Imm_mux_out),
         .Opcode   (opcode),
-        .Result   (alu_bus),
+        .Result   (data_out),
         .Flags    (Flags_out)
 );
 
