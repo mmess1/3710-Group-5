@@ -1,29 +1,82 @@
 module data_path(
+	
 	input wire clk, reset, ram_we,
-   input [15:0] wEnable, Imm_in,
+   
+	
+	/* Reg file */
+	input [15:0] wEnable,
+	
+	/* ALU */
    input wire [7:0] opcode, 
-   input wire [3:0] Rdest_select, Rsrc_select,
-	input wire Imm_select,
-	// output wire [4:0] Flags_out,
-	output wire [15:0] instr_out
+	output wire [4:0] Flags_out,
+	
+	/* RAM */
+	input wire we_a, en_a, en_b,
+	
+	/* LS_cntr MUX */
+	input wire lsc_mux_selct,
+	
+	/* PC */
+	input wire [15:0] pc_add_k,
+	input wire pc_mux_selct, pc_en,
+	
+	//extern -->fsm
+	output wire [15:0]ram_out,
+	
+	/* MUXS: */ 
+	input wire fsm_alu_mem_selct,
+	input wire [3:0] Rdest_select, Rsrc_select,
+	input wire  [15:0] Imm_in,
+	input wire Imm_select
+
 );
-	 
-	 
 	 
 	 
 /************************************************************************
 							INTERNAL WIRE
 ***********************************************************************/
 
-	//RAM 
-	wire [9:0] addr_a, addr_b;
-	wire we_a, we_b, clk, en_a, en_b;
-	wire [15:0] q_a, q_b;
-	wire [15:0] RegBank_out;
-   wire [9:0] addr_a, addr_b;
+/***************************
+			RAM
+***************************/
 	
-	//wire  [15:0] data_ram_in_a, data_ram_in_b; // rsrc
+	/* ADDR == mem address */ 
+	wire [15:0] ls_cntrl; // from LS_cntrol
+	
+	/* DIN (data in from rdest mux */
+		/* Rdest_mux_out; */
+	
+	/* DOUT (data out == inst) */
+		wire [15:0] q_a_wire; 
+		wire [15:0] q_b_wire; // represent instrucion set --> only (a) used for now
+	
+	/* Enable wire */
+	//wire we_a_wire; 
+	//wire we_b_wire; 		// write enable
+	//wire en_a_wire; 
+	//wire en_b_wire;		// read enable
+	
+	
+   wire [9:0] addr_a_wire;
+	wire	[9:0] addr_b_wire;   // FIX ME
 
+/***************************
+			PC
+***************************/
+	// PC wires (out)
+	wire [15:0] pc_out_wire;
+	// PC wires (in)
+	wire [15:0] adder_one_wire;
+	wire [15:0] adder_k_wire;
+
+	// mux select
+	wire pc_mux_selct_wire;
+	
+	
+/***************************
+ALU / MUX wires / Regfile
+***************************/
+	/* Reg file */
 		wire [15:0] r0;
 		wire [15:0] r1;
 		wire [15:0] r2;
@@ -42,55 +95,18 @@ module data_path(
 		wire [15:0] r14;
 		wire [15:0] r15;
 		
-		// RDEST/RSRC MUX
+		/* RDEST/RSRC MUX */
 		wire[15:0] Rdest_mux_out;
 		wire[15:0] Rsrc_Imm_mux_out;
 		wire[15:0] Rsrc_mux_out;
 		
-		//wire [15:0] alu_bus;
-		wire [4:0] Flags_out;
+		/* from ALU   --> reg file */
+		wire [15:0] alu_bus;
 		
-		// from pc
-		wire [15:0] pc_out;
-
-// internal
-wire pc_mux_selct;
-
-// intern from pac
-wire [15:0] pc_in, ls_c_wire;
-
-// pc mux addders
-wire [15:0] adder_one, adder_k
-
-		// internal
-	wire [15:0] alu_bus,
 		
 /************************************************************************
 							EXTERNAL WIRE: inputs
 ***********************************************************************/
-	// RAM:
-	// wire  [15:0] data_ram_in_a, data_ram_in_b;
-	wire we_a;
-	wire en_a;
-	wire en_b;
-	
-	// external from fsm
-	wire [15:0] inst_branch; 
-	
-	//extern -->fsm
-	wire [15:0]ram_out;
-	
-	// extern --> from fsm to ..
-	wire fsm_alu_mem_selct;
-	
-		//ex
-		wire load_en;
-
-		// external
-		wire [15:0] instr_old,
-
-		// external 
-		wire [15:0]instr_new;
 
 	
 			 
@@ -182,53 +198,55 @@ ram ram (
 
 	.data_a(Rdest_mux_out),  // USE (data in)
 	.data_b(), //IGNORE
-	.addr_a(ls_c_wire),
+	.addr_a(ls_cntrl),
 	.addr_b(), // IGNORE
 	
 	.we_a(ram_we), 	
 	.we_b(0), // IGNORE
 	.clk(clk), 
-	.en_a(), 
+	.en_a(en_a), 
 	.en_b(0),			// IGNORE
-	.q_a(),			// USE (data out)
+	.q_a(q_a),			// USE (data out == insturction set)
 	.q_b()		//IGNOR FOR NOW
-)
+);
 
 /****************************
 LSC control MUX: meme write addss comes from pc or Reg file
 *******************************/
  mux_2to1 LS_cntl (
+
 	.in0 (pc_out),
 	.in1 (Rdest_mux_out),
-	.sel (pc_mux_selct),
-	.out(ls_c_wire)
-);
+	.sel (lsc_mux_selct),
+	.out(ls_cntrl)
 
+);
 /****************************
 PC MUX:
 *******************************/
  mux_2to1 pc_mux (
-	.in0 (adder_one),
-	.in1 (adder_k),
-	.sel (pc_mux_selct),
+	.in0 (adder_one_wire),
+	.in1 (adder_k_wire),
+	.sel (pc_mux_select),
 	.out(pc_in)
 );
+
 /****************************
 PC adder 1:
 *******************************/
- pc_inc adder_on (
+ pc_inc adder_one (
 	.in(pc_out),
 	.k (1),
-	.sum(adder_one)
+	.sum(adder_one_wire)
 );
+
 /****************************
 PC adder k:
 *******************************/
  pc_inc add_kk(
 	.in(pc_out),
-	.k (inst_branch),
-	.sel (pc_mux_selct),
-	.sum(adder_k)
+	.k (pc_add_k),
+	.sum(adder_k_wire)
 );
 
 /****************************
@@ -245,8 +263,8 @@ pc pc1 (
 ALU MUX: reg file get value from alue or mem
 *******************************/
  mux_2to1 alu_mux (
-	.in0 (ram_out), 							// comes from ram
-	.in1 (alu_out), 				   // from alu
+	.in0 (alu_out), 							// comes from alue
+	.in1 (ram_out), 				   // from ram
 	.sel (fsm_alu_mem_selct),
 	.out(alu_bus)
 );
@@ -256,9 +274,9 @@ ALU MUX: reg file get value from alue or mem
 ALU MUX: reg file get value from alue or mem
 *******************************/
 instr_buffer instr_buffer(
-    .clk(clk)       // Clock signal
+    .clk(clk),      // Clock signal
     .reset(reset),    // Reset signal
-    .load_en(load_en)     // Control signal to load data
+    .load_en(load_en),     // Control signal to load data
     .in(instr_old),   // 16-bit input instruction
     .out(instr_new)   // 16-bit output instruction
 );

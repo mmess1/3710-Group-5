@@ -1,13 +1,12 @@
 module lab4_Top(
-    input  wire CLOCK_50, 
-
     
-    input  wire [3:0]  KEY,
-  //  output wire [9:0]  LEDR,
+	 input  wire CLOCK_50, 
+    input  wire [3:0]  KEY
+   // output wire [9:0]  LEDR,
   //  output wire [6:0]  HEX0,
   //  output wire [6:0]  HEX1,
- //   output wire [6:0]  HEX2,
-    output wire [6:0]  HEX3
+  //  output wire [6:0]  HEX2,
+  //  output wire [6:0]  HEX3
     
 );
 
@@ -15,46 +14,107 @@ module lab4_Top(
 wire reset = KEY[0];
 wire clk_slow;
 
-// Program Counter
-wire [15:0] pc_count;
-
-// Instruction
-reg  [15:0] instr_set;
-
-// FSM → data path
+/***************************
+			FSM --> DataPath
+***************************/
+/* Ram */
+wire we_a; 
+wire en_a; 
+wire en_b; 
+wire ram_we;
+/* LS_cntr MUX */
+wire lsc_mux_selct;
+/* PC */
+wire [15:0] pc_add_k;
+wire pc_mux_selct;
 wire pc_en;
+/* Reg file */
 wire [15:0] wEnable;
-wire [15:0] Imm_in;
+/* ALU/ Muxes */ 
+wire [15:0] imm_in;
 wire [7:0]  opcode;
 wire [3:0]  Rdest_sel;
 wire [3:0]  Rsrc_sel;
-wire        Imm_sel;
-wire [15:0] decoder;
-wire        decoder_en;
+wire        imm_sel;
+wire fsm_alu_mem_selct;
 
-wire [15:0] data_out;
+/***************************
+			Data Path --> FSM
+***************************/
+wire [4:0] Flags;
+wire [15:0] ram_out;
+reg [15:0] instr_set;
 
-// Data Path
-wire [4:0]  Flags_out;
-// wire [15:0] r0,r1,r2,r3,r4,r5,r6,r7;
-// wire [15:0] r8,r9,r10,r11,r12,r13,r14,r15;
+
 
 // FSM
 decode_fsm fsm (
-    .clk(clk_slow),
-    .reset(reset),
-    // .Flags_out(Flags_out),
-    .instr_set(instr_set), // input
-    .pc_en(pc_en),
-	 .w_en(wEnable),
-    .opcode(opcode),
 
-  
-	 .imm_sel(Imm_sel),
-	 
-	 .rsrc(Rsrc_sel),
-	 .rdest(Rdest_sel)
+/*global */
+ .clk(clk_slow),
+ .reset(reset),
+/* PC */
+.pc_add_k(pc_add_k),
+.pc_mux_selct(pc_mux_selct),
+.pc_en(pc_en),
+/* LS_cntr MUX */
+.lsc_mux_selct(lsc_mux_selct),
+/* RAM */
+.ram_we(ram_we),
+.we_a(we_a), 
+.en_a(en_a), 
+.en_b(en_b),
+ram_out(ram_out), // data out ---> FIX ME
+/* ALU */
+.opcode(opcode),
+.Flags_in(Flags),
+/* Reg file */
+.wEnable(wEnable),
+
+/* MUXS: */ 
+.fsm_alu_mem_selct(fsm_alu_mem_selct),
+.Rdest_select(Rdest_sel),
+.Rsrc_select(Rsrc_sel),
+.Imm_in(imm_in),
+.Imm_select(imm_sel),
+
+.instr_set(instr_set)
+
 );
+
+
+	
+// Data Path
+data_path dp (
+
+/*global */
+ .clk(clk_slow),
+ .reset(reset),
+/* PC */
+.pc_add_k(pc_add_k),
+.pc_mux_selct(pc_mux_selct),
+/* LS_cntr MUX */
+.lsc_mux_selct(lsc_mux_selct),
+/* RAM */
+.ram_we(ram_we),
+.we_a(we_a), 
+.en_a(en_a), 
+.en_b(en_b),
+ram_out(ram_out), // data out ---> FIX ME
+/* ALU */
+.opcode(opcode),
+.Flags_out(Flags),
+/* Reg file */
+.wEnable(wEnable),
+
+/* MUXS: */ 
+.fsm_alu_mem_selct(fsm_alu_mem_selct),
+.Rdest_select(Rdest_sel),
+.Rsrc_select(Rsrc_sel),
+.Imm_in(Imm_in),
+.Imm_select(imm_sel)
+);
+
 
 // Clock Divider
 clock_div #(.DIV(5_000_000)) u_div (
@@ -63,41 +123,10 @@ clock_div #(.DIV(5_000_000)) u_div (
     .clk_out(clk_slow)
 );
 
-// Decoder (commented-out)
-/*
-decoder dc (
-    .instr_set (instr_set),
-    .clk       (clk_slow),
-    .reset     (reset),
-    .wEnable   (wEnable),
-    .Imm_in    (Imm_in),
-    .Rdest     (Rdest_sel),
-    .Rsrc_Imm  (Rsrc_sel),
-    .Imm_select(Imm_sel)
-);
-*/
 
-// Data Path
-data_path dp (
-    .clk(clk_slow),
-    .reset(reset),
-    .wEnable(wEnable),
-    .Imm_in(Imm_in),
-    .opcode(opcode),
-    .Rdest_select(Rdest_sel),
-    .Rsrc_select(Rsrc_sel),
-    .data_out(data_out)
-);
-
-// Program Counter
-pc pc1 (
-    .pc_en(pc_en),
-    .rst(reset),
-    .clk(clk_slow),
-    .pc_count(pc_count)
-);
 
 // Instruction ROM
+/*
 always @(posedge clk_slow or negedge reset) begin
     if (!reset)
         instr_set <= 16'b0;
@@ -111,6 +140,7 @@ always @(posedge clk_slow or negedge reset) begin
         endcase
     end
 end
+*/
 
 // HEX function
 function [6:0] hex7;
@@ -140,9 +170,9 @@ endfunction
 
 // The commented-out assignments for HEX could be re-enabled if needed:
  //assign HEX0 = hex7(data_out[3:0]);
-// assign HEX1 = hex7(data_out[3:0]);
- assign HEX2 = hex7(pc_count[3:0]);
- assign HEX3 = hex7(pc_count [7:4]);
+//assign HEX1 = hex7(data_out[3:0]);
+ //assign HEX2 = hex7(pc_count[3:0]);
+ //assign HEX3 = hex7(pc_count [7:4]);
 
 // assign pc_current = pc_count; // Corrected assignment for pc_current
 
