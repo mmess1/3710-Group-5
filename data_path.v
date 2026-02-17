@@ -1,16 +1,17 @@
-module data_path(
-	
+module data_path#(parameter DATA_FILE="")
+(
 	input wire clk, reset, ram_we,
    
+	
 	/* Reg file */
-	input [15:0] wEnable,
+	input [3:0] wEnable,
 	
 	/* ALU */
-   	input wire [7:0] opcode, 
+   input wire [7:0] opcode, 
+	output wire [4:0] Flags_out,
 	
 	/* RAM */
-	input wire we_a, en_a,
-	// input wire en_b, // Port B disabled
+	input wire we_a, en_a, en_b,
 	
 	/* LS_cntr MUX */
 	input wire lsc_mux_selct,
@@ -19,6 +20,8 @@ module data_path(
 	input wire [15:0] pc_add_k,
 	input wire pc_mux_selct, pc_en,
 	
+	//extern -->fsm
+	output wire [15:0]ram_out,
 	
 	/* MUXS: */ 
 	input wire fsm_alu_mem_selct,
@@ -26,10 +29,6 @@ module data_path(
 	input wire  [15:0] Imm_in,
 	input wire Imm_select
 
-	//extern -->fsm
-	output wire [4:0] Flags_out,
-	output wire [15:0]ram_out,
-	output [15:0] r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15;
 );
 	 
 	 
@@ -48,8 +47,8 @@ module data_path(
 		/* Rdest_mux_out; */
 	
 	/* DOUT (data out == inst) */
-	wire [15:0] q_a_wire; 
-		// wire [15:0] q_b_wire; // Port B disabled
+		wire [15:0] q_a_wire; 
+		wire [15:0] q_b_wire; // represent instrucion set --> only (a) used for now
 	
 	/* Enable wire */
 	//wire we_a_wire; 
@@ -59,7 +58,7 @@ module data_path(
 	
 	
    wire [9:0] addr_a_wire;
-		// wire	[9:0] addr_b_wire;   // Port B disabled
+	wire	[9:0] addr_b_wire;   // FIX ME
 
 /***************************
 			PC
@@ -113,7 +112,7 @@ ALU / MUX wires / Regfile
 			 
 RegBank RegBank (
     .clk    (clk),
-    .regEnable(wEnable),
+    .wEnable(wEnable),
     .reset  (reset),
     .ALUBus (alu_bus),
 
@@ -195,20 +194,22 @@ mux_16to1 Rsrc_mux (
 /****************************
 RAM
 *******************************/
-ram ram (
+ram ram(.DATA_FILE1=DATA_FILE)
+(
+	
 
 	.data_a(Rdest_mux_out),  // USE (data in)
-	// .data_b(), // Port B disabled
+	.data_b(), //IGNORE
 	.addr_a(ls_cntrl),
-	// .addr_b(), // Port B disabled
+	.addr_b(), // IGNORE
 	
 	.we_a(ram_we), 	
-	// .we_b(0), // Port B disabled
+	.we_b(0), // IGNORE
 	.clk(clk), 
 	.en_a(en_a), 
-	// .en_b(0),			// Port B disabled
-	.q_a(ram_out),			// USE (data out == insturction set)
-	// .q_b() 		// Port B disabled
+	.en_b(0),			// IGNORE
+	.q_a(q_a),			// USE (data out == insturction set)
+	.q_b()		//IGNOR FOR NOW
 );
 
 /****************************
@@ -280,12 +281,6 @@ instr_buffer instr_buffer(
     .load_en(load_en),     // Control signal to load data
     .in(instr_old),   // 16-bit input instruction
     .out(instr_new)   // 16-bit output instruction
-);
-
-endmoduleImm_mux_out),
-        .Opcode   (opcode),
-        .Result   (alu_bus),
-        .Flags    (Flags_out)
 );
 
 endmodule
