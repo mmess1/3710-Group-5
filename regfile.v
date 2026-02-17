@@ -26,8 +26,8 @@ module Register (
 	 output reg [15:0] r
 );
 	 
- always @( posedge clk or negedge reset) begin
-	if (!reset) r <= 16'h0000;
+ always @( posedge clk or posedge reset) begin
+	 if (reset) r <= 16'h0000;
 	else
 		begin			
 			if (w_Enable)

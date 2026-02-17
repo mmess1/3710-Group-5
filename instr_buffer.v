@@ -6,9 +6,9 @@ module instr_buffer(
     output reg [15:0] out   // 16-bit output instruction
 );
     
-    // On reset, clear the output. Otherwise, load data on load signal.
-    always @(posedge clk or negedge reset) begin
-        if (!reset) begin
+    // On reset (active-high), clear the output. Otherwise, load data on load signal.
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
             out <= 16'b0;  // Clear the instruction on reset
         end else if (load_en) begin
             out <= in;     // Load new instruction into register

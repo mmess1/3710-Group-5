@@ -1,6 +1,6 @@
-module decode_fsm (
+module load_store_FSM (
     
-	 input wire clk,
+	input wire clk,
     input wire reset,     // active-low reset
     /* Reg file */
     input wire [15:0] wEnable,  // Control signal for register write enable
@@ -8,7 +8,7 @@ module decode_fsm (
     input wire [7:0] opcode,  // The opcode (or instruction)
     input wire [4:0] Flags_in,  // Flags output (if needed for operations)
     /* RAM */
-    output reg [15:0] instr_set,  // Instruction being processed
+    output reg [15:0] ram_out,  // Instruction being processed
     output reg we_a, en_a, en_b, ram_wen,
     /* LS_cntr MUX */
     output reg lsc_mux_selct,  // Load/Store counter MUX select
@@ -25,59 +25,42 @@ module decode_fsm (
 
 // Decoder Module Instantiation with all inputs connected
 // Instruction set (localparams)
-localparam [15:0] ADD   = 16'b0000_xxxx_0101_xxxx;
-localparam [15:0] ADDU  = 16'b0000_xxxx_0110_xxxx;
-localparam [15:0] ADDC  = 16'b0000_xxxx_0111_xxxx;
-localparam [15:0] ADDI  = 16'b0101_xxxx_xxxx_xxxx;
-localparam [15:0] ADDUI = 16'b0110_xxxx_xxxx_xxxx;
-localparam [15:0] ADDCI = 16'b0111_xxxx_xxxx_xxxx;
-localparam [15:0] MOV   = 16'b0000_xxxx_1101_xxxx;
-localparam [15:0] MOVI  = 16'b1101_xxxx_xxxx_xxxx;
-localparam [15:0] MUL   = 16'b0000_xxxx_1110_xxxx;
-localparam [15:0] MULI  = 16'b1110_xxxx_xxxx_xxxx;
-localparam [15:0] SUB   = 16'b0000_xxxx_1001_xxxx;
-localparam [15:0] SUBC  = 16'b0000_xxxx_1010_xxxx;
-localparam [15:0] SUBI  = 16'b1001_xxxx_xxxx_xxxx;
-localparam [15:0] SUBCI = 16'b1010_xxxx_xxxx_xxxx;
-localparam [15:0] CMP   = 16'b0000_xxxx_1011_xxxx;
-localparam [15:0] CMPI  = 16'b1011_xxxx_xxxx_xxxx;
-localparam [15:0] AND   = 16'b0000_xxxx_0001_xxxx;
-localparam [15:0] OR    = 16'b0000_xxxx_0010_xxxx;
-localparam [15:0] XOR   = 16'b0000_xxxx_0011_xxxx;
-localparam [15:0] NOT   = 16'b0000_xxxx_0100_xxxx;
-localparam [15:0] LSH   = 16'b0000_xxxx_1100_xxxx;
-localparam [15:0] LSHI  = 16'b1100_xxxx_xxxx_xxxx;
-localparam [15:0] RSH   = 16'b0000_xxxx_1000_xxxx;
-localparam [15:0] RSHI  = 16'b1000_xxxx_xxxx_xxxx;
-localparam [15:0] ARSH  = 16'b0000_xxxx_1111_xxxx;
-localparam [15:0] ARSHI = 16'b1111_xxxx_xxxx_xxxx;
-localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
-
+localparam [7:0] WAIT  = 8'h00,
+                 ADD   = 8'h05, ADDU  = 8'h06, ADDC  = 8'h07,
+                 ADDI  = 8'h50, ADDUI = 8'h60, ADDCI = 8'h70,
+                 MOV   = 8'h0D, MOVI  = 8'hD0,
+                 MUL   = 8'h0E, MULI  = 8'hE0,
+                 SUB   = 8'h09, SUBC  = 8'h0A,
+                 SUBI  = 8'h90, SUBCI = 8'hA0,
+                 CMP   = 8'h0B, CMPI  = 8'hB0,
+                 AND   = 8'h01, OR    = 8'h02, XOR   = 8'h03, NOT = 8'h04,
+                 LSH   = 8'h0C, LSHI  = 8'hC0,
+                 RSH   = 8'h08, RSHI  = 8'h80,
+                 ARSH  = 8'h0F, ARSHI = 8'hF0;
+				 LOAD  = 8'h40, // P-Code 4, Ext 0
+                 STOR  = 8'h44; // P-Code 4, Ext 4
     wire decoded_Imm_sel;
 
-    // State encoding
-    localparam S0_FETCH   = 2'd0;
-    localparam S1_DECODE  = 2'd1;
-    localparam S2_EXECUTE = 2'd2;
-    localparam S3_STORE   = 2'd3;
-    localparam S4_LOAD    = 2'd4;
-    localparam S5_DOUT    = 2'd5;
+// State encoding
+localparam 	S0_FETCH   = 2'd0,
+			S1_DECODE  = 2'd1;
+			S2_EXECUTE = 2'd2;
+			S3_STORE   = 2'd3;
+			S4_LOAD    = 2'd4;
+			S5_DOUT    = 2'd5;
 
-    // LOAD/STORE instruction patterns
-    localparam [15:0] LOAD  = 16'b0100_xxxx_0000_xxxx;
-    localparam [15:0] STOR  = 16'b0100_xxxx_0100_xxxx;
-
-    reg [1:0] PS, NS;  // Present state and next state
+    reg [2:0] PS, NS;  // Present state and next state
 	 
 	  // reg [15:0] local_instruction = 16'b0;
 
-    // State register
-    always @(posedge clk or negedge reset) begin
-        if (!reset)
-            PS <= S0_FETCH; // Default to fetch state on reset
-        else
-            PS <= NS;
-    end
+	// State register (use active-high reset)
+	always @(posedge clk or posedge reset) begin
+		if (reset)
+			PS <= S0_FETCH; // Default to fetch state on reset
+		else
+			PS <= NS;
+	end
+
 
     // Next-state logic
     always @(*) begin
@@ -112,8 +95,7 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
         
 		  .Imm_in(Imm_in),
         .opcode(opcode),
-        .Imm_select(Imm_select),
-		  
+        .Imm_select(Imm_select)
     );
 
     // Output logic (based on FSM state)
@@ -142,8 +124,10 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 					 
             end
 
-            S1_DECODE: begin
-									// Arithmetic operations
+            S1_DECODE: begin			  	  
+								end
+							S2_EXECUTE: begin
+								case(opcode)
 									ADD, ADDU, ADDC, SUB, SUBI, SUBC, SUBCI, MUL, CMP: begin
 										 wEnable = 16'b1; // Enable register write (assuming we write the result to a register)
 										 pc_en = 1; // Enable PC increment (not a jump/branch)
@@ -182,29 +166,6 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 										 pc_en = 1; // PC should increment normally
 									end
 
-									// WAIT instruction (idle state)
-									WAIT: begin
-										 pc_en = 1; // Even though WAIT does nothing, we need to increment PC normally
-									end
-									// Load/Store operations (e.g., LOAD, STOR)
-									LOAD: begin
-										 wEnable = 16'b0; // Write to register file after loading data
-										 pc_en = 0; // PC should increment normally
-										 en_a = 1; // Enable RAM read
-										 ram_en = 1; // Enable RAM for the load operation
-									end
-
-									STOR: begin
-										 pc_en = 1; // PC should increment normally
-										 we_a = 1; // Enable RAM write
-										 en_a = 1; // Enable RAM read
-										 ram_en = 1; // Enable RAM for the store operation
-										 fsm_alu_mem_selct = 1'd1; // regfile gets its value form the ram not alu
-									end
-										  	  
-								end
-
-							S2_EXECUTE: begin
 								 // decoder should be off--> must manually turn on PC and Write enable
 								 pc_en = 1'b1;  // PC increments
 								 wEnable = 16'b1;  // Enable write to register file
@@ -236,6 +197,13 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 						  
 						  ram_en = 1; // Enable RAM for the store operation
 						  pc_en = 1; // PC should increment normally
+
+							pc_en = 1; // PC should increment normally
+							we_a = 1; // Enable RAM write
+							en_a = 1; // Enable RAM read
+							ram_en = 1; // Enable RAM for the store operation
+							fsm_alu_mem_selct = 1'd1; // regfile gets its value form the ram not alu
+
 					end
 
 
@@ -251,8 +219,11 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 						 // 3) Transfer the data from memory to the destination register (Rdst)
 						 //    - Take the data from the memory read output (DOUT from memory) and pass it to the destination register
 						 //    - Enable the write control signal to the register file so that the data can be written into the destination register
-						 
-						 pc_en = 1; // PC should increment normally
+						wEnable = 16'b0; // Write to register file after loading data
+						pc_en = 0; // PC should increment normally
+						en_a = 1; // Enable RAM read
+						ram_en = 1; // Enable RAM for the load operation
+
 						 we_a = 1; // Enable RAM write
 						 en_a = 1; // Enable RAM read
 						 ram_en = 1; // Enable RAM for the store operation

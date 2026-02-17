@@ -1,4 +1,4 @@
-module lab4_Top(
+module load_store_TOP(
     
 	 input  wire CLOCK_50, 
     input  wire [3:0]  KEY
@@ -111,7 +111,7 @@ ram_out(ram_out), // data out ---> FIX ME
 .fsm_alu_mem_selct(fsm_alu_mem_selct),
 .Rdest_select(Rdest_sel),
 .Rsrc_select(Rsrc_sel),
-.Imm_in(Imm_in),
+.Imm_in(imm_in),
 .Imm_select(imm_sel)
 );
 
