@@ -52,10 +52,12 @@ endmodule
 /********/
 module RegBank(
     input [15:0] ALUBus,       // Data to write to register
-    input [3:0] wEnable,         // 4-bit destination register index
+    input [15:0] wEnable,         // 16-bit one-hot write enable
     input clk, reset,          // Clock and Reset
     output [15:0] r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15 // All register outputs
 );
+
+    wire [15:0] regEnable = wEnable;
 
     // Register Instantiations
     Register Inst0(.Result(ALUBus), .w_Enable(regEnable[0]), .reset(reset), .clk(clk), .r(r0));
@@ -74,13 +76,5 @@ module RegBank(
     Register Inst13(.Result(ALUBus), .w_Enable(regEnable[13]), .reset(reset), .clk(clk), .r(r13));
     Register Inst14(.Result(ALUBus), .w_Enable(regEnable[14]), .reset(reset), .clk(clk), .r(r14));
     Register Inst15(.Result(ALUBus), .w_Enable(regEnable[15]), .reset(reset), .clk(clk), .r(r15));
-
-    // Generate the regEnable signal: only one bit should be high
-    reg [15:0] regEnable;
-
-    always @(*) begin
-        regEnable = 16'b0;  // Default to all bits off
-        regEnable[rdest] = 1; // Set the rdest bit high (only one bit should be set)
-    end
 
 endmodule

@@ -144,12 +144,12 @@ module load_store_TOP(
 
     // Simple debug display:
     //  - HEX1:HEX0 shows r0
-    //  - HEX3:HEX2 shows r2
+    //  - HEX3:HEX2 shows r1
     //  - HEX5:HEX4 shows pc_count
     hex7seg h0(.hex(r0[3:0]),       .seg(HEX0));
     hex7seg h1(.hex(r0[7:4]),       .seg(HEX1));
-    hex7seg h2(.hex(r2[3:0]),       .seg(HEX2));
-    hex7seg h3(.hex(r2[7:4]),       .seg(HEX3));
+    hex7seg h2(.hex(r1[3:0]),       .seg(HEX2));
+    hex7seg h3(.hex(r1[7:4]),       .seg(HEX3));
 
     hex7seg h4(.hex(pc_count[3:0]), .seg(HEX4));
     hex7seg h5(.hex(pc_count[7:4]), .seg(HEX5));

@@ -1,29 +1,39 @@
 module load_store_FSM (
-    
+	 
 	 input wire clk,
     input wire reset,     // active-low reset
-    /* Reg file */
-    output reg [3:0] wEnable,  // Control signal for register write enable
+
+    input  wire [15:0] instr_set,
+
     /* ALU */
-    input wire [7:0] opcode,  // The opcode (or instruction)
-    input wire [4:0] Flags_in,  // Flags output (if needed for operations)
+    input  wire [4:0] Flags_in,
+
+    /* Reg file */
+    output reg  [15:0] wEnable,  // one-hot write enable
+
+    /* Decoder outputs to datapath */
+    output wire [7:0]  opcode,
+    output wire [3:0]  Rdest_select,
+    output wire [3:0]  Rsrc_select,
+    output wire [15:0] Imm_in,
+    output reg         Imm_select,
+
     /* RAM */
-    output reg [15:0] instr_set,  // Instruction being processed
     output reg we_a, en_a, en_b, ram_wen,
+
     /* LS_cntr MUX */
-    output reg lsc_mux_selct,  // Load/Store counter MUX select
+    output reg lsc_mux_selct,
+
     /* PC */
-    output reg [15:0] pc_add_k,  // Program counter address (for jumps or branches)
-    output reg pc_mux_selct, pc_en,  // Control signals for the program counter
+    output reg [15:0] pc_add_k,
+    output reg pc_mux_selct, pc_en,
+
     /* MUXs */
-    output reg fsm_alu_mem_selct,  // ALU/Memory select for MUX
-    output reg [3:0] Rdest_select, Rsrc_select,  // Register destination and source select
-    output reg [15:0] Imm_in,  // Immediate input
-    output reg Imm_select,  // Select signal for immediate value
+    output reg fsm_alu_mem_selct,
+
     output reg decoder_en   // Decoder enable signal
 );
 
-// Decoder Module Instantiation with all inputs connected
 // Instruction set (localparams)
 localparam [15:0] ADD   = 16'b0000_xxxx_0101_xxxx;
 localparam [15:0] ADDU  = 16'b0000_xxxx_0110_xxxx;
@@ -53,23 +63,19 @@ localparam [15:0] ARSH  = 16'b0000_xxxx_1111_xxxx;
 localparam [15:0] ARSHI = 16'b1111_xxxx_xxxx_xxxx;
 localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 
-wire decoded_Imm_sel;
+// LOAD/STORE instruction patterns
+localparam [15:0] LOAD  = 16'b0100_????_0000_????;
+localparam [15:0] STOR  = 16'b0100_????_0100_????;
 
     // State encoding
-    localparam S0_FETCH   = 2'd0;
-    localparam S1_DECODE  = 2'd1;
-    localparam S2_EXECUTE = 2'd2;
-    localparam S3_STORE   = 2'd3;
-    localparam S4_LOAD    = 2'd4;
-    localparam S5_DOUT    = 2'd5;
+    localparam [2:0] S0_FETCH   = 3'd0;
+    localparam [2:0] S1_DECODE  = 3'd1;
+    localparam [2:0] S2_EXECUTE = 3'd2;
+    localparam [2:0] S3_STORE   = 3'd3;
+    localparam [2:0] S4_LOAD    = 3'd4;
+    localparam [2:0] S5_DOUT    = 3'd5;
 
-    // LOAD/STORE instruction patterns
- localparam [15:0] LOAD  = 16'b0100_xxxx_0000_xxxx;
- localparam [15:0] STOR  = 16'b0100_xxxx_0100_xxxx;
-
-    reg [1:0] PS, NS;  // Present state and next state
-	 
-	  // reg [15:0] local_instruction = 16'b0;
+    reg [2:0] PS, NS;  // Present state and next state
 
     // State register
     always @(posedge clk or negedge reset) begin
@@ -83,131 +89,110 @@ wire decoded_Imm_sel;
     always @(*) begin
         NS = PS;
         case (PS)
-            S0_FETCH:  NS = S1_DECODE;    // Move to decode state
+            S0_FETCH:  NS = S1_DECODE;
+
+            // different way (no is_store/is_load wires): just match instruction
             S1_DECODE: begin
-                casex (instr_set)
+                casez (instr_set)
                     STOR: NS = S3_STORE;
                     LOAD: NS = S4_LOAD;
                     default: NS = S2_EXECUTE;
                 endcase
             end
-            S2_EXECUTE: NS = S0_FETCH;    // Back to fetch state
-            
+
+            S2_EXECUTE: NS = S0_FETCH;
+
             /* LOAD/STORE States */
-            S3_STORE: NS = S0_FETCH; // Back to fetch after store
-            S4_LOAD: NS = S5_DOUT; // After loading data, move to the data out state
-            S5_DOUT: NS = S0_FETCH; // Back to fetch after data out (if needed)
-            default: NS = S0_FETCH;  // Default state is fetch
+            S3_STORE: NS = S0_FETCH;
+            S4_LOAD:  NS = S5_DOUT;
+            S5_DOUT:  NS = S0_FETCH;
+
+            default: NS = S0_FETCH;
         endcase
     end
 
- // Decoder instantiation with full set of inputs and outputs
+ // Decoder (combinational)
  decoder u_decoder (
         .instr_set(instr_set),
-        .clk(clk),
-        .reset(reset),
-
-        .Rdest_select(Rdest_select),
-        .Rsrc_select(Rsrc_select),
-		  .Imm_in(Imm_in),
-        .opcode(opcode),
-        .Imm_select(Imm_select)
+        .Imm_in   (Imm_in),
+        .opcode   (opcode),
+        .Rdest    (Rdest_select),
+        .Rsrc     (Rsrc_select)
  );
- 
- reg load_en;
- reg [15:0] buff_instr;
- 
- // inst Buffer
-instr_buffer buff(
- .clk(clk),        
-.reset(reset),    
-.load_en(load_en),     
-.in(instr_set),  
-.out(buff_instr)
-);
 
     // Output logic (based on FSM state)
     always @(*) begin
-        // Default values
-        
-        // Reset default values
+        // defaults
         wEnable = 16'b0;
-        Imm_in = 16'b0;
-        opcode = 8'b0;
-        Rdest = 4'b0;
-        Rsrc_Imm = 4'b0;
-        Imm_select = 0;
-        pc_add_k = 16'b0;
-        pc_mux_selct = 0;
-        pc_en = 0;
-        we_a = 0;
-        en_a = 0;
-        en_b = 0;
-        ram_en = 0;
-        lsc_mux_selct = 0;
 
-		  load_en = 0;
-		  
+        Imm_select = 1'b0;
+
+        pc_add_k = 16'h0000;
+        pc_mux_selct = 1'b0;
+        pc_en = 1'b0;
+
+        we_a = 1'b0;
+        en_a = 1'b0;
+        en_b = 1'b0;
+        ram_wen = 1'b0;
+
+        lsc_mux_selct = 1'b0;
+
+        fsm_alu_mem_selct = 1'b0;
+
+        decoder_en = 1'b1;
+
+        // immediate select (I-type except load/store)
+        if ((opcode[7:4] != 4'h0) && (opcode != 8'h40) && (opcode != 8'h44))
+            Imm_select = 1'b1;
+
         case (PS)
             S0_FETCH: begin
-                // Fetch state: No operations, just fetch instruction
-					 load_en = 1;
+                // fetch instruction using PC as address
+                en_a = 1'b1;
+                lsc_mux_selct = 1'b0;
             end
 
             S1_DECODE: begin
-									// Arithmetic operations
+                // decode happens continuously; no control outputs needed here
+            end
 
-										  	  
-								end
+            S2_EXECUTE: begin
+                // normal ALU writeback
+                pc_en = 1'b1;
+                fsm_alu_mem_selct = 1'b0;
 
-							S2_EXECUTE: begin
-								 // decoder should be off--> must manually turn on PC and Write enable
-								 
-								 //
-								 
-								 
-								 pc_en = 1'b1;  // PC increments
-								 wEnable = Rdest_select;  // Enable write to register file
-							end
+                // don't write on CMP/CMPI/WAIT
+                if ((opcode == 8'h0B) || (opcode == 8'hB0) || (opcode == 8'h00))
+                    wEnable = 16'b0;
+                else
+                    wEnable = (16'h0001 << Rdest_select);
+            end
 
-							/* Load/Store States */
-					S3_STORE: begin
-						
-				   lsc_mux_selct = 1'd1; // date from rdest addr	
-				   pc_en = 1; // PC should increment normally
-					we_a = 1; // Enable RAM write
-					en_a = 1; // Enable RAM read
-				   ram_en = 1; // Enable RAM for the store operation
-				
+            /* Store: mem[Rdest] = Rsrc */
+            S3_STORE: begin
+                lsc_mux_selct = 1'b1; // address comes from Rdest
+                en_a = 1'b1;
+                we_a = 1'b1;
+                ram_wen = 1'b1;
+                pc_en = 1'b1;
+            end
 
-					end
+            /* Load read cycle: start mem read at addr=Rdest */
+            S4_LOAD: begin
+                lsc_mux_selct = 1'b1;
+                en_a = 1'b1;
+            end
 
-
-					S4_LOAD: begin
-						 
-						 lsc_mux_selct = 1'd1; // date from rdest addr
-						 en_a = 1; // Enable RAM read
-						 ram_en = 1; // Enable RAM for the store operation
-						 fsm_alu_mem_selct = 1'd1; // regfile gets its value form the ram not alu
-						 
-					end
-
-
-						S5_DOUT: begin
-							wEnable <= buff_instr[7:4];  // upper 4 bits of the immediate
-							fsm_alu_mem_selct = 1;
-							pc_en = 1;			
-
-						end
+            /* DOUT cycle: write mem data into Rsrc */
+            S5_DOUT: begin
+                lsc_mux_selct = 1'b1;
+                fsm_alu_mem_selct = 1'b1;
+                wEnable = (16'h0001 << Rsrc_select);
+                pc_en = 1'b1;
+            end
 
             default: begin
-                // Default case (failsafe)
-                pc_en = 1'b0;
-                wEnable = 16'b0;
-                Rsrc_select = 4'b0000;
-                Rdest_select = 4'b0000;
-                opcode = 8'h00;
-                Imm_select = 1'b0;
             end
         endcase
     end

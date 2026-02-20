@@ -1,15 +1,20 @@
 module decoder(
-    input wire [15:0] instr_set,
+    input  wire [15:0] instr_set,
 
-    output reg [15:0] Imm_in,
-    output reg [7:0] opcode,
-    output reg [3:0] Rdest, Rsrc,
+    output wire [15:0] Imm_in,
+    output wire [7:0]  opcode,
+    output wire [3:0]  Rdest,
+    output wire [3:0]  Rsrc
 );
 
-// Decode instruction fields
-opcode <= {instr_set[15:12], instr_set[7:4]};   // opcode (4 bits)
-Rsrc <= instr_set[3:0];   // lower 4 bits of the immediate
-Rdest <= instr_set[7:4];  // upper 4 bits of the immediate
-Imm_in <= {instr_set[7:4], instr_set[3:0]}; // full 16-bit immediate value
+    // opcode = {P-code, Ext}
+    assign opcode = {instr_set[15:12], instr_set[7:4]};
+
+    // Register fields
+    assign Rdest  = instr_set[11:8];
+    assign Rsrc   = instr_set[3:0];
+
+    // Immediate (sign-extended imm8)
+    assign Imm_in = {{8{instr_set[7]}}, instr_set[7:0]};
 
 endmodule

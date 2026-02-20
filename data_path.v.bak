@@ -193,15 +193,20 @@ RAM
 ram #(
 	.DATA_WIDTH(16),
 	.ADDR_WIDTH(10),
-	.DATA_FILE0(DATA_FILE),
-	.DATA_FILE1("")
+	.DATA_FILE0(""),
+	.DATA_FILE1(DATA_FILE)
 ) u_ram(
 	.data_a(Rsrc_mux_out),
+	.data_b(16'b0),
 	.addr_a(ls_cntrl[9:0]),
+	.addr_b(10'b0),
 	.we_a(mem_we),
+	.we_b(1'b0),
 	.clk(clk),
 	.en_a(en_a),
-	.q_a(q_a_wire)
+	.en_b(1'b0),
+	.q_a(q_a_wire),
+	.q_b()
 );
 
 /****************************

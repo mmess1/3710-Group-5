@@ -108,7 +108,7 @@ module ram #(
 	    .clk(clk),
 	    .en_a(en_a & sel_a), 
 	    // .en_b(en_b & sel_a), // only enable block1 when sel=1
-	    .q_a(q1_a), 
+	    .q_a(q1_a)
 		// .q_b(q1_b)
 	);
 
