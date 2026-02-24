@@ -220,7 +220,7 @@ LSC control MUX: mem address comes from pc or Reg file
 PC MUX:
 *******************************/
 assign adder_one_wire = pc_out_wire + 16'd1;
-assign adder_k_wire   = pc_out_wire + pc_add_k;
+assign adder_k_wire   = pc_out_wire + $signed (pc_add_k);
 
  mux_2to1 pc_mux (
 	.in0 (adder_one_wire),
