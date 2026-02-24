@@ -27,13 +27,13 @@ module branch_TOP(
     wire [7:0]  opcode;
     wire [3:0]  Rdest_select;
     wire [3:0]  Rsrc_select;
-    wire [15:0] Imm_in;
+    wire [7:0] Imm_in;
     wire        Imm_select;
 
     wire we_a, en_a, en_b, ram_wen;
     wire lsc_mux_selct;
 
-    wire [7:0] pc_add_k;
+    wire [15:0] pc_add_k;
     wire pc_mux_selct, pc_en;
 
     wire fsm_alu_mem_selct;
@@ -94,7 +94,7 @@ module branch_TOP(
 
     data_path #(
         // NOTE: if Quartus can't find this, change to an absolute path like other labs
-        .DATA_FILE("C:/Users/genet/altera_lite/quartus/ece3710/3710-Group-5/util/branch.hex")
+        .DATA_FILE("C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch.hex")
     ) dp(
         .clk(clk_slow),
         .reset(reset_n),
@@ -108,7 +108,6 @@ module branch_TOP(
         .we_a(we_a),
         .en_a(en_a),
         .en_b(en_b),
-		  .load_en(load_en),
 
         .lsc_mux_selct(lsc_mux_selct),
 

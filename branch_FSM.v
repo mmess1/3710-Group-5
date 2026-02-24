@@ -1,4 +1,4 @@
-module load_store_FSM (
+module branch_FSM (
 	 
 	 input wire clk,
     input wire reset,     // active-low reset
@@ -25,7 +25,7 @@ module load_store_FSM (
     output reg lsc_mux_selct,
 
     /* PC */
-    output reg [7:0] pc_add_k,
+    output reg [15:0] pc_add_k,
     output reg pc_mux_selct, pc_en,
 
     /* MUXs */
@@ -87,8 +87,8 @@ localparam [3:0] XX  = 4'b1111;   // Minus (Negative result, sign bit = 1)
 
 
 // LOAD/STORE instruction patterns
-localparam [15:0] LOAD  = 16'b0100_????_0000_????;
-localparam [15:0] STOR  = 16'b0100_????_0100_????;
+localparam [15:0] LOAD  = 16'b0100_xxxx_0000_xxxx;
+localparam [15:0] STOR  = 16'b0100_xxx_0100_xxxx;
 
     // State encoding
     localparam [2:0] S0_FETCH   = 3'd0;
@@ -118,7 +118,7 @@ localparam [15:0] STOR  = 16'b0100_????_0100_????;
 
             // different way (no is_store/is_load wires): just match instruction
             S1_DECODE: begin
-                casez (instr_set)
+                casex (instr_set)
                     STOR: NS = S3_STORE;
                     LOAD: NS = S4_LOAD;
 						  BRANCH: NS = S6_BRANCH;
@@ -154,7 +154,7 @@ localparam [15:0] STOR  = 16'b0100_????_0100_????;
 
         Imm_select = 1'b0;
 
-        pc_add_k = 8'd0000;
+        pc_add_k = 16'd0;
         pc_mux_selct = 1'b0; // use pc+1 or pc+k
         pc_en = 1'b0;
 
@@ -223,13 +223,10 @@ localparam [15:0] STOR  = 16'b0100_????_0100_????;
 						
 						pc_en = 1'b1;
 						
-						if(check_flags(Flags_in)) begin
-						
-						// k == imm vlaue
-						pc_add_k = Imm_in;
-						// enable pc + k
-						pc_mux_selct = 1;
-	
+						if (check_flags(Rdest_select, Flags_in)) begin
+							// k == imm vlaue
+							pc_add_k = $signed(Imm_in[7:0]);						// enable pc + k
+							pc_mux_selct = 1;
 						end
 						
 				end
@@ -237,92 +234,98 @@ localparam [15:0] STOR  = 16'b0100_????_0100_????;
     end
 
 
-function integer check_flags(input [4:0] Flags_in);
-    case (Flags_in)
-        EQ:  begin
-                if (Flags_in[1] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        NE:  begin
-                if (Flags_in[1] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        GE:  begin
-                if (Flags_in[1] == 1 | Flags_in[0] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        CS:  begin
-                if (Flags_in[3] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        CC:  begin
-                if (Flags_in[3] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        HI:  begin
-                if (Flags_in[4] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        LS:  begin
-                if (Flags_in[4] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        LO:  begin
-                if (Flags_in[4] == 0 & Flags_in[1] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        HS:  begin
-                if (Flags_in[4] == 1 | Flags_in[1] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        GT:  begin
-                if (Flags_in[0] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        LE:  begin
-                if (Flags_in[0] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        FS:  begin
-                if (Flags_in[2] == 1) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        FC:  begin
-                if (Flags_in[2] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        LT:  begin
-                if (Flags_in[0] == 0 & Flags_in[1] == 0) begin
-                    check_flags = 1; // Return 1 if condition is met
-                end
-             end
-        UC:  begin
-                // Your specific condition for UC here
-                // If condition is met, return 1
-                check_flags = 1;  // Placeholder for UC condition
-             end
-        XX:  begin
-                // Your specific condition for XX here
-                // If condition is met, return 1
-                check_flags = 1;  // Placeholder for XX condition
-             end
-        // Default case to handle unexpected conditions
-        default: begin
-                    check_flags = 0; // Return 0 if no condition is met
-                 end
-    endcase
+function integer check_flags;
+    input [3:0] cond;      // use Rdest_select here for Bcond
+    input [4:0] Flags_in;  // ALU flags
+    begin
+        // default every call (prevents stale/latch-like behavior)
+        check_flags = 0;
+
+        case (cond)
+            EQ: begin
+                if (Flags_in[1] == 1'b1)
+                    check_flags = 1;
+            end
+
+            NE: begin
+                if (Flags_in[1] == 1'b0)
+                    check_flags = 1;
+            end
+
+            GE: begin
+                if ((Flags_in[1] == 1'b1) || (Flags_in[0] == 1'b1))
+                    check_flags = 1;
+            end
+
+            CS: begin
+                if (Flags_in[3] == 1'b1)
+                    check_flags = 1;
+            end
+
+            CC: begin
+                if (Flags_in[3] == 1'b0)
+                    check_flags = 1;
+            end
+
+            HI: begin
+                if (Flags_in[4] == 1'b1)
+                    check_flags = 1;
+            end
+
+            LS: begin
+                if (Flags_in[4] == 1'b0)
+                    check_flags = 1;
+            end
+
+            LO: begin
+                if ((Flags_in[4] == 1'b0) && (Flags_in[1] == 1'b0))
+                    check_flags = 1;
+            end
+
+            HS: begin
+                if ((Flags_in[4] == 1'b1) || (Flags_in[1] == 1'b1))
+                    check_flags = 1;
+            end
+
+            GT: begin
+                if (Flags_in[0] == 1'b1)
+                    check_flags = 1;
+            end
+
+            LE: begin
+                if (Flags_in[0] == 1'b0)
+                    check_flags = 1;
+            end
+
+            FS: begin
+                if (Flags_in[2] == 1'b1)
+                    check_flags = 1;
+            end
+
+            FC: begin
+                if (Flags_in[2] == 1'b0)
+                    check_flags = 1;
+            end
+
+            LT: begin
+                if ((Flags_in[0] == 1'b0) && (Flags_in[1] == 1'b0))
+                    check_flags = 1;
+            end
+
+            UC: begin
+                // unconditional branch
+                check_flags = 1;
+            end
+
+            XX: begin
+                // reserved / never (safe default)
+                check_flags = 0;
+            end
+
+            default: begin
+                check_flags = 0;
+            end
+        endcase
+    end
 endfunction
 endmodule
