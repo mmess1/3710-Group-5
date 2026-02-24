@@ -152,8 +152,8 @@ module branch_TOP(
 	 hex7seg h2(.hex(pc_count[11:8]),	.seg(HEX2));
 	 hex7seg h3(.hex(pc_count[15:12]),	.seg(HEX3));
 	 
-	 hex7seg h4(.hex(r5[0:0]),				.seg(HEX4));
-	 hex7seg h5(.hex(r6[0:0]), 				.seg(HEX5));
+	 hex7seg h4(.hex(r5[3:0]),			.seg(HEX4));
+	 hex7seg h5(.hex(r6[3:0]), 			.seg(HEX5));
 
     assign LEDR = pc_add_k[7:0];
 
