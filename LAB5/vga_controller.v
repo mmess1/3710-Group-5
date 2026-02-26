@@ -3,9 +3,9 @@ module vga_controller (
 	input wire          rst,
 	output wire      vga_hs, 
 	output wire      vga_vs,
-	output wire vga_blank_n,
-	output reg [9:0] hcount,
-	output reg [9:0] vcount
+	output wire vga_blank_n, 	// can draw or not
+	output reg [9:0] hcount,	// current x cordinate
+	output reg [9:0] vcount		// current y cordinate
 );
 
 // Parameters for a VGA display resolution of 640 x 480 pixels (at a 60Hz refresh rate so 60 frames/second) display
@@ -32,28 +32,56 @@ always @(posedge vga_clk, negedge rst) begin
     if (~rst) begin
         hcount <= 10'd0;
         vcount <= 10'd0;
-    end 
-	 // Remember hcount will go from 0 to 799 for the 800 pixels and vcount will go to 525 lines.
-	 // hcount sets back to zero at the end of a line.
-	 // Vcount only updates after a line of pixels, vcount sets back to zero after a full frame.
-	 // TO DO: WRITE THE NESTED LOOPS TO KEEP TRACK OF VCOUNT AND HCOUNT
+    end
 	 
+	 /* Remember hcount will go from 0 to 799 for the 800 pixels and vcount will go to 525 lines.
+		hcount sets back to zero at the end of a line.
+		Vcount only updates after a line of pixels, vcount sets back to zero after a full frame.
+		TO DO: WRITE THE NESTED LOOPS TO KEEP TRACK OF VCOUNT AND HCOUNT
+	 */ 
+	   // Increment hcount (pixel position on the current line)
+     if (hcount < 799) begin
+            hcount <= hcount + 1;
+     end else begin
+        hcount <= 10'd0; // Reset hcount after 800 pixels (end of line)
+            
+        // Increment vcount only once hcount = 800
+        if (vcount < 524) begin
+                vcount <= vcount + 1;
+            end else begin
+                vcount <= 10'd0; // Reset vcount after 525 lines (end of frame)
+            end
+        end
+    end
 end
+	 
+
 
 // vga_hs is active LOW, so it should be 0 during the horizontal sync (H_SYNC) also know as the pulse region.
 // Otherwise, vga_hs should be 1 during. Recall hcount keeps track of what pixel you are at in a line.
 // TO DO: FILL IN WHAT BOOLEAN FUNCTION DESCRIBES VGA_HS
 // HINT: HCOUNT TELLS WHICH PIXEL IN A LINE YOU ARE AT -- IS IT IN THE H SYNC REGION???????
-assign vga_hs = ;
+
+// [visible area (640)] --> [front Porch (16)] --> [Horizontal Sync (96)] --> [back Porch (48) ]
+// Pixels:      (0 - 640)             (641 - 656)                 (689 - 784)          (785 - 800)
+ 
+ assign vga_hs = (hcount <= (H_DISPLAY + H_FRONT_PORCH))) | (hcount >= (H_TOTAL - H_BACK_PORCH));
+ 
 
 // vga_vs is active LOW, so it should be 0 during the vertical sync (V_SYNC) also know as the pulse region.
 // Recall vcount keeps track of what line you are at.
 // TO DO: FILL IN WHAT BOOLEAN FUNCTION DESCRIBES VGA_VS
 // HINT: VCOUNT TELLS WHICH LINE IN A FRAM YOU ARE AT -- IS IT IN THE V SYNC REGION???????
-assign vga_vs = ;
+
+// [visible area (480)] --> [front Porch (10)] --> [Vertical Sync (2)] --> [back Porch (33) ]
+// Pixels:      (0 - 480)             (641 - 688)             (689 - 784)          (785 - 800)
+
+assign vga_vs = (vcount <= (V_DISPLAY + V_FRONT_PORCH))) | (vcount >= (V_TOTAL - V_BACK_PORCH));
 
 // vga_blank_n is active LOW during blank regions (porches and syncs), and HIGH during video transmission. 
 // TO DO: FILL IN WHAT BOOLEAN FUNCTION DESCRIBES VGA_BLANK_N
-assign vga_blank_n = ;
+
+assign vga_blank_n = (hcount < H_DISPLAY)) & (vcount < V_DISPLAY);
+
 
 endmodule
