@@ -127,16 +127,6 @@ set_location_assignment PIN_AF10 -to SW[3]
 set_location_assignment PIN_AF9 -to SW[2]
 set_location_assignment PIN_AC12 -to SW[1]
 set_location_assignment PIN_AB12 -to SW[0]
-set_global_assignment -name VERILOG_FILE branch_TOP.v
-set_global_assignment -name VERILOG_FILE data_path.v
-set_global_assignment -name VERILOG_FILE decoder.v
-set_global_assignment -name VERILOG_FILE hex7seg.v
-set_global_assignment -name VERILOG_FILE instr_buffer.v
-set_global_assignment -name VERILOG_FILE load_store_FSM.v
-set_global_assignment -name VERILOG_FILE MUXs.v
-set_global_assignment -name VERILOG_FILE pc.v
-set_global_assignment -name VERILOG_FILE regfile.v
-set_global_assignment -name VERILOG_FILE util/clock_div.v
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -203,16 +193,11 @@ set_instance_assignment -name IO_STANDARD "2.5 V" -to SW[3]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to SW[2]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to SW[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to SW[0]
-set_global_assignment -name VERILOG_FILE bram.v
-set_global_assignment -name AHDL_FILE branch.txt
-set_global_assignment -name VERILOG_FILE "LAB4b-tbs/load_store_TB.v"
 set_global_assignment -name EDA_TEST_BENCH_FILE "LAB2-tbs/mul_shift_flag_FSM.v" -section_id mul_shift_flag_FSM
 set_global_assignment -name EDA_TEST_BENCH_NAME load_store_TB -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id load_store_TB
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME load_store_TB -section_id load_store_TB
 set_global_assignment -name EDA_TEST_BENCH_FILE "LAB4b-tbs/load_store_TB.v" -section_id load_store_TB
-set_global_assignment -name VERILOG_FILE branch_FSM.v
-set_global_assignment -name VERILOG_FILE alu.v
 set_location_assignment PIN_AJ4 -to ADC_CS_N
 set_location_assignment PIN_AK4 -to ADC_DIN
 set_location_assignment PIN_AK3 -to ADC_DOUT
