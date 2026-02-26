@@ -1,0 +1,14 @@
+BEGIN 1:data_path:fast:work
+    ls_cntrl :  1:load_store_TB:fast:work
+    mem_we :  1:load_store_TB:fast:work
+    Rsrc_mux_out :  1:load_store_TB:fast:work
+END 
+BEGIN 1:bram:fast__1:work
+    ram :  1:load_store_TB:fast:work
+END 
+BEGIN 1:bram:fast:work
+    ram :  1:load_store_TB:fast:work
+END 
+BEGIN 1:branch_FSM:fast:work
+    PS :  1:load_store_TB:fast:work
+END 

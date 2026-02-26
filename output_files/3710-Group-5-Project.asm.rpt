@@ -1,5 +1,5 @@
 Assembler report for 3710-Group-5-Project
-Mon Feb  2 14:10:16 2026
+Tue Feb 24 00:19:03 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -10,7 +10,7 @@ Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
   2. Assembler Summary
   3. Assembler Settings
   4. Assembler Generated Files
-  5. Assembler Device Options: C:/Users/mmess/3710-Group-5/output_files/3710-Group-5-Project.sof
+  5. Assembler Device Options: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/output_files/3710-Group-5-Project.sof
   6. Assembler Messages
 
 
@@ -38,9 +38,9 @@ on the Quartus Prime software download page.
 +---------------------------------------------------------------+
 ; Assembler Summary                                             ;
 +-----------------------+---------------------------------------+
-; Assembler Status      ; Successful - Mon Feb  2 14:10:16 2026 ;
+; Assembler Status      ; Successful - Tue Feb 24 00:19:03 2026 ;
 ; Revision Name         ; 3710-Group-5-Project                  ;
-; Top-level Entity Name ; bram_FSM_TOP                          ;
+; Top-level Entity Name ; branch_TOP                            ;
 ; Family                ; Cyclone V                             ;
 ; Device                ; 5CSEMA5F31C6                          ;
 +-----------------------+---------------------------------------+
@@ -53,23 +53,23 @@ on the Quartus Prime software download page.
 +--------+---------+---------------+
 
 
-+-------------------------------------------------------------------+
-; Assembler Generated Files                                         ;
-+-------------------------------------------------------------------+
-; File Name                                                         ;
-+-------------------------------------------------------------------+
-; C:/Users/mmess/3710-Group-5/output_files/3710-Group-5-Project.sof ;
-+-------------------------------------------------------------------+
-
-
 +---------------------------------------------------------------------------------------------+
-; Assembler Device Options: C:/Users/mmess/3710-Group-5/output_files/3710-Group-5-Project.sof ;
-+----------------+----------------------------------------------------------------------------+
-; Option         ; Setting                                                                    ;
-+----------------+----------------------------------------------------------------------------+
-; JTAG usercode  ; 0x0124A392                                                                 ;
-; Checksum       ; 0x0124A392                                                                 ;
-+----------------+----------------------------------------------------------------------------+
+; Assembler Generated Files                                                                   ;
++---------------------------------------------------------------------------------------------+
+; File Name                                                                                   ;
++---------------------------------------------------------------------------------------------+
+; C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/output_files/3710-Group-5-Project.sof ;
++---------------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------+
+; Assembler Device Options: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/output_files/3710-Group-5-Project.sof ;
++----------------+------------------------------------------------------------------------------------------------------+
+; Option         ; Setting                                                                                              ;
++----------------+------------------------------------------------------------------------------------------------------+
+; JTAG usercode  ; 0x0208E364                                                                                           ;
+; Checksum       ; 0x0208E364                                                                                           ;
++----------------+------------------------------------------------------------------------------------------------------+
 
 
 +--------------------+
@@ -78,14 +78,14 @@ on the Quartus Prime software download page.
 Info: *******************************************************************
 Info: Running Quartus Prime Assembler
     Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
-    Info: Processing started: Mon Feb  2 14:10:07 2026
+    Info: Processing started: Tue Feb 24 00:18:52 2026
 Info: Command: quartus_asm --read_settings_files=off --write_settings_files=off 3710-Group-5-Project -c 3710-Group-5-Project
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (115030): Assembler is generating device programming files
 Info: Quartus Prime Assembler was successful. 0 errors, 1 warning
-    Info: Peak virtual memory: 5298 megabytes
-    Info: Processing ended: Mon Feb  2 14:10:16 2026
-    Info: Elapsed time: 00:00:09
-    Info: Total CPU time (on all processors): 00:00:07
+    Info: Peak virtual memory: 5379 megabytes
+    Info: Processing ended: Tue Feb 24 00:19:03 2026
+    Info: Elapsed time: 00:00:11
+    Info: Total CPU time (on all processors): 00:00:11
 
 

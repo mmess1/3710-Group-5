@@ -29,9 +29,9 @@ module load_store_TB;
     // was r0,r1 only
     wire [15:0] r0, r1, r2, r3, r4, r5;
 
-    localparam MEMFILE = "load_store.hex";
+    localparam MEMFILE = "C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch.hex";
 
-    load_store_FSM fsm(
+    branch_FSM fsm(
         .clk(clk),
         .reset(reset),
 
@@ -62,7 +62,7 @@ module load_store_TB;
     );
 
     data_path #(
-        .bram1text(MEMFILE)
+        .DATA_FILE(MEMFILE)
     ) dp(
         .clk(clk),
         .reset(reset),

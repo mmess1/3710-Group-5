@@ -1,0 +1,433 @@
+# Reading pref.tcl
+# //  Questa Altera Starter FPGA Edition-64
+# //  Version 2025.2 win64 May 31 2025
+# //
+# // Unpublished work. Copyright 2025 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+# do 3710-Group-5-Project_run_msim_rtl_verilog.do
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Questa Altera Starter FPGA Edition-64 vmap 2025.2 Lib Mapping Utility 2025.05 May 31 2025
+# vmap work rtl_work 
+# ** Note: (vmap-220) 'c:/altera_lite/25.1std/questa_fse/win64/../modelsim.ini' is used as the ini file.
+# Copying c:/altera_lite/25.1std/questa_fse/win64/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# 
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:04 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module branch_TOP
+# 
+# Top level modules:
+# 	branch_TOP
+# End time: 23:58:04 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:05 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module data_path
+# 
+# Top level modules:
+# 	data_path
+# End time: 23:58:05 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:05 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module decoder
+# 
+# Top level modules:
+# 	decoder
+# End time: 23:58:05 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:05 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module hex7seg
+# 
+# Top level modules:
+# 	hex7seg
+# End time: 23:58:05 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:05 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module instr_buffer
+# 
+# Top level modules:
+# 	instr_buffer
+# End time: 23:58:05 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:05 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module mux_16to1
+# -- Compiling module mux_2to1
+# 
+# Top level modules:
+# 	mux_16to1
+# 	mux_2to1
+# End time: 23:58:06 on Feb 23,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:06 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module pc
+# 
+# Top level modules:
+# 	pc
+# End time: 23:58:06 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:06 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module Register
+# -- Compiling module RegBank
+# 
+# Top level modules:
+# 	RegBank
+# End time: 23:58:06 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:06 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module clock_div
+# 
+# Top level modules:
+# 	clock_div
+# End time: 23:58:06 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:06 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module bram
+# -- Compiling module ram
+# 
+# Top level modules:
+# 	ram
+# End time: 23:58:06 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:07 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module branch_FSM
+# 
+# Top level modules:
+# 	branch_FSM
+# End time: 23:58:07 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:07 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module alu
+# 
+# Top level modules:
+# 	alu
+# End time: 23:58:07 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+# vlog  -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs {C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v}
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:58:07 on Feb 23,2026
+# vlog -reportprogress 300 -work work "+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs" C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v 
+# ** Note: (vlog-220) 'modelsim.ini' is used as the ini file.
+# -- Compiling module load_store_TB
+# 
+# Top level modules:
+# 	load_store_TB
+# End time: 23:58:07 on Feb 23,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+# vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cyclonev_ver -L cyclonev_hssi_ver -L cyclonev_pcie_hip_ver -L rtl_work -L work -voptargs="+acc"  load_store_TB
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cyclonev_ver -L cyclonev_hssi_ver -L cyclonev_pcie_hip_ver -L rtl_work -L work -voptargs=""+acc"" load_store_TB 
+# Start time: 23:58:07 on Feb 23,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# ** Note: (vopt-143) Recognized 1 FSM in module "branch_FSM(fast)".
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2685) [TFMPC] - Too few port connections for 'dp'.  Expected 36, found 26.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r15'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r14'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r13'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r12'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r11'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r10'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r9'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r8'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r7'.
+# ** Warning: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(66): (vopt-2718) [TFMPC] - Missing connection for port 'r6'.
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=12.
+# Loading work.load_store_TB(fast)
+# Loading work.branch_FSM(fast)
+# Loading work.decoder(fast)
+# Loading work.data_path(fast)
+# Loading work.RegBank(fast)
+# Loading work.Register(fast)
+# Loading work.mux_16to1(fast)
+# Loading work.mux_2to1(fast)
+# Loading work.alu(fast)
+# Loading work.ram(fast)
+# Loading work.bram(fast)
+# Loading work.bram(fast__1)
+# Loading work.pc(fast)
+# Loading work.instr_buffer(fast)
+# ** Warning: (vsim-3015) [PCDPC] - Port size (8) does not match connection size (16) for port 'Imm_in'. The port definition is at: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v(18).
+#    Time: 0 ps  Iteration: 0  Instance: /load_store_TB/fsm File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v Line: 34
+# ** Warning: (vsim-3015) [PCDPC] - Port size (16) does not match connection size (8) for port 'Imm_in'. The port definition is at: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v(4).
+#    Time: 0 ps  Iteration: 0  Instance: /load_store_TB/fsm/u_decoder File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v Line: 151
+# ** Warning: (vsim-3015) [PCDPC] - Port size (8) does not match connection size (16) for port 'Imm_in'. The port definition is at: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v(29).
+#    Time: 0 ps  Iteration: 0  Instance: /load_store_TB/dp File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v Line: 66
+# ** Warning: (vsim-3015) [PCDPC] - Port size (16) does not match connection size (8) for port 'in1'. The port definition is at: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v(33).
+#    Time: 0 ps  Iteration: 0  Instance: /load_store_TB/dp/Rsrc_Imm_mux File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v Line: 173
+# 
+# add wave *
+# view structure
+# .main_pane.structure.interior.cs.body.struct
+# view signals
+# .main_pane.objects.interior.cs.body.tree
+# run -all
+# [10000] reset=0
+# [30000] reset=0
+# [50000] reset=0
+# [70000] cyc=3  PC=0000  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [90000] cyc=4  PC=0000  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [110000] cyc=5  PC=0000  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [130000] cyc=6  PC=0001  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [150000] cyc=7  PC=0001  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [170000] cyc=8  PC=0001  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [190000] cyc=9  PC=0002  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [210000] cyc=10  PC=0002  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [230000] cyc=11  PC=0002  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [250000] cyc=12  PC=0003  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [270000] cyc=13  PC=0003  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [290000] cyc=14  PC=0003  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=0000  r4=0000  r5=0000
+# [310000] cyc=15  PC=0004  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [330000] cyc=16  PC=0004  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [350000] cyc=17  PC=0004  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [370000] cyc=18  PC=0005  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=0000
+# [390000] cyc=19  PC=0005  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=0000
+# [410000] cyc=20  PC=0005  state=      EXEC  r0=0000  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=0000
+# [430000] cyc=21  PC=0006  state=     FETCH  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [450000] cyc=22  PC=0006  state=    DECODE  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [470000] cyc=23  PC=0006  state=      LOAD  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [490000] cyc=24  PC=0006  state=      DOUT  r0=0000  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [510000] cyc=25  PC=0007  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [530000] cyc=26  PC=0007  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [550000] cyc=27  PC=0007  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=0000
+# [570000] cyc=28  PC=0008  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [590000] cyc=29  PC=0008  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [610000] cyc=30  PC=0008  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [630000] cyc=31  PC=0009  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [650000] cyc=32  PC=0009  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [670000] cyc=33  PC=0009  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [690000] cyc=34  PC=000a  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [710000] cyc=35  PC=000a  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [730000] cyc=36  PC=000a  state=         ?  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [750000] cyc=37  PC=000e  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [770000] cyc=38  PC=000e  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [790000] cyc=39  PC=000e  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=0000  r5=zz00
+# [810000] cyc=40  PC=000f  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=zz00
+# [830000] cyc=41  PC=000f  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=zz00
+# [850000] cyc=42  PC=000f  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=zz00
+# [870000] cyc=43  PC=0010  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [890000] cyc=44  PC=0010  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [910000] cyc=45  PC=0010  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [930000] cyc=46  PC=0011  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [950000] cyc=47  PC=0011  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [970000] cyc=48  PC=0011  state=         ?  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [990000] cyc=49  PC=0012  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1010000] cyc=50  PC=0012  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1030000] cyc=51  PC=0012  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1050000] cyc=52  PC=0013  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1070000] cyc=53  PC=0013  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1090000] cyc=54  PC=0013  state=         ?  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1110000] cyc=55  PC=0014  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1130000] cyc=56  PC=0014  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1150000] cyc=57  PC=0014  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1170000] cyc=58  PC=0015  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1190000] cyc=59  PC=0015  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1210000] cyc=60  PC=0015  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1230000] cyc=61  PC=0016  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1250000] cyc=62  PC=0016  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1270000] cyc=63  PC=0016  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1290000] cyc=64  PC=0017  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1310000] cyc=65  PC=0017  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1330000] cyc=66  PC=0017  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1350000] cyc=67  PC=0018  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1370000] cyc=68  PC=0018  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1390000] cyc=69  PC=0018  state=         ?  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1410000] cyc=70  PC=0019  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1430000] cyc=71  PC=0019  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1450000] cyc=72  PC=0019  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1470000] cyc=73  PC=001a  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1490000] cyc=74  PC=001a  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1510000] cyc=75  PC=001a  state=         ?  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1530000] cyc=76  PC=001b  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1550000] cyc=77  PC=001b  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1570000] cyc=78  PC=001b  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1590000] cyc=79  PC=001c  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1610000] cyc=80  PC=001c  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1630000] cyc=81  PC=001c  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1650000] cyc=82  PC=001d  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1670000] cyc=83  PC=001d  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1690000] cyc=84  PC=001d  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1710000] cyc=85  PC=001e  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1730000] cyc=86  PC=001e  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1750000] cyc=87  PC=001e  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1770000] cyc=88  PC=001f  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1790000] cyc=89  PC=001f  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1810000] cyc=90  PC=001f  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1830000] cyc=91  PC=0020  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1850000] cyc=92  PC=0020  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1870000] cyc=93  PC=0020  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1890000] cyc=94  PC=0021  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1910000] cyc=95  PC=0021  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1930000] cyc=96  PC=0021  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1950000] cyc=97  PC=0022  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1970000] cyc=98  PC=0022  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [1990000] cyc=99  PC=0022  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2010000] cyc=100  PC=0023  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2030000] cyc=101  PC=0023  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2050000] cyc=102  PC=0023  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2070000] cyc=103  PC=0024  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2090000] cyc=104  PC=0024  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2110000] cyc=105  PC=0024  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2130000] cyc=106  PC=0025  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2150000] cyc=107  PC=0025  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2170000] cyc=108  PC=0025  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2190000] cyc=109  PC=0026  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2210000] cyc=110  PC=0026  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2230000] cyc=111  PC=0026  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2250000] cyc=112  PC=0027  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2270000] cyc=113  PC=0027  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2290000] cyc=114  PC=0027  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2310000] cyc=115  PC=0028  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2330000] cyc=116  PC=0028  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2350000] cyc=117  PC=0028  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2370000] cyc=118  PC=0029  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2390000] cyc=119  PC=0029  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2410000] cyc=120  PC=0029  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2430000] cyc=121  PC=002a  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2450000] cyc=122  PC=002a  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2470000] cyc=123  PC=002a  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2490000] cyc=124  PC=002b  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2510000] cyc=125  PC=002b  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2530000] cyc=126  PC=002b  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2550000] cyc=127  PC=002c  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2570000] cyc=128  PC=002c  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2590000] cyc=129  PC=002c  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2610000] cyc=130  PC=002d  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2630000] cyc=131  PC=002d  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2650000] cyc=132  PC=002d  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2670000] cyc=133  PC=002e  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2690000] cyc=134  PC=002e  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2710000] cyc=135  PC=002e  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2730000] cyc=136  PC=002f  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2750000] cyc=137  PC=002f  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2770000] cyc=138  PC=002f  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2790000] cyc=139  PC=0030  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2810000] cyc=140  PC=0030  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2830000] cyc=141  PC=0030  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2850000] cyc=142  PC=0031  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2870000] cyc=143  PC=0031  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2890000] cyc=144  PC=0031  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2910000] cyc=145  PC=0032  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2930000] cyc=146  PC=0032  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2950000] cyc=147  PC=0032  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2970000] cyc=148  PC=0033  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [2990000] cyc=149  PC=0033  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3010000] cyc=150  PC=0033  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3030000] cyc=151  PC=0034  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3050000] cyc=152  PC=0034  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3070000] cyc=153  PC=0034  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3090000] cyc=154  PC=0035  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3110000] cyc=155  PC=0035  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3130000] cyc=156  PC=0035  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3150000] cyc=157  PC=0036  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3170000] cyc=158  PC=0036  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3190000] cyc=159  PC=0036  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3210000] cyc=160  PC=0037  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3230000] cyc=161  PC=0037  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3250000] cyc=162  PC=0037  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3270000] cyc=163  PC=0038  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3290000] cyc=164  PC=0038  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3310000] cyc=165  PC=0038  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3330000] cyc=166  PC=0039  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3350000] cyc=167  PC=0039  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3370000] cyc=168  PC=0039  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3390000] cyc=169  PC=003a  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3410000] cyc=170  PC=003a  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3430000] cyc=171  PC=003a  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3450000] cyc=172  PC=003b  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3470000] cyc=173  PC=003b  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3490000] cyc=174  PC=003b  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3510000] cyc=175  PC=003c  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3530000] cyc=176  PC=003c  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3550000] cyc=177  PC=003c  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3570000] cyc=178  PC=003d  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3590000] cyc=179  PC=003d  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3610000] cyc=180  PC=003d  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3630000] cyc=181  PC=003e  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3650000] cyc=182  PC=003e  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3670000] cyc=183  PC=003e  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3690000] cyc=184  PC=003f  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3710000] cyc=185  PC=003f  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3730000] cyc=186  PC=003f  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3750000] cyc=187  PC=0040  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3770000] cyc=188  PC=0040  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3790000] cyc=189  PC=0040  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3810000] cyc=190  PC=0041  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3830000] cyc=191  PC=0041  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3850000] cyc=192  PC=0041  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3870000] cyc=193  PC=0042  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3890000] cyc=194  PC=0042  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3910000] cyc=195  PC=0042  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3930000] cyc=196  PC=0043  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3950000] cyc=197  PC=0043  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3970000] cyc=198  PC=0043  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [3990000] cyc=199  PC=0044  state=     FETCH  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [4010000] cyc=200  PC=0044  state=    DECODE  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# [4030000] cyc=201  PC=0044  state=      EXEC  r0=d010  r1=0000  r2=0000  r3=zz09  r4=zz09  r5=xxxx
+# ** Note: $finish    : C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v(171)
+#    Time: 4030 ns  Iteration: 1  Instance: /load_store_TB
+# 1
+# Break in Module load_store_TB at C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v line 171
+# End time: 00:36:03 on Feb 25,2026, Elapsed time: 24:37:56
+# Errors: 0, Warnings: 16

@@ -1,0 +1,36 @@
+0: D010 // r0 = 0x10
+1: D122 // r1 = 0x22
+2: D222 // r2 = 0x22
+3: D309 // r3 = 0x09
+4: 04D3 // r4 = r3
+
+5: 4440 // MEM[r0] = r4
+6: 4700 // r7 = MEM[r0]
+
+7: D500 // r5 = 0 success count
+8: D600 // r6 = 0 fail count
+
+9: 01B2 // CMP r2 r1 -> equal
+10: C004 // BEQ +4 -> jump to 15 if pass
+11: 5601 // fail r6++
+12: CE03 // BUC +3 -> jump to 16
+13: 04D3 // filler dummy (skipped)
+14: 04D3 // filler dummy (skipped)
+15: 5501 // pass r5++
+
+16: 03B1 // CMP r1 r3 -> greater than
+17: C604 // BGT +4 -> jump to 22 if pass
+18: 5601 // fail r6++
+19: CE03 // BUC +3 -> jump to 23
+20: 04D3 // filler dummy (skipped)
+21: 04D3 // filler dummy (skipped)
+22: 5501 // pass r5++
+
+23: 03B1 // CMP r1 r3 again -> not less than
+24: CC04 // BLT +4 -> jump to 29 if pass (won't happen here)
+25: 5601 // fail r6++
+26: CE03 // BUC +3 -> jump to 30
+27: 04D3 // filler dummy (skipped)
+28: 04D3 // filler dummy (skipped)
+29: 5501 // pass r5++
+30: 0000 // stop / wait

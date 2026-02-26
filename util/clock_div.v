@@ -6,8 +6,8 @@ module clock_div #(parameter integer DIV = 3_000_000) (
     // Integer for counting cycles
     reg [31:0] cnt; // Ensure this is a register
 
-    always @(posedge clk_in or posedge reset) begin
-        if (reset) begin
+    always @(posedge clk_in or negedge reset) begin
+        if (!reset) begin
             cnt     <= 0;         // Reset the counter to 0
             clk_out <= 1'b0;      // Reset the output clock to 0
         end else begin

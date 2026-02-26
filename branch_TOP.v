@@ -27,7 +27,7 @@ module branch_TOP(
     wire [7:0]  opcode;
     wire [3:0]  Rdest_select;
     wire [3:0]  Rsrc_select;
-    wire [7:0] Imm_in;
+    wire [7:0]  Imm_in;
     wire        Imm_select;
 
     wire we_a, en_a, en_b, ram_wen;
@@ -148,10 +148,11 @@ module branch_TOP(
 
     hex7seg h0(.hex(pc_count[3:0]),		.seg(HEX0));
     hex7seg h1(.hex(pc_count[7:4]),		.seg(HEX1));
-	 hex7seg h2(.hex(pc_count[11:8]),	.seg(HEX2));
-	 hex7seg h3(.hex(pc_count[15:12]),	.seg(HEX3));
-	 
-	 hex7seg h4(.hex(r5[3:0]),			.seg(HEX4));
+
+    hex7seg h2(.hex(pc_add_k[3:0]),		.seg(HEX2));
+    hex7seg h3(.hex(pc_add_k[7:4]),		.seg(HEX3));
+
+	 hex7seg h4(.hex(r5[3:0]),				.seg(HEX4));
 	 hex7seg h5(.hex(r6[3:0]), 			.seg(HEX5));
 
     assign LEDR = pc_add_k[7:0];

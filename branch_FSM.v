@@ -1,5 +1,5 @@
 module branch_FSM (
-	 
+
 	 input wire clk,
     input wire reset,     // active-low reset
 
@@ -15,7 +15,7 @@ module branch_FSM (
     output wire [7:0]  opcode,
     output wire [3:0]  Rdest_select,
     output wire [3:0]  Rsrc_select,
-    output wire [7:0] Imm_in,
+    output wire [7:0]  Imm_in,
     output reg         Imm_select,
 
     /* RAM */
@@ -66,8 +66,6 @@ localparam [15:0] WAIT  = 16'b0000_xxxx_0000_xxxx;
 localparam [15:0] BRANCH = 16'b1100_xxxx_xxxx_xxxx;
 
 // branch coditions:
-// Define 16 branch condition flags as localparams
-// Define 16 branch condition flags as localparams
 localparam [3:0] EQ  = 4'b0000;   // Equal (result == 0)
 localparam [3:0] NE  = 4'b0001;   // Not Equal (result != 0)
 localparam [3:0] GE  = 4'b1101;   // Greater Than or Equal (signed, result >= 0)
@@ -97,10 +95,13 @@ localparam [15:0] STOR  = 16'b0100_xxx_0100_xxxx;
     localparam [2:0] S3_STORE   = 3'd3;
     localparam [2:0] S4_LOAD    = 3'd4;
     localparam [2:0] S5_DOUT    = 3'd5;
-	 
+
 	 localparam [2:0] S6_BRANCH  = 3'd6;
 
     reg [2:0] PS, NS;  // Present state and next state
+
+    // ADDED: save compare flags inside FSM for later branch use
+    reg [4:0] saved_flags;
 
     // State register
     always @(posedge clk or negedge reset) begin
@@ -108,6 +109,14 @@ localparam [15:0] STOR  = 16'b0100_xxx_0100_xxxx;
             PS <= S0_FETCH; // Default to fetch state on reset
         else
             PS <= NS;
+    end
+
+    // ADDED: latch flags only on CMP/CMPI execute cycle
+    always @(posedge clk or negedge reset) begin
+        if (!reset)
+            saved_flags <= 5'b0;
+        else if ((PS == S2_EXECUTE) && ((opcode == 8'h0B) || (opcode == 8'hB0)))
+            saved_flags <= Flags_in;
     end
 
     // Next-state logic
@@ -218,17 +227,15 @@ localparam [15:0] STOR  = 16'b0100_xxx_0100_xxxx;
                 wEnable = (16'h0001 << Rsrc_select);
                 pc_en = 1'b1;
             end
-				
-				S6_BRANCH: begin // RANCHE -- pc + k
-						
+
+				S6_BRANCH: begin // BRANCH -- pc + k
 						pc_en = 1'b1;
-						
-						if (check_flags(Rdest_select, Flags_in)) begin
-							// k == imm vlaue
-							pc_add_k = $signed(Imm_in[7:0]);						// enable pc + k
-							pc_mux_selct = 1;
+						pc_add_k = {{8{Imm_in[7]}}, Imm_in};
+
+						// use saved CMP/CMPI flags, not live Flags_in
+						if (check_flags(Rdest_select, saved_flags)) begin
+							pc_mux_selct = 1'b1;
 						end
-						
 				end
 		 endcase
     end
@@ -314,7 +321,7 @@ function integer check_flags;
 
             UC: begin
                 // unconditional branch
-                check_flags = 1;
+					check_flags = 0; // temporary safe default until mapped
             end
 
             XX: begin

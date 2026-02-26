@@ -1,7 +1,10 @@
 
-State Machine - |bram_FSM_TOP|bram_FSM:FSM|PS
-Name PS.s_final PS.s_write PS.s_read PS.s_init 
-PS.s_init 0 0 0 0 
-PS.s_read 0 0 1 1 
-PS.s_write 0 1 0 1 
-PS.s_final 1 0 0 1 
+State Machine - |branch_TOP|branch_FSM:fsm|PS
+Name PS.S6_BRANCH PS.S5_DOUT PS.S4_LOAD PS.S3_STORE PS.S2_EXECUTE PS.S1_DECODE PS.S0_FETCH 
+PS.S0_FETCH 0 0 0 0 0 0 0 
+PS.S1_DECODE 0 0 0 0 0 1 1 
+PS.S2_EXECUTE 0 0 0 0 1 0 1 
+PS.S3_STORE 0 0 0 1 0 0 1 
+PS.S4_LOAD 0 0 1 0 0 0 1 
+PS.S5_DOUT 0 1 0 0 0 0 1 
+PS.S6_BRANCH 1 0 0 0 0 0 1 

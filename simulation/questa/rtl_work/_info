@@ -1,0 +1,418 @@
+m255
+K4
+z2
+!s12c _opt
+Z0 !s99 nomlopt
+!s11f vlog 2025.2 2025.05, May 31 2025
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z1 dC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/simulation/questa
+T_opt
+!i145 1
+!i144 0
+!s110 1771916289
+Vci22NDoQD;dCeI7jN5S^Y3
+04 13 4 work load_store_TB fast 0
+=1-f02f741cc12f-699d4c00-1c1-7894
+R0
+!s12f OEM100
+!s12b OEM100
+!s124 OEM10U34 
+!s135 nogc
+o-quiet -auto_acc_if_foreign -work work -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cyclonev_ver -L cyclonev_hssi_ver -L cyclonev_pcie_hip_ver -L rtl_work -L work +acc
+tCvgOpt 0 defaultOptions 1107585188
+n@_opt
+OL;O;2025.2;82
+valu
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v
+Z2 !s110 1771916287
+!i10b 1
+!s100 @Bg_C;XcS]8eH578iA4Kb2
+IM[ZmzRol_AfLad?BO=?l[3
+R1
+Z3 w1771546953
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v
+!i122 11
+L0 16 210
+Z4 VDg1SIo80bB@j0V0VzS_@n1
+Z5 OL;L;2025.2;82
+r1
+!s85 0
+31
+Z6 !s108 1771916287.000000
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/alu.v|
+!i113 0
+Z7 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z8 !s92 -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5 -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z9 tCvgOpt 0 defaultOptions 1085333592
+vbram
+Z10 2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v
+Z11 !s110 1771916286
+!i10b 1
+!s100 RMem8gi_=0QL18@b7bLX:2
+INMjFE7BLAbSGE51aZA_Z52
+R1
+R3
+Z12 8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v
+Z13 FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v
+!i122 9
+L0 4 55
+R4
+R5
+r1
+!s85 0
+31
+Z14 !s108 1771916286.000000
+Z15 !s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v|
+Z16 !s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/bram.v|
+!i113 0
+R7
+R8
+R9
+vbranch_FSM
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v
+R2
+!i10b 1
+!s100 :MDaC5=Um8BF>hW2W53?g0
+IoF`2:oa<CW6W@;P9GZoY`1
+R1
+w1771915518
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v
+!i122 10
+L0 1 338
+R4
+R5
+r1
+!s85 0
+31
+R6
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_FSM.v|
+!i113 0
+R7
+R8
+R9
+nbranch_@f@s@m
+vbranch_TOP
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v
+!s110 1771916284
+!i10b 1
+!s100 g6MHbVZa]dlIH5GIAK[Q<0
+IF7fWfaP8cEYM[9gdlN]>U1
+R1
+w1771915463
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v
+!i122 0
+L0 1 160
+R4
+R5
+r1
+!s85 0
+31
+!s108 1771916284.000000
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch_TOP.v|
+!i113 0
+R7
+R8
+R9
+nbranch_@t@o@p
+vclock_div
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v
+R11
+!i10b 1
+!s100 h[:@zdC`Le6T?A]RF@m4B3
+I[DaCPkl[PgdB<SWkX;LDj2
+R1
+w1771910219
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v
+!i122 8
+L0 1 22
+R4
+R5
+r1
+!s85 0
+31
+R14
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util/clock_div.v|
+!i113 0
+R7
+!s92 -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/util -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+vdata_path
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v
+Z17 !s110 1771916285
+!i10b 1
+!s100 B=ie8@8GfQ1<9MVO`<K^W3
+IzOT@Q96LiKR@zM;i^k3jg0
+R1
+w1771915473
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v
+!i122 1
+L0 1 268
+R4
+R5
+r1
+!s85 0
+31
+Z18 !s108 1771916285.000000
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/data_path.v|
+!i113 0
+R7
+R8
+R9
+vdecoder
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v
+R17
+!i10b 1
+!s100 =^VV^YMck2Ukj:IcMB`cj0
+IfO2z_A`]EXCe5KYkkRbR21
+R1
+R3
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v
+!i122 2
+L0 1 20
+R4
+R5
+r1
+!s85 0
+31
+R18
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/decoder.v|
+!i113 0
+R7
+R8
+R9
+vhex7seg
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v
+R17
+!i10b 1
+!s100 lccj^Q=6SC793OA0lA1LR2
+I^LF=PH_zk;Mkmd_?WFb=G3
+R1
+w1771743304
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v
+!i122 3
+L0 1 28
+R4
+R5
+r1
+!s85 0
+31
+R18
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/hex7seg.v|
+!i113 0
+R7
+R8
+R9
+vinstr_buffer
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v
+R17
+!i10b 1
+!s100 GhN4@QL8`znC7QQD=LO9^3
+ISf]zZ<FTzA_hg@RDNYI5:1
+R1
+R3
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v
+!i122 4
+Z19 L0 1 16
+R4
+R5
+r1
+!s85 0
+31
+R18
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/instr_buffer.v|
+!i113 0
+R7
+R8
+R9
+vload_store_TB
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v
+R2
+!i10b 1
+!s100 ;S]^cH@RKe08OcNjVmk5f2
+IZ=]J<6HzHzT`T8nOk05ah2
+R1
+w1771909230
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v
+!i122 12
+L0 3 172
+R4
+R5
+r1
+!s85 0
+31
+R6
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs/load_store_TB.v|
+!i113 0
+R7
+!s92 -work work +incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/LAB4b-tbs -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R9
+nload_store_@t@b
+vmux_16to1
+Z20 2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v
+R11
+!i10b 1
+!s100 N==^<TQn]>3P`CKj7=V4Z1
+Ibn9[a<Qe88S=njFojI5UI1
+R1
+R3
+Z21 8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v
+Z22 FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v
+!i122 5
+L0 1 29
+R4
+R5
+r1
+!s85 0
+31
+R18
+Z23 !s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v|
+Z24 !s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/MUXs.v|
+!i113 0
+R7
+R8
+R9
+vmux_2to1
+R20
+R11
+!i10b 1
+!s100 jQc9R[O^QmaYZk>9lcFl=3
+IQL9Ym3Uemf`dgH=e?=;mB2
+R1
+R3
+R21
+R22
+!i122 5
+L0 32 14
+R4
+R5
+r1
+!s85 0
+31
+R18
+R23
+R24
+!i113 0
+R7
+R8
+R9
+vpc
+2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v
+R11
+!i10b 1
+!s100 CebY6ZN>T>@3B<cdBn;f@2
+IlFURz``[f[_PCa?88Yihh3
+R1
+R3
+8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v
+FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v
+!i122 6
+R19
+R4
+R5
+r1
+!s85 0
+31
+R14
+!s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v|
+!s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/pc.v|
+!i113 0
+R7
+R8
+R9
+vram
+R10
+R11
+!i10b 1
+!s100 2FAag]0:d1:g=cALAj:7I3
+IiDL>YO1:lo<<WLe5]TV?K1
+R1
+R3
+R12
+R13
+!i122 9
+L0 60 59
+R4
+R5
+r1
+!s85 0
+31
+R14
+R15
+R16
+!i113 0
+R7
+R8
+R9
+vRegBank
+Z25 2C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v
+R11
+!i10b 1
+!s100 NPY4QIcV^M08;IV]bl4`31
+I39^NT@K>oioX<3<TO1gj93
+R1
+R3
+Z26 8C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v
+Z27 FC:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v
+!i122 7
+L0 53 28
+R4
+R5
+r1
+!s85 0
+31
+R14
+Z28 !s107 C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v|
+Z29 !s90 -reportprogress|300|-work|work|+incdir+C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5|C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/regfile.v|
+!i113 0
+R7
+R8
+R9
+n@reg@bank
+vRegister
+R25
+R11
+!i10b 1
+!s100 AEk<UJJ:@MQ0]=X=oXlnX3
+IQB6O>CCc4d;AQ4:RCd<>z1
+R1
+R3
+R26
+R27
+!i122 7
+L0 23 21
+R4
+R5
+r1
+!s85 0
+31
+R14
+R28
+R29
+!i113 0
+R7
+R8
+R9
+n@register
