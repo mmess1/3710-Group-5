@@ -27,26 +27,19 @@ parameter V_DISPLAY     = 10'd480; // Vertical Display Region -- 480 lines
 parameter V_FRONT_PORCH = 10'd10;  // Vertical Front Porch -- 10 lines
 parameter V_TOTAL       = 10'd525; // Vertical Total Width -- 2 + 33 + 480 + 10 = 525 lines
 
-// This always block keeps your hcount (which pixel in the line you are on) and vcount (which line you are on).
-always @(posedge vga_clk, negedge rst) begin
+always @(posedge vga_clk or negedge rst) begin
     if (~rst) begin
-        hcount <= 10'd0;
-        vcount <= 10'd0;
-    end
-	 
-	 /* Remember hcount will go from 0 to 799 for the 800 pixels and vcount will go to 525 lines.
-		hcount sets back to zero at the end of a line.
-		Vcount only updates after a line of pixels, vcount sets back to zero after a full frame.
-		TO DO: WRITE THE NESTED LOOPS TO KEEP TRACK OF VCOUNT AND HCOUNT
-	 */ 
-	   // Increment hcount (pixel position on the current line)
-     if (hcount < 799) begin
+        hcount <= 10'd0;   // Reset horizontal count to 0
+        vcount <= 10'd0;   // Reset vertical count to 0
+    end else begin
+        // Increment hcount (pixel position on the current line)
+        if (hcount < H_TOTAL - 1) begin
             hcount <= hcount + 1;
-     end else begin
-        hcount <= 10'd0; // Reset hcount after 800 pixels (end of line)
+        end else begin
+            hcount <= 10'd0; // Reset hcount after 800 pixels (end of line)
             
-        // Increment vcount only once hcount = 800
-        if (vcount < 524) begin
+            // Increment vcount (line position in the frame) after a line
+            if (vcount < V_TOTAL - 1) begin
                 vcount <= vcount + 1;
             end else begin
                 vcount <= 10'd0; // Reset vcount after 525 lines (end of frame)
@@ -65,7 +58,7 @@ end
 // [visible area (640)] --> [front Porch (16)] --> [Horizontal Sync (96)] --> [back Porch (48) ]
 // Pixels:      (0 - 640)             (641 - 656)                 (689 - 784)          (785 - 800)
  
- assign vga_hs = (hcount <= (H_DISPLAY + H_FRONT_PORCH))) | (hcount >= (H_TOTAL - H_BACK_PORCH));
+ assign vga_hs = (hcount <= (H_DISPLAY + H_FRONT_PORCH)) | (hcount >= (H_TOTAL - H_BACK_PORCH));
  
 
 // vga_vs is active LOW, so it should be 0 during the vertical sync (V_SYNC) also know as the pulse region.
@@ -76,12 +69,12 @@ end
 // [visible area (480)] --> [front Porch (10)] --> [Vertical Sync (2)] --> [back Porch (33) ]
 // Pixels:      (0 - 480)             (641 - 688)             (689 - 784)          (785 - 800)
 
-assign vga_vs = (vcount <= (V_DISPLAY + V_FRONT_PORCH))) | (vcount >= (V_TOTAL - V_BACK_PORCH));
+assign vga_vs = (vcount <= (V_DISPLAY + V_FRONT_PORCH)) | (vcount >= (V_TOTAL - V_BACK_PORCH));
 
 // vga_blank_n is active LOW during blank regions (porches and syncs), and HIGH during video transmission. 
 // TO DO: FILL IN WHAT BOOLEAN FUNCTION DESCRIBES VGA_BLANK_N
 
-assign vga_blank_n = (hcount < H_DISPLAY)) & (vcount < V_DISPLAY);
+assign vga_blank_n = (hcount < H_DISPLAY) & (vcount < V_DISPLAY);
 
 
 endmodule
