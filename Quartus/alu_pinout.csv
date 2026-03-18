@@ -119,3 +119,17 @@ VGA_R[4], Input, PIN_AE15, 3A, B3A_N0, PIN_AE15, 2.5 V,,,,,,,,,,,,,
 VGA_R[5], Input, PIN_AD15, 3A, B3A_N0, PIN_AD15, 2.5 V,,,,,,,,,,,,,
 VGA_R[6], Input, PIN_AF13, 3A, B3A_N0, PIN_AF13, 2.5 V,,,,,,,,,,,,,
 VGA_R[7], Input, PIN_AF6, 3A, B3A_N0, PIN_AF6, 2.5 V,,,,,,,,,,,,,
+
+// VGA Control Signal Pinout
+
+// VGA_BLANK_N (Active Low Blank Signal)
+VGA_BLANK_N, Input, PIN_AE16, 3A, B3A_N0, PIN_AE16, 2.5 V,,,,,,,,,,,,,
+
+// VGA Horizontal Sync (VGA_HS)
+VGA_HS, Output, PIN_AE17, 3A, B3A_N0, PIN_AE17, 2.5 V,,,,,,,,,,,,,
+
+// VGA Vertical Sync (VGA_VS)
+VGA_VS, Output, PIN_AE18, 3A, B3A_N0, PIN_AE18, 2.5 V,,,,,,,,,,,,,
+
+// VGA Clock (VGA_CLK)
+VGA_CLK, Input, PIN_AE19, 3A, B3A_N0, PIN_AE19, 2.5 V,,,,,,,,,,,,,
