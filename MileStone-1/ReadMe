@@ -1,10 +1,13 @@
 Goals:
 
-
+  - Generate a Stable Signal VGA using - 640x480 & 60Hz HSYNC
+  - Draw Backgrounds
+  - Center Dotted line
+  - Paddles
 
 Scope:
 
-
-
+  - Pixelclock + sync Generator
 
 Risks:
+   - idk
