@@ -1,33 +1,32 @@
 module data_path#(parameter DATA_FILE="")
 (
 	input wire clk, reset, ram_we,
-   
-	
+
 	/* Reg file */
 	input [15:0] wEnable,
-	
+
 	/* ALU */
-   input wire [7:0] opcode, 
+   input wire [7:0] opcode,
 	output wire [4:0] Flags_out,
-	
+
 	/* RAM */
 	input wire we_a, en_a, en_b,
-	
+
 	/* LS_cntr MUX */
 	input wire lsc_mux_selct,
-	
+
 	/* PC */
 	input wire [15:0] pc_add_k,
 	input wire pc_mux_selct, pc_en,
-	
+
 	//extern -->fsm
 	output wire [15:0]ram_out,
 	output wire [15:0] pc_count,
-	
-	/* MUXS: */ 
+
+	/* MUXS: */
 	input wire fsm_alu_mem_selct,
 	input wire [3:0] Rdest_select, Rsrc_select,
-	input wire  [15:0] Imm_in,
+	input wire  [7:0] Imm_in,
 	input wire Imm_select,
 
 	// debug / board
@@ -47,10 +46,9 @@ module data_path#(parameter DATA_FILE="")
 	output wire [15:0] r13,
 	output wire [15:0] r14,
 	output wire [15:0] r15
-
 );
-	 
-	 
+
+
 /************************************************************************
 						INTERNAL WIRE
 ***********************************************************************/
@@ -58,13 +56,13 @@ module data_path#(parameter DATA_FILE="")
 /***************************
 			RAM
 ***************************/
-	
-	/* ADDR == mem address */ 
+
+	/* ADDR == mem address */
 	wire [15:0] ls_cntrl; // from LS_cntrol
-	
+
 	/* DOUT (data out == inst) */
-	wire [15:0] q_a_wire; 
-	
+	wire [15:0] q_a_wire;
+
 	/* Enable wire */
 	wire mem_we;
 	assign mem_we = ram_we | we_a;
@@ -86,11 +84,11 @@ ALU / MUX wires / Regfile
 	wire[15:0] Rdest_mux_out;
 	wire[15:0] Rsrc_Imm_mux_out;
 	wire[15:0] Rsrc_mux_out;
-	
+
 	/* from ALU   --> reg file */
 	wire [15:0] alu_bus;
 	wire [15:0] alu_out;
-	
+
 	/* instruction buffer */
 	wire [15:0] instr_buf_out;
 	wire load_en;
@@ -104,7 +102,6 @@ ALU / MUX wires / Regfile
 						EXTERNAL WIRE: inputs
 ***********************************************************************/
 
-			 
 RegBank RegBank (
     .clk    (clk),
     .wEnable(wEnable),
@@ -193,20 +190,15 @@ RAM
 ram #(
 	.DATA_WIDTH(16),
 	.ADDR_WIDTH(10),
-	.DATA_FILE0(""),
-	.DATA_FILE1(DATA_FILE)
+	.DATA_FILE0(DATA_FILE),
+	.DATA_FILE1("")
 ) u_ram(
 	.data_a(Rsrc_mux_out),
-	.data_b(16'b0),
 	.addr_a(ls_cntrl[9:0]),
-	.addr_b(10'b0),
 	.we_a(mem_we),
-	.we_b(1'b0),
 	.clk(clk),
 	.en_a(en_a),
-	.en_b(1'b0),
-	.q_a(q_a_wire),
-	.q_b()
+	.q_a(q_a_wire)
 );
 
 /****************************
@@ -225,7 +217,7 @@ LSC control MUX: mem address comes from pc or Reg file
 PC MUX:
 *******************************/
 assign adder_one_wire = pc_out_wire + 16'd1;
-assign adder_k_wire   = pc_out_wire + pc_add_k;
+assign adder_k_wire   = pc_out_wire + $signed(pc_add_k);
 
  mux_2to1 pc_mux (
 	.in0 (adder_one_wire),
@@ -235,7 +227,7 @@ assign adder_k_wire   = pc_out_wire + pc_add_k;
 );
 
 /****************************
-PC 
+PC
 *******************************/
 pc pc1 (
     .pc_en(pc_en),

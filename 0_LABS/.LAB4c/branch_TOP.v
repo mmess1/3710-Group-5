@@ -1,4 +1,4 @@
-module load_store_TOP(
+module branch_TOP(
     input  wire        CLOCK_50,
     input  wire [3:0]  KEY,
     output wire [9:0]  LEDR,
@@ -6,8 +6,8 @@ module load_store_TOP(
     output wire [6:0]  HEX1,
     output wire [6:0]  HEX2,
     output wire [6:0]  HEX3,
-    output wire [6:0]  HEX4,
-    output wire [6:0]  HEX5
+	 output wire [6:0]  HEX4,
+	 output wire [6:0]  HEX5
 );
 
     // KEY[0] on the DE1 is active-low
@@ -16,7 +16,7 @@ module load_store_TOP(
     wire clk_slow;
 
     // Clock Divider (active-low reset)
-    clock_div #(.DIV(5_000_000)) u_div (
+    clock_div #(.DIV(6_000_000)) u_div (
         .clk_in (CLOCK_50),
         .reset  (reset_n),
         .clk_out(clk_slow)
@@ -27,7 +27,7 @@ module load_store_TOP(
     wire [7:0]  opcode;
     wire [3:0]  Rdest_select;
     wire [3:0]  Rsrc_select;
-    wire [15:0] Imm_in;
+    wire [7:0]  Imm_in;
     wire        Imm_select;
 
     wire we_a, en_a, en_b, ram_wen;
@@ -62,7 +62,7 @@ module load_store_TOP(
 
     wire [15:0] pc_count;
 
-    load_store_FSM fsm(
+    branch_FSM fsm(
         .clk(clk_slow),
         .reset(reset_n),
 
@@ -94,7 +94,7 @@ module load_store_TOP(
 
     data_path #(
         // NOTE: if Quartus can't find this, change to an absolute path like other labs
-        .DATA_FILE("LAB4b-tbs/load_store.hex")
+        .DATA_FILE("C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/branch.hex")
     ) dp(
         .clk(clk_slow),
         .reset(reset_n),
@@ -143,17 +143,18 @@ module load_store_TOP(
     );
 
     // Simple debug display:
-    //  - HEX1:HEX0 shows r0
-    //  - HEX3:HEX2 shows r1
-    //  - HEX5:HEX4 shows pc_count
-    hex7seg h0(.hex(r0[3:0]),       .seg(HEX0));
-    hex7seg h1(.hex(r0[7:4]),       .seg(HEX1));
-    hex7seg h2(.hex(r1[3:0]),       .seg(HEX2));
-    hex7seg h3(.hex(r1[7:4]),       .seg(HEX3));
+    //  - HEX3:HEX0 shows 16-bit pc_count
+	 //  - LEDR shows the current k value
 
-    hex7seg h4(.hex(pc_count[3:0]), .seg(HEX4));
-    hex7seg h5(.hex(pc_count[7:4]), .seg(HEX5));
+    hex7seg h0(.hex(pc_count[3:0]),		.seg(HEX0));
+    hex7seg h1(.hex(pc_count[7:4]),		.seg(HEX1));
 
-    assign LEDR = r2[9:0];
+    hex7seg h2(.hex(pc_add_k[3:0]),		.seg(HEX2));
+    hex7seg h3(.hex(pc_add_k[7:4]),		.seg(HEX3));
+
+	 hex7seg h4(.hex(r5[3:0]),				.seg(HEX4));
+	 hex7seg h5(.hex(r6[3:0]), 			.seg(HEX5));
+
+    assign LEDR = pc_add_k[7:0];
 
 endmodule
