@@ -1,6 +1,7 @@
 
 State Machine - |PONG_TOP|ADC_reader:adc0|state
-Name state.S_START state.S_SHIFT state.S_WAIT 
-state.S_START 0 0 0 
-state.S_WAIT 1 0 1 
-state.S_SHIFT 1 1 0 
+Name state.S_SHIFT_HIGH state.S_SHIFT_LOW state.S_WAIT state.S_CONV 
+state.S_CONV 0 0 0 0 
+state.S_WAIT 0 0 1 1 
+state.S_SHIFT_LOW 0 1 0 1 
+state.S_SHIFT_HIGH 1 0 0 1 

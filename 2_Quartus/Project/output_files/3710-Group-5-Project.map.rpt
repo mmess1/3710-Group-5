@@ -1,5 +1,5 @@
 Analysis & Synthesis report for 3710-Group-5-Project
-Fri Mar 27 14:15:31 2026
+Fri Mar 27 14:42:26 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -19,17 +19,15 @@ Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
  11. General Register Statistics
  12. Inverted Register Statistics
  13. Multiplexer Restructuring Statistics (Restructuring Performed)
- 14. Parameter Settings for User Entity Instance: ADC_reader:adc0
- 15. Parameter Settings for User Entity Instance: renderer:video0|vga_controller:vga_ctrl
- 16. Parameter Settings for Inferred Entity Instance: lpm_divide:Div1
- 17. Parameter Settings for Inferred Entity Instance: lpm_divide:Div0
- 18. Parameter Settings for Inferred Entity Instance: game_engine:game0|lpm_divide:Div1
- 19. Parameter Settings for Inferred Entity Instance: game_engine:game0|lpm_divide:Div0
- 20. Parameter Settings for Inferred Entity Instance: renderer:video0|lpm_divide:Mod0
- 21. Port Connectivity Checks: "ADC_reader:adc0"
- 22. Post-Synthesis Netlist Statistics for Top Partition
- 23. Elapsed Time Per Partition
- 24. Analysis & Synthesis Messages
+ 14. Parameter Settings for User Entity Instance: renderer:video0|vga_controller:vga_ctrl
+ 15. Parameter Settings for Inferred Entity Instance: lpm_divide:Div1
+ 16. Parameter Settings for Inferred Entity Instance: lpm_divide:Div0
+ 17. Parameter Settings for Inferred Entity Instance: ADC_reader:adc0|lpm_divide:Div0
+ 18. Parameter Settings for Inferred Entity Instance: renderer:video0|lpm_divide:Mod0
+ 19. Port Connectivity Checks: "ADC_reader:adc0"
+ 20. Post-Synthesis Netlist Statistics for Top Partition
+ 21. Elapsed Time Per Partition
+ 22. Analysis & Synthesis Messages
 
 
 
@@ -56,17 +54,17 @@ on the Quartus Prime software download page.
 +-----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                      ;
 +---------------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status     ; Successful - Fri Mar 27 14:15:31 2026           ;
+; Analysis & Synthesis Status     ; Successful - Fri Mar 27 14:42:26 2026           ;
 ; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name                   ; 3710-Group-5-Project                            ;
 ; Top-level Entity Name           ; PONG_TOP                                        ;
 ; Family                          ; Cyclone V                                       ;
 ; Logic utilization (in ALMs)     ; N/A                                             ;
-; Total registers                 ; 177                                             ;
+; Total registers                 ; 152                                             ;
 ; Total pins                      ; 90                                              ;
 ; Total virtual pins              ; 0                                               ;
 ; Total block memory bits         ; 0                                               ;
-; Total DSP Blocks                ; 2                                               ;
+; Total DSP Blocks                ; 1                                               ;
 ; Total HSSI RX PCSs              ; 0                                               ;
 ; Total HSSI PMA RX Deserializers ; 0                                               ;
 ; Total HSSI TX PCSs              ; 0                                               ;
@@ -213,62 +211,58 @@ on the Quartus Prime software download page.
 +---------------------------------------------+--------------+
 ; Resource                                    ; Usage        ;
 +---------------------------------------------+--------------+
-; Estimate of Logic utilization (ALMs needed) ; 279          ;
+; Estimate of Logic utilization (ALMs needed) ; 255          ;
 ;                                             ;              ;
-; Combinational ALUT usage for logic          ; 488          ;
+; Combinational ALUT usage for logic          ; 454          ;
 ;     -- 7 input functions                    ; 1            ;
-;     -- 6 input functions                    ; 61           ;
-;     -- 5 input functions                    ; 62           ;
-;     -- 4 input functions                    ; 63           ;
-;     -- <=3 input functions                  ; 301          ;
+;     -- 6 input functions                    ; 50           ;
+;     -- 5 input functions                    ; 63           ;
+;     -- 4 input functions                    ; 53           ;
+;     -- <=3 input functions                  ; 287          ;
 ;                                             ;              ;
-; Dedicated logic registers                   ; 177          ;
+; Dedicated logic registers                   ; 152          ;
 ;                                             ;              ;
 ; I/O pins                                    ; 90           ;
 ;                                             ;              ;
-; Total DSP Blocks                            ; 2            ;
+; Total DSP Blocks                            ; 1            ;
 ;                                             ;              ;
 ; Maximum fan-out node                        ; KEY[0]~input ;
-; Maximum fan-out                             ; 177          ;
-; Total fan-out                               ; 2450         ;
-; Average fan-out                             ; 2.89         ;
+; Maximum fan-out                             ; 152          ;
+; Total fan-out                               ; 2244         ;
+; Average fan-out                             ; 2.85         ;
 +---------------------------------------------+--------------+
 
 
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                                                                                                                                   ;
-+-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
-; Compilation Hierarchy Node                ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                         ; Entity Name         ; Library Name ;
-+-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
-; |PONG_TOP                                 ; 488 (12)            ; 177 (0)                   ; 0                 ; 2          ; 90   ; 0            ; |PONG_TOP                                                                                                                   ; PONG_TOP            ; work         ;
-;    |ADC_reader:adc0|                      ; 89 (89)             ; 88 (88)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0                                                                                                   ; ADC_reader          ; work         ;
-;    |game_engine:game0|                    ; 114 (90)            ; 44 (44)                   ; 0                 ; 2          ; 0    ; 0            ; |PONG_TOP|game_engine:game0                                                                                                 ; game_engine         ; work         ;
-;       |lpm_divide:Div0|                   ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div0                                                                                 ; lpm_divide          ; work         ;
-;          |lpm_divide_vcm:auto_generated|  ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div0|lpm_divide_vcm:auto_generated                                                   ; lpm_divide_vcm      ; work         ;
-;             |sign_div_unsign_5nh:divider| ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div0|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider                       ; sign_div_unsign_5nh ; work         ;
-;                |alt_u_div_g2f:divider|    ; 12 (12)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div0|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider|alt_u_div_g2f:divider ; alt_u_div_g2f       ; work         ;
-;       |lpm_divide:Div1|                   ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div1                                                                                 ; lpm_divide          ; work         ;
-;          |lpm_divide_vcm:auto_generated|  ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div1|lpm_divide_vcm:auto_generated                                                   ; lpm_divide_vcm      ; work         ;
-;             |sign_div_unsign_5nh:divider| ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div1|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider                       ; sign_div_unsign_5nh ; work         ;
-;                |alt_u_div_g2f:divider|    ; 12 (12)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0|lpm_divide:Div1|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider|alt_u_div_g2f:divider ; alt_u_div_g2f       ; work         ;
-;    |lpm_divide:Div0|                      ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0                                                                                                   ; lpm_divide          ; work         ;
-;       |lpm_divide_nbm:auto_generated|     ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated                                                                     ; lpm_divide_nbm      ; work         ;
-;          |sign_div_unsign_tlh:divider|    ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider                                         ; sign_div_unsign_tlh ; work         ;
-;             |alt_u_div_00f:divider|       ; 37 (37)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider|alt_u_div_00f:divider                   ; alt_u_div_00f       ; work         ;
-;    |lpm_divide:Div1|                      ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1                                                                                                   ; lpm_divide          ; work         ;
-;       |lpm_divide_nbm:auto_generated|     ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated                                                                     ; lpm_divide_nbm      ; work         ;
-;          |sign_div_unsign_tlh:divider|    ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider                                         ; sign_div_unsign_tlh ; work         ;
-;             |alt_u_div_00f:divider|       ; 37 (37)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider|alt_u_div_00f:divider                   ; alt_u_div_00f       ; work         ;
-;    |renderer:video0|                      ; 199 (67)            ; 45 (24)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0                                                                                                   ; renderer            ; work         ;
-;       |clk_divider:clk_div|               ; 1 (1)               ; 1 (1)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|clk_divider:clk_div                                                                               ; clk_divider         ; work         ;
-;       |lpm_divide:Mod0|                   ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0                                                                                   ; lpm_divide          ; work         ;
-;          |lpm_divide_i3m:auto_generated|  ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated                                                     ; lpm_divide_i3m      ; work         ;
-;             |sign_div_unsign_llh:divider| ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated|sign_div_unsign_llh:divider                         ; sign_div_unsign_llh ; work         ;
-;                |alt_u_div_gve:divider|    ; 72 (72)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated|sign_div_unsign_llh:divider|alt_u_div_gve:divider   ; alt_u_div_gve       ; work         ;
-;       |score_font:left_digit|             ; 14 (14)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|score_font:left_digit                                                                             ; score_font          ; work         ;
-;       |score_font:right_digit|            ; 13 (13)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|score_font:right_digit                                                                            ; score_font          ; work         ;
-;       |vga_controller:vga_ctrl|           ; 32 (32)             ; 20 (20)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|vga_controller:vga_ctrl                                                                           ; vga_controller      ; work         ;
-+-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                                                                                                                                 ;
++-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
+; Compilation Hierarchy Node                ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                       ; Entity Name         ; Library Name ;
++-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
+; |PONG_TOP                                 ; 454 (12)            ; 152 (0)                   ; 0                 ; 1          ; 90   ; 0            ; |PONG_TOP                                                                                                                 ; PONG_TOP            ; work         ;
+;    |ADC_reader:adc0|                      ; 96 (84)             ; 66 (66)                   ; 0                 ; 1          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0                                                                                                 ; ADC_reader          ; work         ;
+;       |lpm_divide:Div0|                   ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0|lpm_divide:Div0                                                                                 ; lpm_divide          ; work         ;
+;          |lpm_divide_vcm:auto_generated|  ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0|lpm_divide:Div0|lpm_divide_vcm:auto_generated                                                   ; lpm_divide_vcm      ; work         ;
+;             |sign_div_unsign_5nh:divider| ; 12 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0|lpm_divide:Div0|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider                       ; sign_div_unsign_5nh ; work         ;
+;                |alt_u_div_g2f:divider|    ; 12 (12)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|ADC_reader:adc0|lpm_divide:Div0|lpm_divide_vcm:auto_generated|sign_div_unsign_5nh:divider|alt_u_div_g2f:divider ; alt_u_div_g2f       ; work         ;
+;    |game_engine:game0|                    ; 66 (66)             ; 41 (41)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|game_engine:game0                                                                                               ; game_engine         ; work         ;
+;    |lpm_divide:Div0|                      ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0                                                                                                 ; lpm_divide          ; work         ;
+;       |lpm_divide_nbm:auto_generated|     ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated                                                                   ; lpm_divide_nbm      ; work         ;
+;          |sign_div_unsign_tlh:divider|    ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider                                       ; sign_div_unsign_tlh ; work         ;
+;             |alt_u_div_00f:divider|       ; 37 (37)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div0|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider|alt_u_div_00f:divider                 ; alt_u_div_00f       ; work         ;
+;    |lpm_divide:Div1|                      ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1                                                                                                 ; lpm_divide          ; work         ;
+;       |lpm_divide_nbm:auto_generated|     ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated                                                                   ; lpm_divide_nbm      ; work         ;
+;          |sign_div_unsign_tlh:divider|    ; 37 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider                                       ; sign_div_unsign_tlh ; work         ;
+;             |alt_u_div_00f:divider|       ; 37 (37)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|lpm_divide:Div1|lpm_divide_nbm:auto_generated|sign_div_unsign_tlh:divider|alt_u_div_00f:divider                 ; alt_u_div_00f       ; work         ;
+;    |renderer:video0|                      ; 206 (74)            ; 45 (24)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0                                                                                                 ; renderer            ; work         ;
+;       |clk_divider:clk_div|               ; 1 (1)               ; 1 (1)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|clk_divider:clk_div                                                                             ; clk_divider         ; work         ;
+;       |lpm_divide:Mod0|                   ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0                                                                                 ; lpm_divide          ; work         ;
+;          |lpm_divide_i3m:auto_generated|  ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated                                                   ; lpm_divide_i3m      ; work         ;
+;             |sign_div_unsign_llh:divider| ; 72 (0)              ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated|sign_div_unsign_llh:divider                       ; sign_div_unsign_llh ; work         ;
+;                |alt_u_div_gve:divider|    ; 72 (72)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|lpm_divide:Mod0|lpm_divide_i3m:auto_generated|sign_div_unsign_llh:divider|alt_u_div_gve:divider ; alt_u_div_gve       ; work         ;
+;       |score_font:left_digit|             ; 14 (14)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|score_font:left_digit                                                                           ; score_font          ; work         ;
+;       |score_font:right_digit|            ; 13 (13)             ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|score_font:right_digit                                                                          ; score_font          ; work         ;
+;       |vga_controller:vga_ctrl|           ; 32 (32)             ; 20 (20)                   ; 0                 ; 0          ; 0    ; 0            ; |PONG_TOP|renderer:video0|vga_controller:vga_ctrl                                                                         ; vga_controller      ; work         ;
++-------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
 Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
 
 
@@ -277,23 +271,24 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +---------------------------------+-------------+
 ; Statistic                       ; Number Used ;
 +---------------------------------+-------------+
-; Two Independent 18x18           ; 2           ;
-; Total number of DSP blocks      ; 2           ;
+; Two Independent 18x18           ; 1           ;
+; Total number of DSP blocks      ; 1           ;
 ;                                 ;             ;
-; Fixed Point Unsigned Multiplier ; 2           ;
+; Fixed Point Unsigned Multiplier ; 1           ;
 +---------------------------------+-------------+
 
 
 Encoding Type:  One-Hot
-+--------------------------------------------------------------+
-; State Machine - |PONG_TOP|ADC_reader:adc0|state              ;
-+---------------+---------------+---------------+--------------+
-; Name          ; state.S_START ; state.S_SHIFT ; state.S_WAIT ;
-+---------------+---------------+---------------+--------------+
-; state.S_START ; 0             ; 0             ; 0            ;
-; state.S_WAIT  ; 1             ; 0             ; 1            ;
-; state.S_SHIFT ; 1             ; 1             ; 0            ;
-+---------------+---------------+---------------+--------------+
++-------------------------------------------------------------------------------------------+
+; State Machine - |PONG_TOP|ADC_reader:adc0|state                                           ;
++--------------------+--------------------+-------------------+--------------+--------------+
+; Name               ; state.S_SHIFT_HIGH ; state.S_SHIFT_LOW ; state.S_WAIT ; state.S_CONV ;
++--------------------+--------------------+-------------------+--------------+--------------+
+; state.S_CONV       ; 0                  ; 0                 ; 0            ; 0            ;
+; state.S_WAIT       ; 0                  ; 0                 ; 1            ; 1            ;
+; state.S_SHIFT_LOW  ; 0                  ; 1                 ; 0            ; 1            ;
+; state.S_SHIFT_HIGH ; 1                  ; 0                 ; 0            ; 1            ;
++--------------------+--------------------+-------------------+--------------+--------------+
 
 
 +----------------------------------------------------------------------------------+
@@ -303,21 +298,18 @@ Encoding Type:  One-Hot
 +----------------------------------------+-----------------------------------------+
 ; game_engine:game0|ball_y[2,4,8]        ; Merged with game_engine:game0|ball_y[9] ;
 ; game_engine:game0|ball_y[0,1,3,5,6]    ; Merged with game_engine:game0|ball_y[7] ;
-; game_engine:game0|y_pos1[5,6,8]        ; Stuck at GND due to stuck port data_in  ;
-; game_engine:game0|y_pos1[1]            ; Stuck at VCC due to stuck port data_in  ;
-; game_engine:game0|y_pos2[5,6,8]        ; Stuck at GND due to stuck port data_in  ;
-; game_engine:game0|y_pos2[1]            ; Stuck at VCC due to stuck port data_in  ;
-; game_engine:game0|y_pos2[2]            ; Merged with game_engine:game0|y_pos2[4] ;
-; game_engine:game0|y_pos2[4]            ; Merged with game_engine:game0|y_pos2[7] ;
-; game_engine:game0|y_pos2[7]            ; Merged with game_engine:game0|y_pos1[2] ;
-; game_engine:game0|y_pos1[2]            ; Merged with game_engine:game0|y_pos1[4] ;
-; game_engine:game0|y_pos1[4]            ; Merged with game_engine:game0|y_pos1[7] ;
-; game_engine:game0|y_pos2[3]            ; Merged with game_engine:game0|y_pos1[3] ;
-; game_engine:game0|y_pos1[3]            ; Merged with game_engine:game0|y_pos1[7] ;
+; ADC_reader:adc0|y_pos1[5,6,8]          ; Stuck at GND due to stuck port data_in  ;
+; ADC_reader:adc0|y_pos1[1]              ; Stuck at VCC due to stuck port data_in  ;
+; ADC_reader:adc0|y_pos2[5,6,8]          ; Stuck at GND due to stuck port data_in  ;
+; ADC_reader:adc0|y_pos2[1]              ; Stuck at VCC due to stuck port data_in  ;
 ; game_engine:game0|ball_y[9]            ; Stuck at GND due to stuck port data_in  ;
 ; game_engine:game0|ball_y[7]            ; Stuck at VCC due to stuck port data_in  ;
 ; ADC_reader:adc0|shift_out[0]           ; Stuck at GND due to stuck port data_in  ;
-; Total Number of Removed Registers = 26 ;                                         ;
+; ADC_reader:adc0|state~8                ; Lost fanout                             ;
+; ADC_reader:adc0|state~9                ; Lost fanout                             ;
+; ADC_reader:adc0|y_pos2[3,4,7]          ; Merged with ADC_reader:adc0|y_pos2[2]   ;
+; ADC_reader:adc0|y_pos1[3,4,7]          ; Merged with ADC_reader:adc0|y_pos1[2]   ;
+; Total Number of Removed Registers = 27 ;                                         ;
 +----------------------------------------+-----------------------------------------+
 
 
@@ -326,30 +318,33 @@ Encoding Type:  One-Hot
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 177   ;
-; Number of registers using Synchronous Clear  ; 69    ;
+; Total registers                              ; 152   ;
+; Number of registers using Synchronous Clear  ; 84    ;
 ; Number of registers using Synchronous Load   ; 0     ;
-; Number of registers using Asynchronous Clear ; 177   ;
+; Number of registers using Asynchronous Clear ; 152   ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 87    ;
+; Number of registers using Clock Enable       ; 81    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
 
-+--------------------------------------------------+
-; Inverted Register Statistics                     ;
-+----------------------------------------+---------+
-; Inverted Register                      ; Fan out ;
-+----------------------------------------+---------+
-; game_engine:game0|y_pos1[7]            ; 37      ;
-; game_engine:game0|ball_x[1]            ; 5       ;
-; game_engine:game0|ball_x[0]            ; 4       ;
-; game_engine:game0|ball_x[5]            ; 5       ;
-; game_engine:game0|ball_x[4]            ; 5       ;
-; game_engine:game0|ball_x[3]            ; 5       ;
-; game_engine:game0|ball_x[8]            ; 5       ;
-; Total number of inverted registers = 7 ;         ;
-+----------------------------------------+---------+
++---------------------------------------------------+
+; Inverted Register Statistics                      ;
++-----------------------------------------+---------+
+; Inverted Register                       ; Fan out ;
++-----------------------------------------+---------+
+; ADC_reader:adc0|y_pos2[2]               ; 20      ;
+; ADC_reader:adc0|y_pos1[2]               ; 21      ;
+; ADC_reader:adc0|shift_out[5]            ; 1       ;
+; game_engine:game0|ball_x[1]             ; 5       ;
+; game_engine:game0|ball_x[0]             ; 4       ;
+; game_engine:game0|ball_x[5]             ; 5       ;
+; game_engine:game0|ball_x[4]             ; 5       ;
+; game_engine:game0|ball_x[3]             ; 5       ;
+; game_engine:game0|ball_x[8]             ; 5       ;
+; ADC_reader:adc0|shift_out[1]            ; 1       ;
+; Total number of inverted registers = 10 ;         ;
++-----------------------------------------+---------+
 
 
 +------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -357,25 +352,17 @@ Encoding Type:  One-Hot
 +--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------+
 ; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output             ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------+
-; 4:1                ; 4 bits    ; 8 LEs         ; 8 LEs                ; 0 LEs                  ; Yes        ; |PONG_TOP|game_engine:game0|ball_x[2]  ;
-; 4:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; Yes        ; |PONG_TOP|ADC_reader:adc0|shift_out[5] ;
-; 5:1                ; 16 bits   ; 48 LEs        ; 0 LEs                ; 48 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|div_cnt[13]  ;
-; 5:1                ; 12 bits   ; 36 LEs        ; 0 LEs                ; 36 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|shift_in[10] ;
-; 5:1                ; 5 bits    ; 15 LEs        ; 5 LEs                ; 10 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|bit_cnt[0]   ;
-; 4:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; Yes        ; |PONG_TOP|game_engine:game0|ball_x[4]  ;
-; 3:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; No         ; |PONG_TOP|renderer:video0|VGA_B        ;
+; 4:1                ; 4 bits    ; 8 LEs         ; 8 LEs                ; 0 LEs                  ; Yes        ; |PONG_TOP|game_engine:game0|ball_x[9]  ;
+; 5:1                ; 16 bits   ; 48 LEs        ; 0 LEs                ; 48 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|wait_cnt[6]  ;
+; 5:1                ; 11 bits   ; 33 LEs        ; 0 LEs                ; 33 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|shift_in[4]  ;
+; 5:1                ; 4 bits    ; 12 LEs        ; 4 LEs                ; 8 LEs                  ; Yes        ; |PONG_TOP|ADC_reader:adc0|bit_cnt[0]   ;
+; 5:1                ; 2 bits    ; 6 LEs         ; 2 LEs                ; 4 LEs                  ; Yes        ; |PONG_TOP|ADC_reader:adc0|shift_out[3] ;
+; 5:1                ; 16 bits   ; 48 LEs        ; 0 LEs                ; 48 LEs                 ; Yes        ; |PONG_TOP|ADC_reader:adc0|div_cnt[0]   ;
+; 4:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; Yes        ; |PONG_TOP|game_engine:game0|ball_x[5]  ;
+; 5:1                ; 2 bits    ; 6 LEs         ; 2 LEs                ; 4 LEs                  ; Yes        ; |PONG_TOP|ADC_reader:adc0|shift_out[5] ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; No         ; |PONG_TOP|renderer:video0|VGA_R        ;
+; 8:1                ; 2 bits    ; 10 LEs        ; 4 LEs                ; 6 LEs                  ; No         ; |PONG_TOP|ADC_reader:adc0|Selector18   ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------+
-
-
-+--------------------------------------------------------------+
-; Parameter Settings for User Entity Instance: ADC_reader:adc0 ;
-+----------------+----------+----------------------------------+
-; Parameter Name ; Value    ; Type                             ;
-+----------------+----------+----------------------------------+
-; CLK_HZ         ; 50000000 ; Signed Integer                   ;
-; SCLK_HZ        ; 1000000  ; Signed Integer                   ;
-+----------------+----------+----------------------------------+
-Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
 +--------------------------------------------------------------------------------------+
@@ -443,49 +430,26 @@ Note: In order to hide this table in the UI and the text report file, please set
 Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
-+------------------------------------------------------------------------------------+
-; Parameter Settings for Inferred Entity Instance: game_engine:game0|lpm_divide:Div1 ;
-+------------------------+----------------+------------------------------------------+
-; Parameter Name         ; Value          ; Type                                     ;
-+------------------------+----------------+------------------------------------------+
-; LPM_WIDTHN             ; 12             ; Untyped                                  ;
-; LPM_WIDTHD             ; 12             ; Untyped                                  ;
-; LPM_NREPRESENTATION    ; UNSIGNED       ; Untyped                                  ;
-; LPM_DREPRESENTATION    ; UNSIGNED       ; Untyped                                  ;
-; LPM_PIPELINE           ; 0              ; Untyped                                  ;
-; LPM_REMAINDERPOSITIVE  ; TRUE           ; Untyped                                  ;
-; MAXIMIZE_SPEED         ; 5              ; Untyped                                  ;
-; CBXI_PARAMETER         ; lpm_divide_vcm ; Untyped                                  ;
-; CARRY_CHAIN            ; MANUAL         ; Untyped                                  ;
-; OPTIMIZE_FOR_SPEED     ; 5              ; Untyped                                  ;
-; AUTO_CARRY_CHAINS      ; ON             ; AUTO_CARRY                               ;
-; IGNORE_CARRY_BUFFERS   ; OFF            ; IGNORE_CARRY                             ;
-; AUTO_CASCADE_CHAINS    ; ON             ; AUTO_CASCADE                             ;
-; IGNORE_CASCADE_BUFFERS ; OFF            ; IGNORE_CASCADE                           ;
-+------------------------+----------------+------------------------------------------+
-Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
-
-
-+------------------------------------------------------------------------------------+
-; Parameter Settings for Inferred Entity Instance: game_engine:game0|lpm_divide:Div0 ;
-+------------------------+----------------+------------------------------------------+
-; Parameter Name         ; Value          ; Type                                     ;
-+------------------------+----------------+------------------------------------------+
-; LPM_WIDTHN             ; 12             ; Untyped                                  ;
-; LPM_WIDTHD             ; 12             ; Untyped                                  ;
-; LPM_NREPRESENTATION    ; UNSIGNED       ; Untyped                                  ;
-; LPM_DREPRESENTATION    ; UNSIGNED       ; Untyped                                  ;
-; LPM_PIPELINE           ; 0              ; Untyped                                  ;
-; LPM_REMAINDERPOSITIVE  ; TRUE           ; Untyped                                  ;
-; MAXIMIZE_SPEED         ; 5              ; Untyped                                  ;
-; CBXI_PARAMETER         ; lpm_divide_vcm ; Untyped                                  ;
-; CARRY_CHAIN            ; MANUAL         ; Untyped                                  ;
-; OPTIMIZE_FOR_SPEED     ; 5              ; Untyped                                  ;
-; AUTO_CARRY_CHAINS      ; ON             ; AUTO_CARRY                               ;
-; IGNORE_CARRY_BUFFERS   ; OFF            ; IGNORE_CARRY                             ;
-; AUTO_CASCADE_CHAINS    ; ON             ; AUTO_CASCADE                             ;
-; IGNORE_CASCADE_BUFFERS ; OFF            ; IGNORE_CASCADE                           ;
-+------------------------+----------------+------------------------------------------+
++----------------------------------------------------------------------------------+
+; Parameter Settings for Inferred Entity Instance: ADC_reader:adc0|lpm_divide:Div0 ;
++------------------------+----------------+----------------------------------------+
+; Parameter Name         ; Value          ; Type                                   ;
++------------------------+----------------+----------------------------------------+
+; LPM_WIDTHN             ; 12             ; Untyped                                ;
+; LPM_WIDTHD             ; 12             ; Untyped                                ;
+; LPM_NREPRESENTATION    ; UNSIGNED       ; Untyped                                ;
+; LPM_DREPRESENTATION    ; UNSIGNED       ; Untyped                                ;
+; LPM_PIPELINE           ; 0              ; Untyped                                ;
+; LPM_REMAINDERPOSITIVE  ; TRUE           ; Untyped                                ;
+; MAXIMIZE_SPEED         ; 5              ; Untyped                                ;
+; CBXI_PARAMETER         ; lpm_divide_vcm ; Untyped                                ;
+; CARRY_CHAIN            ; MANUAL         ; Untyped                                ;
+; OPTIMIZE_FOR_SPEED     ; 5              ; Untyped                                ;
+; AUTO_CARRY_CHAINS      ; ON             ; AUTO_CARRY                             ;
+; IGNORE_CARRY_BUFFERS   ; OFF            ; IGNORE_CARRY                           ;
+; AUTO_CASCADE_CHAINS    ; ON             ; AUTO_CASCADE                           ;
+; IGNORE_CASCADE_BUFFERS ; OFF            ; IGNORE_CASCADE                         ;
++------------------------+----------------+----------------------------------------+
 Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
@@ -526,37 +490,37 @@ Note: In order to hide this table in the UI and the text report file, please set
 +-----------------------+-----------------------------+
 ; Type                  ; Count                       ;
 +-----------------------+-----------------------------+
-; arriav_ff             ; 177                         ;
-;     CLR               ; 59                          ;
+; arriav_ff             ; 152                         ;
+;     CLR               ; 40                          ;
 ;     CLR SCLR          ; 31                          ;
-;     ENA CLR           ; 49                          ;
-;     ENA CLR SCLR      ; 38                          ;
-; arriav_lcell_comb     ; 496                         ;
-;     arith             ; 216                         ;
-;         0 data inputs ; 27                          ;
-;         1 data inputs ; 126                         ;
-;         2 data inputs ; 22                          ;
+;     ENA CLR           ; 28                          ;
+;     ENA CLR SCLR      ; 53                          ;
+; arriav_lcell_comb     ; 462                         ;
+;     arith             ; 204                         ;
+;         0 data inputs ; 26                          ;
+;         1 data inputs ; 116                         ;
+;         2 data inputs ; 21                          ;
 ;         3 data inputs ; 25                          ;
 ;         4 data inputs ; 14                          ;
 ;         5 data inputs ; 2                           ;
 ;     extend            ; 1                           ;
 ;         7 data inputs ; 1                           ;
-;     normal            ; 273                         ;
+;     normal            ; 251                         ;
 ;         0 data inputs ; 2                           ;
-;         1 data inputs ; 14                          ;
-;         2 data inputs ; 45                          ;
-;         3 data inputs ; 42                          ;
-;         4 data inputs ; 49                          ;
-;         5 data inputs ; 60                          ;
-;         6 data inputs ; 61                          ;
+;         1 data inputs ; 12                          ;
+;         2 data inputs ; 47                          ;
+;         3 data inputs ; 40                          ;
+;         4 data inputs ; 39                          ;
+;         5 data inputs ; 61                          ;
+;         6 data inputs ; 50                          ;
 ;     shared            ; 6                           ;
 ;         0 data inputs ; 1                           ;
 ;         1 data inputs ; 5                           ;
-; arriav_mac            ; 2                           ;
+; arriav_mac            ; 1                           ;
 ; boundary_port         ; 90                          ;
 ;                       ;                             ;
 ; Max LUT depth         ; 11.90                       ;
-; Average LUT depth     ; 4.78                        ;
+; Average LUT depth     ; 5.01                        ;
 +-----------------------+-----------------------------+
 
 
@@ -575,7 +539,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
-    Info: Processing started: Fri Mar 27 14:15:23 2026
+    Info: Processing started: Fri Mar 27 14:42:19 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off 3710-Group-5-Project -c 3710-Group-5-Project
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 16 of the 16 processors detected
@@ -594,13 +558,12 @@ Info (12021): Found 1 design units, including 1 entities, in source file /users/
 Info (12021): Found 1 design units, including 1 entities, in source file /users/mmess/onedrive/documents/github/3710-group-5/1_project_pong/clock_div.v
     Info (12023): Found entity 1: clk_divider File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/clock_div.v Line: 1
 Info (12127): Elaborating entity "PONG_TOP" for the top level hierarchy
+Warning (10230): Verilog HDL assignment warning at PONG_TOP.v(47): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 47
 Warning (10230): Verilog HDL assignment warning at PONG_TOP.v(51): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 51
-Warning (10230): Verilog HDL assignment warning at PONG_TOP.v(55): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 55
-Info (12128): Elaborating entity "ADC_reader" for hierarchy "ADC_reader:adc0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 69
-Info (12128): Elaborating entity "game_engine" for hierarchy "game_engine:game0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 82
-Warning (10230): Verilog HDL assignment warning at game_engine.v(29): truncated value with size 12 to match size of target (9) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 29
-Warning (10230): Verilog HDL assignment warning at game_engine.v(30): truncated value with size 12 to match size of target (9) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 30
-Info (12128): Elaborating entity "renderer" for hierarchy "renderer:video0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 100
+Info (12128): Elaborating entity "ADC_reader" for hierarchy "ADC_reader:adc0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 65
+Warning (10230): Verilog HDL assignment warning at ADC_reader.v(56): truncated value with size 12 to match size of target (9) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Peripherals/ADC_reader.v Line: 56
+Info (12128): Elaborating entity "game_engine" for hierarchy "game_engine:game0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 74
+Info (12128): Elaborating entity "renderer" for hierarchy "renderer:video0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 92
 Warning (10230): Verilog HDL assignment warning at renderer.v(51): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/renderer.v Line: 51
 Warning (10230): Verilog HDL assignment warning at renderer.v(52): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/renderer.v Line: 52
 Warning (10230): Verilog HDL assignment warning at renderer.v(53): truncated value with size 32 to match size of target (3) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/renderer.v Line: 53
@@ -610,14 +573,13 @@ Info (12128): Elaborating entity "clk_divider" for hierarchy "renderer:video0|cl
 Info (12128): Elaborating entity "vga_controller" for hierarchy "renderer:video0|vga_controller:vga_ctrl" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/renderer.v Line: 84
 Warning (10230): Verilog HDL assignment warning at vga_controller.v(37): truncated value with size 32 to match size of target (10) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/vga_controller.v Line: 37
 Warning (10230): Verilog HDL assignment warning at vga_controller.v(43): truncated value with size 32 to match size of target (10) File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/vga_controller.v Line: 43
-Info (278001): Inferred 5 megafunctions from design logic
-    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 57
-    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "Div0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 53
-    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "game_engine:game0|Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 30
-    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "game_engine:game0|Div0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 29
+Info (278001): Inferred 4 megafunctions from design logic
+    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 53
+    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "Div0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 49
+    Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "ADC_reader:adc0|Div0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Peripherals/ADC_reader.v Line: 56
     Info (278004): Inferred divider/modulo megafunction ("lpm_divide") from the following logic: "renderer:video0|Mod0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Video/renderer.v Line: 102
-Info (12130): Elaborated megafunction instantiation "lpm_divide:Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 57
-Info (12133): Instantiated megafunction "lpm_divide:Div1" with the following parameter: File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 57
+Info (12130): Elaborated megafunction instantiation "lpm_divide:Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 53
+Info (12133): Instantiated megafunction "lpm_divide:Div1" with the following parameter: File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 53
     Info (12134): Parameter "LPM_WIDTHN" = "32"
     Info (12134): Parameter "LPM_WIDTHD" = "9"
     Info (12134): Parameter "LPM_NREPRESENTATION" = "UNSIGNED"
@@ -628,8 +590,8 @@ Info (12021): Found 1 design units, including 1 entities, in source file db/sign
     Info (12023): Found entity 1: sign_div_unsign_tlh File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/2_Quartus/Project/db/sign_div_unsign_tlh.tdf Line: 25
 Info (12021): Found 1 design units, including 1 entities, in source file db/alt_u_div_00f.tdf
     Info (12023): Found entity 1: alt_u_div_00f File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/2_Quartus/Project/db/alt_u_div_00f.tdf Line: 23
-Info (12130): Elaborated megafunction instantiation "game_engine:game0|lpm_divide:Div1" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 30
-Info (12133): Instantiated megafunction "game_engine:game0|lpm_divide:Div1" with the following parameter: File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Hard_coded_game/game_engine.v Line: 30
+Info (12130): Elaborated megafunction instantiation "ADC_reader:adc0|lpm_divide:Div0" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Peripherals/ADC_reader.v Line: 56
+Info (12133): Instantiated megafunction "ADC_reader:adc0|lpm_divide:Div0" with the following parameter: File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/Peripherals/ADC_reader.v Line: 56
     Info (12134): Parameter "LPM_WIDTHN" = "12"
     Info (12134): Parameter "LPM_WIDTHD" = "12"
     Info (12134): Parameter "LPM_NREPRESENTATION" = "UNSIGNED"
@@ -695,21 +657,22 @@ Warning (13024): Output pins are stuck at VCC or GND
     Warning (13410): Pin "HEX5[6]" is stuck at VCC File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 17
     Warning (13410): Pin "VGA_SYNC_N" is stuck at GND File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 21
 Info (286030): Timing-Driven Synthesis is running
+Info (17049): 2 registers lost all their fanouts during netlist optimizations.
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
 Warning (21074): Design contains 3 input pin(s) that do not drive logic
     Warning (15610): No output dependent on input pin "KEY[1]" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 3
     Warning (15610): No output dependent on input pin "KEY[2]" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 3
     Warning (15610): No output dependent on input pin "KEY[3]" File: C:/Users/mmess/OneDrive/Documents/GitHub/3710-Group-5/1_PROJECT_PONG/PONG_TOP.v Line: 3
-Info (21057): Implemented 645 device resources after synthesis - the final resource count might be different
+Info (21057): Implemented 588 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 6 input pins
     Info (21059): Implemented 84 output pins
-    Info (21061): Implemented 553 logic cells
-    Info (21062): Implemented 2 DSP elements
-Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 57 warnings
-    Info: Peak virtual memory: 4967 megabytes
-    Info: Processing ended: Fri Mar 27 14:15:31 2026
-    Info: Elapsed time: 00:00:08
+    Info (21061): Implemented 497 logic cells
+    Info (21062): Implemented 1 DSP elements
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 56 warnings
+    Info: Peak virtual memory: 4944 megabytes
+    Info: Processing ended: Fri Mar 27 14:42:26 2026
+    Info: Elapsed time: 00:00:07
     Info: Total CPU time (on all processors): 00:00:15
 
 
