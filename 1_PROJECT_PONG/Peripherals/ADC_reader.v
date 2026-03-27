@@ -1,136 +1,170 @@
-module PONG_TOP(
-    input  wire       CLOCK_50,
-    input  wire [3:0] KEY,
-
-    output wire [9:0] LEDR,
-
-    output wire       ADC_CS_N,
-    output wire       ADC_DIN,
+module ADC_reader(
+    input  wire       clk,
+    input  wire       rst,          // active low
     input  wire       ADC_DOUT,
-    output wire       ADC_SCLK,
-
-    output wire [6:0] HEX0,
-    output wire [6:0] HEX1,
-    output wire [6:0] HEX2,
-    output wire [6:0] HEX3,
-    output wire [6:0] HEX4,
-    output wire [6:0] HEX5,
-
-    output wire       VGA_CLK,
-    output wire       VGA_BLANK_N,
-    output wire       VGA_SYNC_N,
-    output wire       VGA_VS,
-    output wire       VGA_HS,
-    output wire [7:0] VGA_R,
-    output wire [7:0] VGA_G,
-    output wire [7:0] VGA_B
+    output reg        ADC_CS_N,
+    output reg        ADC_DIN,
+    output reg        ADC_SCLK,
+    output reg [8:0]  y_pos1,
+    output reg [8:0]  y_pos2,
+    output reg        sample_strobe
 );
 
-    wire [11:0] pot0_raw;
-    wire [11:0] pot1_raw;
-    wire        sample_strobe;
+    localparam [1:0] S_CONV       = 2'd0;
+    localparam [1:0] S_WAIT       = 2'd1;
+    localparam [1:0] S_SHIFT_LOW  = 2'd2;
+    localparam [1:0] S_SHIFT_HIGH = 2'd3;
 
-    wire [8:0] y_pos1;
-    wire [8:0] y_pos2;
-    wire [9:0] ball_x;
-    wire [9:0] ball_y;
-    wire [3:0] score1;
-    wire [3:0] score2;
+    localparam integer HALF_DIV          = 25;   // 50 MHz -> 1 MHz SCLK
+    localparam integer CONV_PULSE_CYCLES = 2;    // 40 ns high pulse
+    localparam integer CONV_WAIT_CYCLES  = 80;   // 1.6 us wait
 
-    wire [9:0] pot0_dec;
-    wire [9:0] pot1_dec;
+    localparam [8:0] Y_MIN         = 9'd10;
+    localparam [8:0] PADDLE_HEIGHT = 9'd45;
+    localparam [8:0] Y_MAX         = 9'd470 - PADDLE_HEIGHT - 9'd10;
+    localparam [8:0] Y_RANGE       = Y_MAX - Y_MIN;
 
-    wire [3:0] pot0_ones;
-    wire [3:0] pot0_tens;
-    wire [3:0] pot0_hundreds;
+    localparam [11:0] ADC_FS_3V3 = 12'd3299;
 
-    wire [3:0] pot1_ones;
-    wire [3:0] pot1_tens;
-    wire [3:0] pot1_hundreds;
+    reg [1:0]  state;
+    reg [15:0] wait_cnt;
+    reg [15:0] div_cnt;
+    reg [3:0]  bit_cnt;
+    reg [11:0] shift_in;
+    reg [5:0]  shift_out;
 
-    assign VGA_SYNC_N = 1'b0;
-    assign LEDR       = 10'b0;
+    reg        next_chan;
+    reg        result_chan;
+    reg        have_valid;
 
-    ADC_reader adc0 (
-        .clk(CLOCK_50),
-        .rst(KEY[0]),
-        .ADC_DOUT(ADC_DOUT),
-        .ADC_CS_N(ADC_CS_N),
-        .ADC_DIN(ADC_DIN),
-        .ADC_SCLK(ADC_SCLK),
-        .pot0_raw(pot0_raw),
-        .pot1_raw(pot1_raw),
-        .sample_strobe(sample_strobe)
-    );
+    wire [11:0] sample_now;
 
-    game_engine game0 (
-        .clk(CLOCK_50),
-        .rst(KEY[0]),
-        .pot0_raw(pot0_raw),
-        .pot1_raw(pot1_raw),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
-        .ball_x(ball_x),
-        .ball_y(ball_y),
-        .score1(score1),
-        .score2(score2)
-    );
+    assign sample_now = {shift_in[10:0], ADC_DOUT};
 
-    renderer video0 (
-        .CLOCK_50(CLOCK_50),
-        .KEY(KEY),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
-        .ball_x(ball_x),
-        .ball_y(ball_y),
-        .score1(score1),
-        .score2(score2),
-        .VGA_CLK(VGA_CLK),
-        .VGA_BLANK_N(VGA_BLANK_N),
-        .VGA_VS(VGA_VS),
-        .VGA_HS(VGA_HS),
-        .VGA_R(VGA_R),
-        .VGA_G(VGA_G),
-        .VGA_B(VGA_B)
-    );
-
-    // scale raw 0..4095 to decimal 0..999 for 3-digit display
-    assign pot0_dec = (pot0_raw * 10'd999) / 12'd4095;
-    assign pot1_dec = (pot1_raw * 10'd999) / 12'd4095;
-
-    assign pot0_hundreds = pot0_dec / 10'd100;
-    assign pot0_tens     = (pot0_dec % 10'd100) / 10'd10;
-    assign pot0_ones     = pot0_dec % 10'd10;
-
-    assign pot1_hundreds = pot1_dec / 10'd100;
-    assign pot1_tens     = (pot1_dec % 10'd100) / 10'd10;
-    assign pot1_ones     = pot1_dec % 10'd10;
-
-    function [6:0] seg7_decimal;
-        input [3:0] digit;
+    function [5:0] adc_cmd;
+        input chan;
         begin
-            case (digit)
-                4'd0: seg7_decimal = 7'b1000000;
-                4'd1: seg7_decimal = 7'b1111001;
-                4'd2: seg7_decimal = 7'b0100100;
-                4'd3: seg7_decimal = 7'b0110000;
-                4'd4: seg7_decimal = 7'b0011001;
-                4'd5: seg7_decimal = 7'b0010010;
-                4'd6: seg7_decimal = 7'b0000010;
-                4'd7: seg7_decimal = 7'b1111000;
-                4'd8: seg7_decimal = 7'b0000000;
-                4'd9: seg7_decimal = 7'b0010000;
-                default: seg7_decimal = 7'b1111111;
-            endcase
+            adc_cmd = chan ? 6'b110010 : 6'b100010;
         end
     endfunction
 
-    assign HEX0 = seg7_decimal(pot0_ones);
-    assign HEX1 = seg7_decimal(pot0_tens);
-    assign HEX2 = seg7_decimal(pot0_hundreds);
+    function [8:0] scale_adc;
+        input [11:0] raw;
+        reg   [11:0] clipped;
+        begin
+            clipped = (raw > ADC_FS_3V3) ? ADC_FS_3V3 : raw;
+            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_FS_3V3);
+        end
+    endfunction
 
-    assign HEX3 = seg7_decimal(pot1_ones);
-    assign HEX4 = seg7_decimal(pot1_tens);
-    assign HEX5 = seg7_decimal(pot1_hundreds);
+    always @(posedge clk or negedge rst) begin
+        if (~rst) begin
+            ADC_CS_N      <= 1'b0;
+            ADC_DIN       <= 1'b0;
+            ADC_SCLK      <= 1'b0;
+            y_pos1        <= 9'd150;
+            y_pos2        <= 9'd150;
+            sample_strobe <= 1'b0;
+
+            state         <= S_CONV;
+            wait_cnt      <= 16'd0;
+            div_cnt       <= 16'd0;
+            bit_cnt       <= 4'd0;
+            shift_in      <= 12'd0;
+            shift_out     <= 6'b100010;
+
+            next_chan     <= 1'b0;
+            result_chan   <= 1'b0;
+            have_valid    <= 1'b0;
+        end else begin
+            sample_strobe <= 1'b0;
+
+            case (state)
+                S_CONV: begin
+                    ADC_CS_N <= 1'b1;
+                    ADC_DIN  <= 1'b0;
+                    ADC_SCLK <= 1'b0;
+
+                    if (wait_cnt == CONV_PULSE_CYCLES - 1) begin
+                        wait_cnt <= 16'd0;
+                        ADC_CS_N <= 1'b0;
+                        state    <= S_WAIT;
+                    end else begin
+                        wait_cnt <= wait_cnt + 16'd1;
+                    end
+                end
+
+                S_WAIT: begin
+                    ADC_CS_N <= 1'b0;
+                    ADC_DIN  <= 1'b0;
+                    ADC_SCLK <= 1'b0;
+
+                    if (wait_cnt == CONV_WAIT_CYCLES - 1) begin
+                        wait_cnt  <= 16'd0;
+                        div_cnt   <= 16'd0;
+                        bit_cnt   <= 4'd0;
+                        shift_in  <= 12'd0;
+                        shift_out <= adc_cmd(next_chan);
+                        state     <= S_SHIFT_LOW;
+                    end else begin
+                        wait_cnt <= wait_cnt + 16'd1;
+                    end
+                end
+
+                S_SHIFT_LOW: begin
+                    ADC_CS_N <= 1'b0;
+                    ADC_SCLK <= 1'b0;
+                    ADC_DIN  <= (bit_cnt < 4'd6) ? shift_out[5] : 1'b0;
+
+                    if (div_cnt == HALF_DIV - 1) begin
+                        div_cnt   <= 16'd0;
+                        ADC_SCLK  <= 1'b1;
+                        shift_in  <= sample_now;
+                        state     <= S_SHIFT_HIGH;
+                    end else begin
+                        div_cnt <= div_cnt + 16'd1;
+                    end
+                end
+
+                S_SHIFT_HIGH: begin
+                    ADC_CS_N <= 1'b0;
+                    ADC_SCLK <= 1'b1;
+
+                    if (div_cnt == HALF_DIV - 1) begin
+                        div_cnt  <= 16'd0;
+                        ADC_SCLK <= 1'b0;
+
+                        if (bit_cnt < 4'd6)
+                            shift_out <= {shift_out[4:0], 1'b0};
+
+                        if (bit_cnt == 4'd11) begin
+                            if (have_valid) begin
+                                if (result_chan == 1'b0)
+                                    y_pos1 <= scale_adc(sample_now);
+                                else
+                                    y_pos2 <= scale_adc(sample_now);
+
+                                sample_strobe <= 1'b1;
+                            end
+
+                            result_chan <= next_chan;
+                            next_chan   <= ~next_chan;
+                            have_valid  <= 1'b1;
+                            state       <= S_CONV;
+                        end else begin
+                            bit_cnt <= bit_cnt + 4'd1;
+                            state   <= S_SHIFT_LOW;
+                        end
+                    end else begin
+                        div_cnt <= div_cnt + 16'd1;
+                    end
+                end
+
+                default: begin
+                    state <= S_CONV;
+                end
+            endcase
+        end
+    end
 
 endmodule
