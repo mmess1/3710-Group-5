@@ -26,9 +26,7 @@ module PONG_TOP(
     output wire [7:0] VGA_B
 );
 
-    wire [11:0] pot0_raw;
-    wire [11:0] pot1_raw;
-    wire        sample_strobe;
+    wire       sample_strobe;
 
     wire [8:0] y_pos1;
     wire [8:0] y_pos2;
@@ -37,16 +35,16 @@ module PONG_TOP(
     wire [3:0] score1;
     wire [3:0] score2;
 
-    wire [9:0] pot0_dec;
-    wire [9:0] pot1_dec;
+    wire [9:0] p1_dec;
+    wire [9:0] p2_dec;
 
-    wire [3:0] pot0_ones;
-    wire [3:0] pot0_tens;
-    wire [3:0] pot0_hundreds;
+    wire [3:0] p1_ones;
+    wire [3:0] p1_tens;
+    wire [3:0] p1_hundreds;
 
-    wire [3:0] pot1_ones;
-    wire [3:0] pot1_tens;
-    wire [3:0] pot1_hundreds;
+    wire [3:0] p2_ones;
+    wire [3:0] p2_tens;
+    wire [3:0] p2_hundreds;
 
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = 10'b0;
@@ -58,18 +56,14 @@ module PONG_TOP(
         .ADC_CS_N(ADC_CS_N),
         .ADC_DIN(ADC_DIN),
         .ADC_SCLK(ADC_SCLK),
-        .pot0_raw(pot0_raw),
-        .pot1_raw(pot1_raw),
+        .y_pos1(y_pos1),
+        .y_pos2(y_pos2),
         .sample_strobe(sample_strobe)
     );
 
     game_engine game0 (
         .clk(CLOCK_50),
         .rst(KEY[0]),
-        .pot0_raw(pot0_raw),
-        .pot1_raw(pot1_raw),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
         .ball_x(ball_x),
         .ball_y(ball_y),
         .score1(score1),
@@ -94,17 +88,16 @@ module PONG_TOP(
         .VGA_B(VGA_B)
     );
 
-    // scale raw 0..4095 to decimal 0..999 for 3-digit display
-    assign pot0_dec = (pot0_raw * 10'd999) / 12'd4095;
-    assign pot1_dec = (pot1_raw * 10'd999) / 12'd4095;
+    assign p1_dec = y_pos1;
+    assign p2_dec = y_pos2;
 
-    assign pot0_hundreds = pot0_dec / 10'd100;
-    assign pot0_tens     = (pot0_dec % 10'd100) / 10'd10;
-    assign pot0_ones     = pot0_dec % 10'd10;
+    assign p1_hundreds = p1_dec / 10'd100;
+    assign p1_tens     = (p1_dec % 10'd100) / 10'd10;
+    assign p1_ones     = p1_dec % 10'd10;
 
-    assign pot1_hundreds = pot1_dec / 10'd100;
-    assign pot1_tens     = (pot1_dec % 10'd100) / 10'd10;
-    assign pot1_ones     = pot1_dec % 10'd10;
+    assign p2_hundreds = p2_dec / 10'd100;
+    assign p2_tens     = (p2_dec % 10'd100) / 10'd10;
+    assign p2_ones     = p2_dec % 10'd10;
 
     function [6:0] seg7_decimal;
         input [3:0] digit;
@@ -125,12 +118,12 @@ module PONG_TOP(
         end
     endfunction
 
-    assign HEX0 = seg7_decimal(pot0_ones);
-    assign HEX1 = seg7_decimal(pot0_tens);
-    assign HEX2 = seg7_decimal(pot0_hundreds);
+    assign HEX0 = seg7_decimal(p1_ones);
+    assign HEX1 = seg7_decimal(p1_tens);
+    assign HEX2 = seg7_decimal(p1_hundreds);
 
-    assign HEX3 = seg7_decimal(pot1_ones);
-    assign HEX4 = seg7_decimal(pot1_tens);
-    assign HEX5 = seg7_decimal(pot1_hundreds);
+    assign HEX3 = seg7_decimal(p2_ones);
+    assign HEX4 = seg7_decimal(p2_tens);
+    assign HEX5 = seg7_decimal(p2_hundreds);
 
 endmodule

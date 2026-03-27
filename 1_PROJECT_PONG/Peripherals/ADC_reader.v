@@ -10,26 +10,28 @@ module ADC_reader(
     output reg        sample_strobe
 );
 
-    localparam [1:0] S_CONV       = 2'd0;
-    localparam [1:0] S_WAIT       = 2'd1;
-    localparam [1:0] S_SHIFT_LOW  = 2'd2;
-    localparam [1:0] S_SHIFT_HIGH = 2'd3;
+    localparam [1:0] S_CONV  = 2'd0;
+    localparam [1:0] S_WAIT  = 2'd1;
+    localparam [1:0] S_LOW   = 2'd2;
+    localparam [1:0] S_HIGH  = 2'd3;
 
-    localparam integer HALF_DIV          = 25;   // 50 MHz -> 1 MHz SCLK
-    localparam integer CONV_PULSE_CYCLES = 2;    // 40 ns high pulse
-    localparam integer CONV_WAIT_CYCLES  = 80;   // 1.6 us wait
+    localparam integer HALF_DIV          = 25;
+    localparam integer CONV_PULSE_CYCLES = 2;
+    localparam integer CONV_WAIT_CYCLES  = 80;
+    localparam integer TOTAL_BITS        = 12;
 
     localparam [8:0] Y_MIN         = 9'd10;
     localparam [8:0] PADDLE_HEIGHT = 9'd45;
     localparam [8:0] Y_MAX         = 9'd470 - PADDLE_HEIGHT - 9'd10;
     localparam [8:0] Y_RANGE       = Y_MAX - Y_MIN;
 
-    localparam [11:0] ADC_FS_3V3 = 12'd3299;
+    localparam [11:0] ADC_MAX_3V3  = 12'd3299;
 
     reg [1:0]  state;
     reg [15:0] wait_cnt;
     reg [15:0] div_cnt;
     reg [3:0]  bit_cnt;
+
     reg [11:0] shift_in;
     reg [5:0]  shift_out;
 
@@ -52,8 +54,8 @@ module ADC_reader(
         input [11:0] raw;
         reg   [11:0] clipped;
         begin
-            clipped = (raw > ADC_FS_3V3) ? ADC_FS_3V3 : raw;
-            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_FS_3V3);
+            clipped = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
+            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_MAX_3V3);
         end
     endfunction
 
@@ -62,6 +64,7 @@ module ADC_reader(
             ADC_CS_N      <= 1'b0;
             ADC_DIN       <= 1'b0;
             ADC_SCLK      <= 1'b0;
+
             y_pos1        <= 9'd150;
             y_pos2        <= 9'd150;
             sample_strobe <= 1'b0;
@@ -71,7 +74,7 @@ module ADC_reader(
             div_cnt       <= 16'd0;
             bit_cnt       <= 4'd0;
             shift_in      <= 12'd0;
-            shift_out     <= 6'b100010;
+            shift_out     <= 6'd0;
 
             next_chan     <= 1'b0;
             result_chan   <= 1'b0;
@@ -82,8 +85,8 @@ module ADC_reader(
             case (state)
                 S_CONV: begin
                     ADC_CS_N <= 1'b1;
-                    ADC_DIN  <= 1'b0;
                     ADC_SCLK <= 1'b0;
+                    ADC_DIN  <= 1'b0;
 
                     if (wait_cnt == CONV_PULSE_CYCLES - 1) begin
                         wait_cnt <= 16'd0;
@@ -96,8 +99,8 @@ module ADC_reader(
 
                 S_WAIT: begin
                     ADC_CS_N <= 1'b0;
-                    ADC_DIN  <= 1'b0;
                     ADC_SCLK <= 1'b0;
+                    ADC_DIN  <= 1'b0;
 
                     if (wait_cnt == CONV_WAIT_CYCLES - 1) begin
                         wait_cnt  <= 16'd0;
@@ -105,28 +108,27 @@ module ADC_reader(
                         bit_cnt   <= 4'd0;
                         shift_in  <= 12'd0;
                         shift_out <= adc_cmd(next_chan);
-                        state     <= S_SHIFT_LOW;
+                        state     <= S_LOW;
                     end else begin
                         wait_cnt <= wait_cnt + 16'd1;
                     end
                 end
 
-                S_SHIFT_LOW: begin
+                S_LOW: begin
                     ADC_CS_N <= 1'b0;
                     ADC_SCLK <= 1'b0;
                     ADC_DIN  <= (bit_cnt < 4'd6) ? shift_out[5] : 1'b0;
 
                     if (div_cnt == HALF_DIV - 1) begin
-                        div_cnt   <= 16'd0;
-                        ADC_SCLK  <= 1'b1;
-                        shift_in  <= sample_now;
-                        state     <= S_SHIFT_HIGH;
+                        div_cnt  <= 16'd0;
+                        ADC_SCLK <= 1'b1;
+                        state    <= S_HIGH;
                     end else begin
                         div_cnt <= div_cnt + 16'd1;
                     end
                 end
 
-                S_SHIFT_HIGH: begin
+                S_HIGH: begin
                     ADC_CS_N <= 1'b0;
                     ADC_SCLK <= 1'b1;
 
@@ -134,15 +136,17 @@ module ADC_reader(
                         div_cnt  <= 16'd0;
                         ADC_SCLK <= 1'b0;
 
+                        shift_in <= {shift_in[10:0], ADC_DOUT};
+
                         if (bit_cnt < 4'd6)
                             shift_out <= {shift_out[4:0], 1'b0};
 
-                        if (bit_cnt == 4'd11) begin
+                        if (bit_cnt == TOTAL_BITS - 1) begin
                             if (have_valid) begin
                                 if (result_chan == 1'b0)
-                                    y_pos1 <= scale_adc(sample_now);
+                                    y_pos1 <= scale_adc({shift_in[10:0], ADC_DOUT});
                                 else
-                                    y_pos2 <= scale_adc(sample_now);
+                                    y_pos2 <= scale_adc({shift_in[10:0], ADC_DOUT});
 
                                 sample_strobe <= 1'b1;
                             end
@@ -153,7 +157,7 @@ module ADC_reader(
                             state       <= S_CONV;
                         end else begin
                             bit_cnt <= bit_cnt + 4'd1;
-                            state   <= S_SHIFT_LOW;
+                            state   <= S_LOW;
                         end
                     end else begin
                         div_cnt <= div_cnt + 16'd1;
