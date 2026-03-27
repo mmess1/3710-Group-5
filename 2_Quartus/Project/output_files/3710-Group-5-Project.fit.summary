@@ -1,17 +1,17 @@
-Fitter Status : Successful - Tue Feb 24 00:18:47 2026
+Fitter Status : Successful - Fri Mar 27 14:17:08 2026
 Quartus Prime Version : 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 Revision Name : 3710-Group-5-Project
-Top-level Entity Name : branch_TOP
+Top-level Entity Name : PONG_TOP
 Family : Cyclone V
 Device : 5CSEMA5F31C6
 Timing Models : Final
-Logic utilization (in ALMs) : 8,995 / 32,070 ( 28 % )
-Total registers : 16826
-Total pins : 57 / 457 ( 12 % )
+Logic utilization (in ALMs) : 266 / 32,070 ( < 1 % )
+Total registers : 217
+Total pins : 90 / 457 ( 20 % )
 Total virtual pins : 0
 Total block memory bits : 0 / 4,065,280 ( 0 % )
 Total RAM Blocks : 0 / 397 ( 0 % )
-Total DSP Blocks : 1 / 87 ( 1 % )
+Total DSP Blocks : 2 / 87 ( 2 % )
 Total HSSI RX PCSs : 0
 Total HSSI PMA RX Deserializers : 0
 Total HSSI TX PCSs : 0
