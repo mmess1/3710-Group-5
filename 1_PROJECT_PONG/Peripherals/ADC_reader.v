@@ -7,6 +7,8 @@ module ADC_reader(
     output reg        ADC_SCLK,
     output reg [11:0] adc0_raw,
     output reg [11:0] adc1_raw,
+    output reg [8:0]  y_pos1,
+    output reg [8:0]  y_pos2,
     output reg        sample_strobe
 );
 
@@ -19,6 +21,13 @@ module ADC_reader(
     localparam integer CONV_PULSE_CYCLES = 2;
     localparam integer CONV_WAIT_CYCLES  = 80;
     localparam integer TOTAL_BITS        = 12;
+
+    localparam [8:0] Y_MIN         = 9'd10;
+    localparam [8:0] PADDLE_HEIGHT = 9'd45;
+    localparam [8:0] Y_MAX         = 9'd470 - PADDLE_HEIGHT - 9'd10;
+    localparam [8:0] Y_RANGE       = Y_MAX - Y_MIN;
+
+    localparam [11:0] ADC_MAX_3V3  = 12'd3299;
 
     reg [1:0]  state;
     reg [15:0] wait_cnt;
@@ -43,6 +52,15 @@ module ADC_reader(
         end
     endfunction
 
+    function [8:0] scale_adc;
+        input [11:0] raw;
+        reg   [11:0] clipped;
+        begin
+            clipped = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
+            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_MAX_3V3);
+        end
+    endfunction
+
     always @(posedge clk or negedge rst) begin
         if (~rst) begin
             ADC_CS_N      <= 1'b0;
@@ -51,6 +69,8 @@ module ADC_reader(
 
             adc0_raw      <= 12'd0;
             adc1_raw      <= 12'd0;
+            y_pos1        <= 9'd150;
+            y_pos2        <= 9'd150;
             sample_strobe <= 1'b0;
 
             state         <= S_CONV;
@@ -129,10 +149,13 @@ module ADC_reader(
 
                         if (bit_cnt == TOTAL_BITS - 1) begin
                             if (have_valid) begin
-                                if (result_chan == 1'b0)
+                                if (result_chan == 1'b0) begin
                                     adc0_raw <= sampled_word;
-                                else
+                                    y_pos1   <= scale_adc(sampled_word);
+                                end else begin
                                     adc1_raw <= sampled_word;
+                                    y_pos2   <= scale_adc(sampled_word);
+                                end
 
                                 sample_strobe <= 1'b1;
                             end
