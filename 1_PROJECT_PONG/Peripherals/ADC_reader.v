@@ -1,33 +1,24 @@
 module ADC_reader(
     input  wire       clk,
-    input  wire       rst,          // active low
+    input  wire       rst,
     input  wire       ADC_DOUT,
     output reg        ADC_CS_N,
     output reg        ADC_DIN,
     output reg        ADC_SCLK,
     output reg [11:0] adc0_raw,
     output reg [11:0] adc1_raw,
-    output reg [8:0]  y_pos1,
-    output reg [8:0]  y_pos2,
     output reg        sample_strobe
 );
 
-    localparam [1:0] S_CONV  = 2'd0;
-    localparam [1:0] S_WAIT  = 2'd1;
-    localparam [1:0] S_LOW   = 2'd2;
-    localparam [1:0] S_HIGH  = 2'd3;
+    localparam CONV = 2'd0;
+    localparam WAIT = 2'd1;
+    localparam LOW  = 2'd2;
+    localparam HIGH = 2'd3;
 
-    localparam integer HALF_DIV          = 25;
-    localparam integer CONV_PULSE_CYCLES = 2;
-    localparam integer CONV_WAIT_CYCLES  = 80;
-    localparam integer TOTAL_BITS        = 12;
-
-    localparam [8:0] Y_MIN         = 9'd10;
-    localparam [8:0] PADDLE_HEIGHT = 9'd45;
-    localparam [8:0] Y_MAX         = 9'd470 - PADDLE_HEIGHT - 9'd10;
-    localparam [8:0] Y_RANGE       = Y_MAX - Y_MIN;
-
-    localparam [11:0] ADC_MAX_3V3  = 12'd3299;
+    localparam HALF_DIV   = 25;
+    localparam CONV_PULSE = 2;
+    localparam CONV_WAIT  = 80;
+    localparam BITS       = 12;
 
     reg [1:0]  state;
     reg [15:0] wait_cnt;
@@ -35,146 +26,110 @@ module ADC_reader(
     reg [3:0]  bit_cnt;
 
     reg [11:0] shift_in;
-    reg [5:0]  shift_out;
+    reg [5:0]  cmd_bits;
 
-    reg        next_chan;
-    reg        result_chan;
-    reg        have_valid;
-
-    wire [11:0] sampled_word;
-
-    assign sampled_word = {shift_in[10:0], ADC_DOUT};
-
-    function [5:0] adc_cmd;
-        input chan;
-        begin
-            adc_cmd = chan ? 6'b110010 : 6'b100010;
-        end
-    endfunction
-
-    function [8:0] scale_adc;
-        input [11:0] raw;
-        reg   [11:0] clipped;
-        begin
-            clipped = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
-            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_MAX_3V3);
-        end
-    endfunction
+    reg next_chan;
+    reg out_chan;
+    reg valid;
 
     always @(posedge clk or negedge rst) begin
         if (~rst) begin
-            ADC_CS_N      <= 1'b0;
-            ADC_DIN       <= 1'b0;
-            ADC_SCLK      <= 1'b0;
+            state         <= CONV;
+            wait_cnt      <= 0;
+            div_cnt       <= 0;
+            bit_cnt       <= 0;
+            shift_in      <= 0;
+            cmd_bits      <= 0;
+            next_chan     <= 0;
+            out_chan      <= 0;
+            valid         <= 0;
 
-            adc0_raw      <= 12'd0;
-            adc1_raw      <= 12'd0;
-            y_pos1        <= 9'd150;
-            y_pos2        <= 9'd150;
-            sample_strobe <= 1'b0;
-
-            state         <= S_CONV;
-            wait_cnt      <= 16'd0;
-            div_cnt       <= 16'd0;
-            bit_cnt       <= 4'd0;
-            shift_in      <= 12'd0;
-            shift_out     <= 6'd0;
-
-            next_chan     <= 1'b0;
-            result_chan   <= 1'b0;
-            have_valid    <= 1'b0;
+            ADC_CS_N      <= 0;
+            ADC_DIN       <= 0;
+            ADC_SCLK      <= 0;
+            adc0_raw      <= 0;
+            adc1_raw      <= 0;
+            sample_strobe <= 0;
         end else begin
-            sample_strobe <= 1'b0;
+            sample_strobe <= 0;
 
             case (state)
-                S_CONV: begin
-                    ADC_CS_N <= 1'b1;
-                    ADC_SCLK <= 1'b0;
-                    ADC_DIN  <= 1'b0;
+                CONV: begin
+                    ADC_CS_N <= 1;
+                    ADC_SCLK <= 0;
+                    ADC_DIN  <= 0;
 
-                    if (wait_cnt == CONV_PULSE_CYCLES - 1) begin
-                        wait_cnt <= 16'd0;
-                        ADC_CS_N <= 1'b0;
-                        state    <= S_WAIT;
+                    if (wait_cnt == CONV_PULSE - 1) begin
+                        wait_cnt <= 0;
+                        ADC_CS_N <= 0;
+                        state    <= WAIT;
                     end else begin
-                        wait_cnt <= wait_cnt + 16'd1;
+                        wait_cnt <= wait_cnt + 1;
                     end
                 end
 
-                S_WAIT: begin
-                    ADC_CS_N <= 1'b0;
-                    ADC_SCLK <= 1'b0;
-                    ADC_DIN  <= 1'b0;
+                WAIT: begin
+                    ADC_CS_N <= 0;
+                    ADC_SCLK <= 0;
+                    ADC_DIN  <= 0;
 
-                    if (wait_cnt == CONV_WAIT_CYCLES - 1) begin
-                        wait_cnt  <= 16'd0;
-                        div_cnt   <= 16'd0;
-                        bit_cnt   <= 4'd0;
-                        shift_in  <= 12'd0;
-                        shift_out <= adc_cmd(next_chan);
-                        state     <= S_LOW;
+                    if (wait_cnt == CONV_WAIT - 1) begin
+                        wait_cnt <= 0;
+                        div_cnt  <= 0;
+                        bit_cnt  <= 0;
+                        shift_in <= 0;
+                        cmd_bits <= next_chan ? 6'b110010 : 6'b100010;
+                        state    <= LOW;
                     end else begin
-                        wait_cnt <= wait_cnt + 16'd1;
+                        wait_cnt <= wait_cnt + 1;
                     end
                 end
 
-                S_LOW: begin
-                    ADC_CS_N <= 1'b0;
-                    ADC_SCLK <= 1'b0;
-                    ADC_DIN  <= (bit_cnt < 4'd6) ? shift_out[5] : 1'b0;
+                LOW: begin
+                    ADC_CS_N <= 0;
+                    ADC_SCLK <= 0;
+                    ADC_DIN  <= (bit_cnt < 6) ? cmd_bits[5 - bit_cnt] : 0;
 
                     if (div_cnt == HALF_DIV - 1) begin
-                        div_cnt  <= 16'd0;
-                        ADC_SCLK <= 1'b1;
-                        state    <= S_HIGH;
+                        div_cnt  <= 0;
+                        ADC_SCLK <= 1;
+                        state    <= HIGH;
                     end else begin
-                        div_cnt <= div_cnt + 16'd1;
+                        div_cnt <= div_cnt + 1;
                     end
                 end
 
-                S_HIGH: begin
-                    ADC_CS_N <= 1'b0;
-                    ADC_SCLK <= 1'b1;
+                HIGH: begin
+                    ADC_CS_N <= 0;
+                    ADC_SCLK <= 1;
 
-                    if (div_cnt == (HALF_DIV/2)) begin
-                        shift_in <= sampled_word;
-                    end
+                    if (div_cnt == HALF_DIV/2)
+                        shift_in[11 - bit_cnt] <= ADC_DOUT;
 
                     if (div_cnt == HALF_DIV - 1) begin
-                        div_cnt  <= 16'd0;
-                        ADC_SCLK <= 1'b0;
+                        div_cnt  <= 0;
+                        ADC_SCLK <= 0;
 
-                        if (bit_cnt < 4'd6)
-                            shift_out <= {shift_out[4:0], 1'b0};
-
-                        if (bit_cnt == TOTAL_BITS - 1) begin
-                            if (have_valid) begin
-                                if (result_chan == 1'b0) begin
-                                    adc0_raw <= sampled_word;
-                                    y_pos1   <= scale_adc(sampled_word);
-                                end else begin
-                                    adc1_raw <= sampled_word;
-                                    y_pos2   <= scale_adc(sampled_word);
-                                end
-
-                                sample_strobe <= 1'b1;
+                        if (bit_cnt == BITS - 1) begin
+                            if (valid) begin
+                                if (out_chan == 0)
+                                    adc0_raw <= shift_in;
+                                else
+                                    adc1_raw <= shift_in;
+                                sample_strobe <= 1;
                             end
 
-                            result_chan <= next_chan;
-                            next_chan   <= ~next_chan;
-                            have_valid  <= 1'b1;
-                            state       <= S_CONV;
+                            out_chan  <= next_chan;
+                            next_chan <= ~next_chan;
+                            valid     <= 1;
+                            state     <= CONV;
                         end else begin
-                            bit_cnt <= bit_cnt + 4'd1;
-                            state   <= S_LOW;
+                            bit_cnt <= bit_cnt + 1;
+                            state   <= LOW;
                         end
                     end else begin
-                        div_cnt <= div_cnt + 16'd1;
+                        div_cnt <= div_cnt + 1;
                     end
-                end
-
-                default: begin
-                    state <= S_CONV;
                 end
             endcase
         end
