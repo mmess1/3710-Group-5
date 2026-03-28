@@ -30,9 +30,9 @@ module PONG_TOP(
 
     wire [11:0] adc0_raw;
     wire [11:0] adc1_raw;
-
     wire [8:0]  y_pos1;
     wire [8:0]  y_pos2;
+
     wire [9:0]  ball_x;
     wire [9:0]  ball_y;
     wire [3:0]  score1;
@@ -55,16 +55,14 @@ module PONG_TOP(
         .ADC_SCLK(ADC_SCLK),
         .adc0_raw(adc0_raw),
         .adc1_raw(adc1_raw),
+        .y_pos1(y_pos1),
+        .y_pos2(y_pos2),
         .sample_strobe(sample_strobe)
     );
 
     game_engine game0 (
         .clk(CLOCK_50),
         .rst(KEY[0]),
-        .adc0_raw(adc0_raw),
-        .adc1_raw(adc1_raw),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
         .ball_x(ball_x),
         .ball_y(ball_y),
         .score1(score1),
