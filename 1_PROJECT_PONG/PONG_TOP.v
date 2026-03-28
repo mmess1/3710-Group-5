@@ -87,10 +87,10 @@ module PONG_TOP(
         .VGA_B(VGA_B)
     );
 
-    assign in0_thousands = adc0_raw / 12'd1000;
-    assign in0_hundreds  = (adc0_raw % 12'd1000) / 12'd100;
-    assign in0_tens      = (adc0_raw % 12'd100)  / 12'd10;
-    assign in0_ones      = adc0_raw % 12'd10;
+    assign in0_thousands = y_pos1 / 10'd1000;
+    assign in0_hundreds  = (y_pos1 % 10'd1000) / 10'd100;
+    assign in0_tens      = (y_pos1 % 10'd100)  / 10'd10;
+    assign in0_ones      = y_pos1 % 10'd10;
 
     function [6:0] seg7_decimal;
         input [3:0] digit;
