@@ -55,9 +55,11 @@ module ADC_reader(
     function [8:0] scale_adc;
         input [11:0] raw;
         reg   [11:0] clipped;
+        reg   [20:0] scaled_num;
         begin
-            clipped = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
-            scale_adc = Y_MIN + ((clipped * Y_RANGE) / ADC_MAX_3V3);
+            clipped    = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
+            scaled_num = clipped * Y_RANGE;
+            scale_adc  = Y_MIN + (scaled_num / ADC_MAX_3V3);
         end
     endfunction
 
