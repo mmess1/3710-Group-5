@@ -26,25 +26,22 @@ module PONG_TOP(
     output wire [7:0] VGA_B
 );
 
-    wire       sample_strobe;
+    wire        sample_strobe;
 
-    wire [8:0] y_pos1;
-    wire [8:0] y_pos2;
-    wire [9:0] ball_x;
-    wire [9:0] ball_y;
-    wire [3:0] score1;
-    wire [3:0] score2;
+    wire [11:0] adc0_raw;
+    wire [11:0] adc1_raw;
 
-    wire [9:0] p1_dec;
-    wire [9:0] p2_dec;
+    wire [8:0]  y_pos1;
+    wire [8:0]  y_pos2;
+    wire [9:0]  ball_x;
+    wire [9:0]  ball_y;
+    wire [3:0]  score1;
+    wire [3:0]  score2;
 
-    wire [3:0] p1_ones;
-    wire [3:0] p1_tens;
-    wire [3:0] p1_hundreds;
-
-    wire [3:0] p2_ones;
-    wire [3:0] p2_tens;
-    wire [3:0] p2_hundreds;
+    wire [3:0] in0_ones;
+    wire [3:0] in0_tens;
+    wire [3:0] in0_hundreds;
+    wire [3:0] in0_thousands;
 
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = 10'b0;
@@ -56,6 +53,8 @@ module PONG_TOP(
         .ADC_CS_N(ADC_CS_N),
         .ADC_DIN(ADC_DIN),
         .ADC_SCLK(ADC_SCLK),
+        .adc0_raw(adc0_raw),
+        .adc1_raw(adc1_raw),
         .y_pos1(y_pos1),
         .y_pos2(y_pos2),
         .sample_strobe(sample_strobe)
@@ -88,16 +87,10 @@ module PONG_TOP(
         .VGA_B(VGA_B)
     );
 
-    assign p1_dec = y_pos1;
-    assign p2_dec = y_pos2;
-
-    assign p1_hundreds = p1_dec / 10'd100;
-    assign p1_tens     = (p1_dec % 10'd100) / 10'd10;
-    assign p1_ones     = p1_dec % 10'd10;
-
-    assign p2_hundreds = p2_dec / 10'd100;
-    assign p2_tens     = (p2_dec % 10'd100) / 10'd10;
-    assign p2_ones     = p2_dec % 10'd10;
+    assign in0_thousands = adc0_raw / 12'd1000;
+    assign in0_hundreds  = (adc0_raw % 12'd1000) / 12'd100;
+    assign in0_tens      = (adc0_raw % 12'd100)  / 12'd10;
+    assign in0_ones      = adc0_raw % 12'd10;
 
     function [6:0] seg7_decimal;
         input [3:0] digit;
@@ -118,12 +111,11 @@ module PONG_TOP(
         end
     endfunction
 
-    assign HEX0 = seg7_decimal(p1_ones);
-    assign HEX1 = seg7_decimal(p1_tens);
-    assign HEX2 = seg7_decimal(p1_hundreds);
-
-    assign HEX3 = seg7_decimal(p2_ones);
-    assign HEX4 = seg7_decimal(p2_tens);
-    assign HEX5 = seg7_decimal(p2_hundreds);
+    assign HEX0 = seg7_decimal(in0_ones);
+    assign HEX1 = seg7_decimal(in0_tens);
+    assign HEX2 = seg7_decimal(in0_hundreds);
+    assign HEX3 = seg7_decimal(in0_thousands);
+    assign HEX4 = 7'b1111111;
+    assign HEX5 = 7'b1111111;
 
 endmodule
