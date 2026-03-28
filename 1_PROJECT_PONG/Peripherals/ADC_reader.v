@@ -27,7 +27,8 @@ module ADC_reader(
     localparam [8:0] Y_MAX         = 9'd470 - PADDLE_HEIGHT - 9'd10;
     localparam [8:0] Y_RANGE       = Y_MAX - Y_MIN;
 
-    localparam [11:0] ADC_MAX_3V3  = 12'd3299;
+    // set this to your real observed max
+    localparam [11:0] ADC_MAX_3V3  = 12'd2500;
 
     reg [1:0]  state;
     reg [15:0] wait_cnt;
@@ -56,10 +57,18 @@ module ADC_reader(
         input [11:0] raw;
         reg   [11:0] clipped;
         reg   [20:0] scaled_num;
+        reg   [8:0]  scaled_y;
         begin
             clipped    = (raw > ADC_MAX_3V3) ? ADC_MAX_3V3 : raw;
             scaled_num = clipped * Y_RANGE;
-            scale_adc  = Y_MIN + (scaled_num / ADC_MAX_3V3);
+            scaled_y   = Y_MIN + (scaled_num / ADC_MAX_3V3);
+
+            if (scaled_y < Y_MIN)
+                scale_adc = Y_MIN;
+            else if (scaled_y > Y_MAX)
+                scale_adc = Y_MAX;
+            else
+                scale_adc = scaled_y;
         end
     endfunction
 
