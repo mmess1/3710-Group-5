@@ -1,5 +1,5 @@
 Flow report for 3710-Group-5-Project
-Fri Mar 27 14:44:38 2026
+Sun Mar 29 00:17:44 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -41,19 +41,19 @@ on the Quartus Prime software download page.
 +-----------------------------------------------------------------------------------+
 ; Flow Summary                                                                      ;
 +---------------------------------+-------------------------------------------------+
-; Flow Status                     ; Successful - Fri Mar 27 14:44:38 2026           ;
+; Flow Status                     ; Successful - Sun Mar 29 00:17:44 2026           ;
 ; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name                   ; 3710-Group-5-Project                            ;
 ; Top-level Entity Name           ; PONG_TOP                                        ;
 ; Family                          ; Cyclone V                                       ;
 ; Device                          ; 5CSEMA5F31C6                                    ;
 ; Timing Models                   ; Final                                           ;
-; Logic utilization (in ALMs)     ; 250 / 32,070 ( < 1 % )                          ;
-; Total registers                 ; 198                                             ;
-; Total pins                      ; 90 / 457 ( 20 % )                               ;
+; Logic utilization (in ALMs)     ; 630 / 32,070 ( 2 % )                            ;
+; Total registers                 ; 225                                             ;
+; Total pins                      ; 126 / 457 ( 28 % )                              ;
 ; Total virtual pins              ; 0                                               ;
 ; Total block memory bits         ; 0 / 4,065,280 ( 0 % )                           ;
-; Total DSP Blocks                ; 1 / 87 ( 1 % )                                  ;
+; Total DSP Blocks                ; 2 / 87 ( 2 % )                                  ;
 ; Total HSSI RX PCSs              ; 0                                               ;
 ; Total HSSI PMA RX Deserializers ; 0                                               ;
 ; Total HSSI TX PCSs              ; 0                                               ;
@@ -68,7 +68,7 @@ on the Quartus Prime software download page.
 +-------------------+----------------------+
 ; Option            ; Setting              ;
 +-------------------+----------------------+
-; Start date & time ; 03/27/2026 14:42:19  ;
+; Start date & time ; 03/29/2026 00:14:51  ;
 ; Main task         ; Compilation          ;
 ; Revision Name     ; 3710-Group-5-Project ;
 +-------------------+----------------------+
@@ -79,7 +79,7 @@ on the Quartus Prime software download page.
 +--------------------------------------+----------------------------------------+----------------------+-------------+-----------------------------------+
 ; Assignment Name                      ; Value                                  ; Default Value        ; Entity Name ; Section Id                        ;
 +--------------------------------------+----------------------------------------+----------------------+-------------+-----------------------------------+
-; COMPILER_SIGNATURE_ID                ; 233805676953939.177464413902028        ; --                   ; --          ; --                                ;
+; COMPILER_SIGNATURE_ID                ; 251148754895187.177476489101888        ; --                   ; --          ; --                                ;
 ; EDA_DESIGN_INSTANCE_NAME             ; NA                                     ; --                   ; --          ; load_store_TB                     ;
 ; EDA_DESIGN_INSTANCE_NAME             ; NA                                     ; --                   ; --          ; mul_shift_flag_FSM                ;
 ; EDA_GENERATE_FUNCTIONAL_NETLIST      ; Off                                    ; --                   ; --          ; eda_board_design_timing           ;
@@ -114,12 +114,12 @@ on the Quartus Prime software download page.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:07     ; 1.0                     ; 4944 MB             ; 00:00:15                           ;
-; Fitter               ; 00:01:56     ; 1.0                     ; 8039 MB             ; 00:14:35                           ;
-; Assembler            ; 00:00:05     ; 1.0                     ; 5250 MB             ; 00:00:05                           ;
-; Timing Analyzer      ; 00:00:05     ; 1.4                     ; 5445 MB             ; 00:00:06                           ;
-; EDA Netlist Writer   ; 00:00:02     ; 1.0                     ; 4768 MB             ; 00:00:01                           ;
-; Total                ; 00:02:15     ; --                      ; --                  ; 00:15:02                           ;
+; Analysis & Synthesis ; 00:00:07     ; 1.0                     ; 4952 MB             ; 00:00:15                           ;
+; Fitter               ; 00:02:30     ; 1.0                     ; 7985 MB             ; 00:17:08                           ;
+; Assembler            ; 00:00:04     ; 1.0                     ; 5250 MB             ; 00:00:05                           ;
+; Timing Analyzer      ; 00:00:06     ; 1.8                     ; 5461 MB             ; 00:00:08                           ;
+; EDA Netlist Writer   ; 00:00:01     ; 1.0                     ; 4784 MB             ; 00:00:01                           ;
+; Total                ; 00:02:48     ; --                      ; --                  ; 00:17:37                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

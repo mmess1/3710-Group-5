@@ -1,137 +1,76 @@
 module ADC_reader(
     input  wire       clk,
     input  wire       rst,
-    input  wire       ADC_DOUT,
-    output reg        ADC_CS_N,
-    output reg        ADC_DIN,
-    output reg        ADC_SCLK,
-    output reg [11:0] adc0_raw,
-    output reg [11:0] adc1_raw,
-    output reg        sample_strobe
+    input  wire [8:0] mcu_pot0,
+    input  wire [8:0] mcu_pot1,
+    output reg  [8:0] pot0_raw,
+    output reg  [8:0] pot1_raw,
+    output reg  [8:0] y_pos1,
+    output reg  [8:0] y_pos2
 );
 
-    localparam CONV = 2'd0;
-    localparam WAIT = 2'd1;
-    localparam LOW  = 2'd2;
-    localparam HIGH = 2'd3;
+    // Constants for paddle movement limits and scaling.
+    localparam [8:0] Y_TOP         = 9'd10;
+    localparam [8:0] PADDLE_HEIGHT = 9'd45;
+    localparam [8:0] Y_BOTTOM      = 9'd470 - PADDLE_HEIGHT - 9'd10;
+    localparam [8:0] Y_RANGE       = Y_BOTTOM - Y_TOP;
+    localparam [8:0] POT_MAX       = 9'd511;
 
-    localparam HALF_DIV   = 25;
-    localparam CONV_PULSE = 2;
-    localparam CONV_WAIT  = 80;
-    localparam BITS       = 12;
+    // Synchronizer and inverted pot storage registers.
+    reg [8:0] pot0_ff0;
+    reg [8:0] pot0_ff1;
+    reg [8:0] pot1_ff0;
+    reg [8:0] pot1_ff1;
 
-    reg [1:0]  state;
-    reg [15:0] wait_cnt;
-    reg [15:0] div_cnt;
-    reg [3:0]  bit_cnt;
+    reg [8:0] pot0_inv;
+    reg [8:0] pot1_inv;
 
-    reg [11:0] shift_in;
-    reg [5:0]  cmd_bits;
+    // Map a 9-bit pot value into the legal paddle Y range.
+    function [8:0] map_pot_to_y;
+        input [8:0] raw;
+        reg   [17:0] scaled_num;
+        reg   [8:0]  scaled_y;
+        reg   [8:0]  mapped_y;
+        begin
+            scaled_num = raw * Y_RANGE;
+            scaled_y   = scaled_num / 9'd511;
+            mapped_y   = Y_TOP + scaled_y;
 
-    reg next_chan;
-    reg out_chan;
-    reg valid;
+            if (mapped_y < Y_TOP)
+                map_pot_to_y = Y_TOP;
+            else if (mapped_y > Y_BOTTOM)
+                map_pot_to_y = Y_BOTTOM;
+            else
+                map_pot_to_y = mapped_y;
+        end
+    endfunction
 
+    // Sample GPIO pot data invert it and update paddle positions.
     always @(posedge clk or negedge rst) begin
         if (~rst) begin
-            state         <= CONV;
-            wait_cnt      <= 0;
-            div_cnt       <= 0;
-            bit_cnt       <= 0;
-            shift_in      <= 0;
-            cmd_bits      <= 0;
-            next_chan     <= 0;
-            out_chan      <= 0;
-            valid         <= 0;
-
-            ADC_CS_N      <= 0;
-            ADC_DIN       <= 0;
-            ADC_SCLK      <= 0;
-            adc0_raw      <= 0;
-            adc1_raw      <= 0;
-            sample_strobe <= 0;
+            pot0_ff0 <= 9'd0;
+            pot0_ff1 <= 9'd0;
+            pot1_ff0 <= 9'd0;
+            pot1_ff1 <= 9'd0;
+            pot0_inv <= 9'd0;
+            pot1_inv <= 9'd0;
+            pot0_raw <= 9'd0;
+            pot1_raw <= 9'd0;
+            y_pos1   <= Y_TOP;
+            y_pos2   <= Y_TOP;
         end else begin
-            sample_strobe <= 0;
+            pot0_ff0 <= mcu_pot0;
+            pot0_ff1 <= pot0_ff0;
+            pot1_ff0 <= mcu_pot1;
+            pot1_ff1 <= pot1_ff0;
 
-            case (state)
-                CONV: begin
-                    ADC_CS_N <= 1;
-                    ADC_SCLK <= 0;
-                    ADC_DIN  <= 0;
+            pot0_inv <= POT_MAX - pot0_ff1;
+            pot1_inv <= POT_MAX - pot1_ff1;
 
-                    if (wait_cnt == CONV_PULSE - 1) begin
-                        wait_cnt <= 0;
-                        ADC_CS_N <= 0;
-                        state    <= WAIT;
-                    end else begin
-                        wait_cnt <= wait_cnt + 1;
-                    end
-                end
-
-                WAIT: begin
-                    ADC_CS_N <= 0;
-                    ADC_SCLK <= 0;
-                    ADC_DIN  <= 0;
-
-                    if (wait_cnt == CONV_WAIT - 1) begin
-                        wait_cnt <= 0;
-                        div_cnt  <= 0;
-                        bit_cnt  <= 0;
-                        shift_in <= 0;
-                        cmd_bits <= next_chan ? 6'b110010 : 6'b100010;
-                        state    <= LOW;
-                    end else begin
-                        wait_cnt <= wait_cnt + 1;
-                    end
-                end
-
-                LOW: begin
-                    ADC_CS_N <= 0;
-                    ADC_SCLK <= 0;
-                    ADC_DIN  <= (bit_cnt < 6) ? cmd_bits[5 - bit_cnt] : 0;
-
-                    if (div_cnt == HALF_DIV - 1) begin
-                        div_cnt  <= 0;
-                        ADC_SCLK <= 1;
-                        state    <= HIGH;
-                    end else begin
-                        div_cnt <= div_cnt + 1;
-                    end
-                end
-
-                HIGH: begin
-                    ADC_CS_N <= 0;
-                    ADC_SCLK <= 1;
-
-                    if (div_cnt == HALF_DIV/2)
-                        shift_in[11 - bit_cnt] <= ADC_DOUT;
-
-                    if (div_cnt == HALF_DIV - 1) begin
-                        div_cnt  <= 0;
-                        ADC_SCLK <= 0;
-
-                        if (bit_cnt == BITS - 1) begin
-                            if (valid) begin
-                                if (out_chan == 0)
-                                    adc0_raw <= shift_in;
-                                else
-                                    adc1_raw <= shift_in;
-                                sample_strobe <= 1;
-                            end
-
-                            out_chan  <= next_chan;
-                            next_chan <= ~next_chan;
-                            valid     <= 1;
-                            state     <= CONV;
-                        end else begin
-                            bit_cnt <= bit_cnt + 1;
-                            state   <= LOW;
-                        end
-                    end else begin
-                        div_cnt <= div_cnt + 1;
-                    end
-                end
-            endcase
+            pot0_raw <= pot0_inv;
+            pot1_raw <= pot1_inv;
+            y_pos1   <= map_pot_to_y(pot0_inv);
+            y_pos2   <= map_pot_to_y(pot1_inv);
         end
     end
 
