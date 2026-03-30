@@ -49,7 +49,7 @@ module PONG_TOP(
     wire [3:0] pot1_tens;
     wire [3:0] pot1_ones;
 
-    // Fixed top-level output ties.
+    // top-level output ties.
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = 10'b0;
 
@@ -71,8 +71,6 @@ module PONG_TOP(
         .rst(KEY[0]),
         .mcu_pot0(mcu_pot0),
         .mcu_pot1(mcu_pot1),
-        .pot0_raw(pot0_raw),
-        .pot1_raw(pot1_raw),
         .y_pos1(pot0_y),
         .y_pos2(pot1_y)
     );
