@@ -22,7 +22,7 @@ module renderer(
 
     localparam PADDLE_WIDTH  = 10;
     localparam PADDLE_HEIGHT = 45;
-    localparam PLAYER1_X     = 150;
+    localparam PLAYER1_X     = 30;
     localparam PLAYER2_X     = 610;
     localparam BALL_SIZE     = 10;
 
@@ -94,10 +94,10 @@ module renderer(
             VGA_B <= 8'd0;
 
             if (VGA_BLANK_N) begin
-                if (hcount < 10 || hcount >= 630 || vcount < 10 || vcount >= 470) begin
+                if (hcount < 5 || hcount >= 635 || vcount < 5 || vcount >= 475) begin
                     VGA_R <= 8'd255;
                     VGA_G <= 8'd255;
-                    VGA_B <= 8'd0;
+                    VGA_B <= 8'd255;
                 end
                 else if (hcount == 320 && (vcount % 20) < 10) begin
                     VGA_R <= 8'd255;
@@ -123,9 +123,9 @@ module renderer(
                 end
                 else if ((hcount >= ball_x) && (hcount < ball_x + BALL_SIZE) &&
                          (vcount >= ball_y) && (vcount < ball_y + BALL_SIZE)) begin
-                    VGA_R <= 8'd255;
-                    VGA_G <= 8'd255;
-                    VGA_B <= 8'd255;
+                    VGA_R <= 8'd240;
+                    VGA_G <= 8'd100;
+                    VGA_B <= 8'd0;
                 end
             end
         end
