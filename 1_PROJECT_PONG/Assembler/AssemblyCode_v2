@@ -1,0 +1,310 @@
+# note block two will store player game variables:
+Address   Data (16 bits)
+0         [xxxxxxxxxxxxxxxx]
+1         [xxxxxxxxxxxxxxxx]
+2         [xxxxxxxxxxxxxxxx]
+3         [xxxxxxxxxxxxxxxx]
+
+    (REGISTER FILE)
+______________________________
+|   $r1: player1 y address   |
+|   $r2: player2 y address   |
+|   $r3: player1 score addr  |
+|   $r4: player2 score addr  |
+|   $r5: Ballx address       |
+|   $r6: Bally address       |
+|   $r7: temp / input value  |
+|   $r8: Ball dx address     |
+|   $r9: Ball dy address     |
+|   $r10: Temp Register      |
+|   $r11: Temp Register      |
+|   $r12: Temp Register      |
+|   $r13: Temp Register      |
+|   $r14: Temp Register      |
+|   $r15: Temp Register      |
+______________________________
+
+      (RBRAM0: 0 – 511 )
+______________________________
+   add          data
+|    0      [ game start ]    |
+|                             |
+|    6    [ Jump Game loop ]  |
+|    7    [ check paddle1 ]   |
+|    10   [ check paddle2 ]   |
+|                             |
+|    13   [ move ball ]       |
+
+      (RBRAM1: 512 – 1023 )
+______________________________
+  add          data
+| 512      [ player1y ]       |
+| 513      [ player2y ]       |
+| 514      [ player1 score ]  |
+| 515      [ player2 score ]  |
+| 516      [ ball x ]         |
+| 517      [ ball y ]         |
+| 518      [ ball dx ]        |
+| 519      [ ball dy ]        |
+| 520      [ paddle1 move ]   |
+| 521      [ paddle2 move ]   |
+
+
+# player one y address:   512
+# player two y address:   513
+# player one score:       514
+# player two score:       515
+# ball x:                 516
+# ball y:                 517
+# ball dx:                518
+# ball dy:                519
+# paddle one move:        520
+# paddle two move:        521
+
+////////  ////////  ////////  ////////  ////////  ////////
+$r7 -> reserved for temp / paddle input value
+
+$r10 - $r15 = temp registers
+
+////////  ////////  ////////  ////////  ////////  ////////
+  
+# Game Set up:
+
+player posistion:
+  MOVI $r1, 512;   # player1 y address
+  MOVI $r2, 513;   # player2 y address
+
+Score:
+  MOVI $r3, 514;   # Player1 Score address
+  MOVI $r4, 515;   # Player2 Score address
+
+Ball:
+  MOVI $r5, 516;   # Ball x address
+  MOVI $r6, 517;   # Ball y address
+  MOVI $r8, 518;   # Ball dx address
+  MOVI $r9, 519;   # Ball dy address
+
+# initialize player y positions
+  MOVI $r10, 215;
+  STORE $r1, $r10;
+  STORE $r2, $r10;
+
+# initialize scores
+  MOVI $r10, 0;
+  STORE $r3, $r10;
+  STORE $r4, $r10;
+
+# initialize ball position near screen center
+  MOVI $r10, 315;
+  STORE $r5, $r10;
+  MOVI $r10, 235;
+  STORE $r6, $r10;
+
+# initialize ball direction
+  MOVI $r10, 1;    # dx = +1
+  STORE $r8, $r10;
+  MOVI $r10, 0;    # dy = 0
+  STORE $r9, $r10;
+
+JUMP Game_loop;
+  
+////////  ////////  ////////  ////////  ////////  ////////
+Note the paddle inputs will be set at a spacific location that can be used by
+other parts of the program.
+  - if the value inside the paddle is 1 = move up
+  - if the value inside the paddle is 2 = move down
+
+  Note: Values in register file have not been over written:
+
+note: actual LOAD/STORE order for your CPU is:
+  LOAD  $rAddress, $rDest
+  STORE $rAddress, $rSrc
+////////  ////////  ////////  ////////  ////////  ////////
+
+Game_loop:
+
+# 1) check paddle one:
+Check_paddle1:
+LOAD $r13, $r7    # load paddle one move from mem[520]
+CMPI $r7, 0;    
+Bcond 1, Move_paddle1    # branch if not equal to 0: move paddle one
+
+# 2) check paddle two:
+Check_paddle2:
+LOAD $r14, $r7    # load paddle two move from mem[521]
+CMPI $r7, 0;    
+Bcond 1, Move_paddle2    # branch if not equal to 0: move paddle two
+
+# 3) move Ball:
+JUMP Move_ball;
+
+Move paddle 1: --> $r1 hold paddle addres, $r7 hold move diretion 1) = up, 2) = down
+Move_paddle1:
+  LOAD $r1, $r10    # load player1 y
+  CMPI $r7, 1;      # move up
+  Bcond  1, Move_paddle1_down      # move down if not move up
+
+  # top clamp: if player1 y <= 10 do not move higher
+  CMPI $r10, 10;
+  Bcond 13, Check_paddle2
+
+  SUBI $r10, 5;     # move up
+  STORE $r1, $r10   # save player1 y
+  JUMP Check_paddle2           # jump to check paddle two
+  
+) move down:
+Move_paddle1_down:
+  # bottom clamp: if player1 y >= 415 do not move lower
+  CMPI $r10, 415;
+  Bcond 7, Check_paddle2
+
+  ADDI $r10, 5;
+  STORE $r1, $r10   # save player1 y
+  JUMP Check_paddle2           # jump to check paddle two
+
+Move paddle 2: --> $r2 hold paddle addres, $r7 hold move diretion 1) = up, 2) = down
+Move_paddle2:
+  LOAD $r2, $r10    # load player2 y
+  CMPI $r7, 1;      # move up
+  Bcond 1, Move_paddle2_down      # move down if not move up
+
+  # top clamp: if player2 y <= 10 do not move higher
+  CMPI $r10, 10;
+  Bcond 13, Move_ball
+
+  SUBI $r10, 5;     # move up
+  STORE $r2, $r10   # save player2 y
+  JUMP Move_ball           # jump to move ball
+
+) move down:
+Move_paddle2_down:
+  # bottom clamp: if player2 y >= 415 do not move lower
+  CMPI $r10, 415;
+  Bcond 7, Move_ball
+
+  ADDI $r10, 5;
+  STORE $r2, $r10   # save player2 y
+  JUMP Move_ball           # jump to move ball
+
+
+# =========================================================
+# MOVE BALL + PONG ANGLE LOGIC
+# =========================================================
+# ball_dx = +1 or -1
+# ball_dy = -1, 0, +1
+# angle rule:
+#   hit top third    -> dy = -1
+#   hit middle third -> dy =  0
+#   hit bottom third -> dy = +1
+
+
+# dx = +1, ball moves right
+# dx = -1, ball moves left
+# dy = -1, ball moves up
+# dy = 0, ball moves straight
+# dy = +1, ball moves down
+
+Move_ball:
+  LOAD $r5, $r10    # r10 = ball x
+  LOAD $r6, $r11    # r11 = ball y
+  LOAD $r8, $r12    # r12 = ball dx
+  LOAD $r9, $r15    # r15 = ball dy
+
+  ADD $r10, $r12    # ball x = ball x + dx
+  ADD $r11, $r15    # ball y = ball y + dy
+
+  STORE $r5, $r10
+  STORE $r6, $r11
+
+  # top wall bounce: if ball_y <= 10, dy = +1 
+  CMPI $r11, 10
+  Bcond 13, Ball_hit_top
+
+  # bottom wall bounce: if ball_y >= 460, dy = -1
+  CMPI $r11, 460
+  Bcond 7, Ball_hit_bottom
+
+  JUMP Check_left_paddle
+
+Ball_hit_top:
+  MOVI $r15, 1
+  STORE $r9, $r15
+  JUMP Check_left_paddle
+
+Ball_hit_bottom:
+  MOVI $r15, -1
+  STORE $r9, $r15
+  JUMP Check_left_paddle
+
+
+# =========================================================
+# LEFT PADDLE COLLISION
+# left paddle x = 150, width = 10
+# if ball moving left and ball_x <= 160, test collision with paddle1
+# =========================================================
+Check_left_paddle:
+  # only check left paddle when dx < 0
+  CMPI $r12, 0
+  Bcond 6, Left_paddle_x_check
+  JUMP Check_right_paddle
+
+Left_paddle_x_check:
+  CMPI $r10, 160
+  Bcond 13, Left_paddle_y_check    # if ball_x <= 160, possible hit
+  JUMP Check_right_paddle
+
+Left_paddle_y_check:
+  LOAD $r1, $r13                   # r13 = player1 y
+
+  CMP $r11, $r13
+  Bcond 6, Check_right_paddle      # if ball_y < player1_y -> miss
+
+  MOV $r14, $r13
+  ADDI $r14, 45                    # r14 = player1_y + paddle height
+  CMP $r11, $r14
+  Bcond 12, Check_right_paddle     # if ball_y > player1_y + 45 -> miss
+
+  # reverse horizontal direction
+  MOVI $r12, 1
+  STORE $r8, $r12
+
+  # angle zones based on where ball hit the paddle
+  MOV $r14, $r13
+  ADDI $r14, 15                    # top third limit
+  CMP $r11, $r14
+  Bcond 13, Left_hit_top
+
+  MOV $r14, $r13
+  ADDI $r14, 30                    # middle third limit
+  CMP $r11, $r14
+  Bcond 13, Left_hit_middle
+
+  JUMP Left_hit_bottom
+
+Left_hit_top:
+  MOVI $r15, -1
+  STORE $r9, $r15
+  JUMP Check_score
+
+Left_hit_middle:
+  MOVI $r15, 0
+  STORE $r9, $r15
+  JUMP Check_score
+
+Left_hit_bottom:
+  MOVI $r15, 1
+  STORE $r9, $r15
+  JUMP Check_score
+
+
+
+
+# =========================================================
+# Bcond numbers
+# =========================================================
+# Bcond 0  = EQ
+# Bcond 1  = NE
+# Bcond 6  = signed less-than
+# Bcond 7  = signed greater-or-equal
+# Bcond 12 = signed greater-than
+# Bcond 13 = signed less-or-equal
