@@ -14,7 +14,7 @@ module pong_cpu_fsm (
     output wire [7:0]  opcode,
     output wire [3:0]  Rdest_select,
     output wire [3:0]  Rsrc_select,
-    output wire [15:0] Imm_in,       // fixed: was [7:0]
+    output wire [15:0] Imm_in,      
     output reg         Imm_select,
 
     /* RAM */
@@ -178,15 +178,15 @@ always @(*) begin
         S3_STORE: begin
             lsc_mux_selct = 1'b1;
             en_a          = 1'b1;
-            we_a          = ~is_mmio;   // suppress RAM write when MMIO
+            we_a          = ~is_mmio;   // dont write to RAM when mmio value
             ram_wen       = ~is_mmio;
-            mmio_we       = is_mmio;    // pulse MMIO write enable
+            mmio_we       = is_mmio;    // enable mmio write when mmio value
             pc_en         = 1'b1;
         end
 
         S4_LOAD: begin
             lsc_mux_selct     = 1'b1;
-            en_a              = ~is_mmio;  // suppress RAM read when MMIO
+            en_a              = ~is_mmio;  // dont read from RAM when mmio value
             fsm_alu_mem_selct = 1'b1;
         end
 
@@ -212,23 +212,23 @@ function integer check_flags;
     begin
         check_flags = 0;
         case (cond)
-            EQ: check_flags = (flags[1] == 1'b1);
-            NE: check_flags = (flags[1] == 1'b0);
-            GE: check_flags = (flags[1] == 1'b1) || (flags[0] == 1'b1);
-            CS: check_flags = (flags[3] == 1'b1);
-            CC: check_flags = (flags[3] == 1'b0);
-            HI: check_flags = (flags[4] == 1'b1);
-            LS: check_flags = (flags[4] == 1'b0);
-            LO: check_flags = (flags[4] == 1'b0) && (flags[1] == 1'b0);
-            HS: check_flags = (flags[4] == 1'b1) || (flags[1] == 1'b1);
-            GT: check_flags = (flags[0] == 1'b1);
-            LE: check_flags = (flags[0] == 1'b0);
-            FS: check_flags = (flags[2] == 1'b1);
-            FC: check_flags = (flags[2] == 1'b0);
-            LT: check_flags = (flags[0] == 1'b0) && (flags[1] == 1'b0);
-            UC: check_flags = 1;   // fixed: was 0
-            XX: check_flags = 0;
-            default: check_flags = 0;
+            EQ: check_flags = (flags[1] == 1'b1); // Z = 1
+            NE: check_flags = (flags[1] == 1'b0); // Z = 0
+            GE: check_flags = (flags[1] == 1'b1) || (flags[0] == 1'b1); // N = 0 or Z = 0
+            CS: check_flags = (flags[3] == 1'b1); // C = 1
+            CC: check_flags = (flags[3] == 1'b0); // C = 0
+            HI: check_flags = (flags[4] == 1'b1); // L = 1
+            LS: check_flags = (flags[4] == 1'b0); // L = 0
+            LO: check_flags = (flags[4] == 1'b0) && (flags[1] == 1'b0); // L = 0 and Z = 0
+            HS: check_flags = (flags[4] == 1'b1) || (flags[1] == 1'b1); // L = 1 or Z = 1
+            GT: check_flags = (flags[0] == 1'b1); // N = 1
+            LE: check_flags = (flags[0] == 1'b0); // N = 0
+            FS: check_flags = (flags[2] == 1'b1); // F = 1
+            FC: check_flags = (flags[2] == 1'b0); // F = 0
+            LT: check_flags = (flags[0] == 1'b0) && (flags[1] == 1'b0); // N = 0 and Z = 0
+            UC: check_flags = 1;    // always jump
+            XX: check_flags = 0;    // never jump
+            default: check_flags = 0; // don't jump
         endcase
     end
 endfunction
