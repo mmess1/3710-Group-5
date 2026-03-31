@@ -18,7 +18,7 @@ module pong_top (
 
     // ── CPU clock ─────────────────────────────────────────────────────────
     wire clk_cpu;
-    clock_div #(.DIV(5_000_000)) u_cpu_clk (
+    clock_div #(.DIV(5)) u_cpu_clk (
         .clk_in (CLOCK_50),
         .reset  (~reset_n),
         .clk_out(clk_cpu)
@@ -63,7 +63,7 @@ module pong_top (
             case (mmio_addr)
                 16'hFF00: reg_p1_y   <= mmio_wr_data[8:0];
                 16'hFF01: reg_p2_y   <= mmio_wr_data[8:0];
-					 //16'hFF02: reg_ball_x <= mmio_wr_data;
+				//16'hFF02: reg_ball_x <= mmio_wr_data;
                 //16'hFF03: reg_ball_y <= mmio_wr_data;
             endcase
         end
@@ -72,7 +72,7 @@ module pong_top (
     assign mmio_rd_data =
         (mmio_addr == 16'hFF00) ? {7'b0, reg_p1_y} :
         (mmio_addr == 16'hFF01) ? {7'b0, reg_p2_y} :
-		  //(mmio_addr == 16'hFF00) ? reg_ball_x        :
+		//(mmio_addr == 16'hFF00) ? reg_ball_x        :
         //(mmio_addr == 16'hFF01) ? reg_ball_y        :
         16'h0000;
 
@@ -102,7 +102,7 @@ module pong_top (
         .decoder_en       (decoder_en)
     );
 
-    pong_dp #(.DATA_FILE("pong.hex")) dp (
+    pong_dp #(.DATA_FILE("C:/Users/genet/altera_lite/quartus/ece3710/pong_test.hex")) dp (
         .clk              (clk_cpu),
         .reset            (reset_n),
         .ram_we           (ram_wen),
@@ -123,7 +123,7 @@ module pong_top (
         .Imm_in           (Imm_in),
         .Imm_select       (Imm_select),
         .ls_cntrl         (mmio_addr),
-        .Rdest_mux_out    (mmio_wr_data),
+        .Rsrc_mux_out     (mmio_wr_data),
         .mmio_rd_data     (mmio_rd_data),
         .is_mmio          (is_mmio)
     );
