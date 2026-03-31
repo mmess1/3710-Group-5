@@ -30,7 +30,7 @@ module pong_dp #(parameter DATA_FILE="")
 
     /* MMIO */
     output wire [15:0] ls_cntrl,       // LS_cntrl mux provided memory address
-    output wire [15:0] Rdest_mux_out,  // Rdest mux provides write data
+    output wire [15:0] Rsrc_mux_out,   // Rsrc provides store data / MMIO wr data
 
     input wire [15:0] mmio_rd_data,
     input wire        is_mmio
@@ -48,16 +48,16 @@ wire [15:0] r11, r12, r13, r14, r15;
 /* ALU result */
 wire [15:0] alu_out;
 
-/* Rsrc mux chain */
-wire [15:0] Rsrc_mux_out;
+/* MUX output */
 wire [15:0] Rsrc_Imm_mux_out;
+wire [15:0] Rdest_mux_out;
 
 /* ALU bus into reg file */
 wire [15:0] alu_bus;
 
 /* RAM output */
 wire [15:0] q_a;
-assign ram_out = q_a;
+assign ram_out = lsc_mux_select ? instr_new : q_a; // hold instr stable during load/store
 
 /* PC */
 wire [15:0] pc_out;
@@ -66,7 +66,7 @@ wire [15:0] adder_one_wire = pc_out + 16'd1;
 wire [15:0] adder_k_wire   = pc_out + pc_add_k;
 
 /* Instruction buffer */
-wire        load_en = en_a & ~lsc_mux_select; // only latch during fetch
+wire        load_en = ~en_a & ~lsc_mux_select; // latch during decode/execute, not fetch
 wire [15:0] instr_old = q_a;
 wire [15:0] instr_new;
 
@@ -118,8 +118,8 @@ alu alu (
     .Flags    (Flags_out)
 );
 
-ram #(.DATA_FILE0(DATA_FILE)) u_ram (   // fixed: was DATA_FILE1
-    .data_a(Rdest_mux_out),
+ram #(.DATA_FILE0(DATA_FILE)) u_ram (  
+    .data_a(Rsrc_mux_out),              
     .addr_a(ls_cntrl[9:0]),
     .we_a  (ram_we),
     .clk   (clk),
@@ -152,7 +152,7 @@ pc pc1 (
 );
 
 /* ALU/mem MUX — selects MMIO read-back or RAM for loads */
-wire [15:0] mem_rd_mux = is_mmio ? mmio_rd_data : ram_out;
+wire [15:0] mem_rd_mux = is_mmio ? mmio_rd_data : q_a; 
 
 mux_2to1 alu_mux (
     .in0(alu_out),
