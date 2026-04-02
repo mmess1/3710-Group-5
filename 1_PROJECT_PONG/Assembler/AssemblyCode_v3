@@ -1,0 +1,224 @@
+MOVI $r1, 1
+LSHI $r1, 9
+MOV $r2, $r1
+ADDI $r2, 1
+MOV $r3, $r1
+ADDI $r3, 2
+MOV $r4, $r1
+ADDI $r4, 3
+MOV $r5, $r1
+ADDI $r5, 4
+MOV $r6, $r1
+ADDI $r6, 5
+MOV $r8, $r1
+ADDI $r8, 6
+MOV $r9, $r1
+ADDI $r9, 7
+MOV $r13, $r1
+ADDI $r13, 8
+MOV $r14, $r1
+ADDI $r14, 9
+MOVI $r10, 54
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r1, $r10
+STORE $r2, $r10
+MOVI $r10, 0
+STORE $r3, $r10
+STORE $r4, $r10
+MOVI $r10, 79
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r5, $r10
+MOVI $r10, 59
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r6, $r10
+MOVI $r10, 1
+STORE $r8, $r10
+MOVI $r10, 0
+STORE $r9, $r10
+# LOOP
+LOAD $r13, $r7
+CMPI $r7, 1
+Bcond 0, 96
+CMPI $r7, 2
+Bcond 0, 100
+# CHECKP2
+LOAD $r14, $r7
+CMPI $r7, 1
+Bcond 0, 106
+CMPI $r7, 2
+Bcond 0, 111
+# MOVEBALL
+LOAD $r5, $r10
+LOAD $r6, $r11
+LOAD $r8, $r12
+LOAD $r9, $r7
+ADD $r10, $r12
+ADD $r11, $r7
+STORE $r5, $r10
+STORE $r6, $r11
+CMPI $r11, 10
+Bcond 13, 73
+MOVI $r15, 115
+LSHI $r15, 2
+CMP $r11, $r15
+Bcond 7, 72
+# CHECKLEFTDX
+CMPI $r12, 0
+Bcond 6, 1
+Bcond 14, 31
+# CHECKLEFTX
+MOVI $r15, 5
+LSHI $r15, 5
+CMP $r10, $r15
+Bcond 13, 1
+Bcond 14, 26
+# CHECKLEFTY
+LOAD $r1, $r15
+CMP $r11, $r15
+Bcond 6, 111
+MOV $r7, $r15
+ADDI $r7, 45
+CMP $r11, $r7
+Bcond 12, 107
+MOVI $r7, 1
+STORE $r8, $r7
+MOV $r7, $r15
+ADDI $r7, 15
+CMP $r11, $r7
+Bcond 13, 7
+MOV $r7, $r15
+ADDI $r7, 30
+CMP $r11, $r7
+Bcond 13, 6
+MOVI $r7, 1
+STORE $r9, $r7
+Bcond 14, -52
+# LEFTHITTOP
+MOVI $r7, -1
+STORE $r9, $r7
+Bcond 14, -55
+# LEFTHITMID
+MOVI $r7, 0
+STORE $r9, $r7
+Bcond 14, -58
+# CHECKRIGHTDX
+CMPI $r12, 0
+Bcond 12, 1
+Bcond 14, -61
+# CHECKRIGHTX
+MOVI $r15, 15
+LSHI $r15, 5
+SUBI $r15, 10
+CMP $r10, $r15
+Bcond 7, 1
+Bcond 14, -67
+# CHECKRIGHTY
+LOAD $r2, $r15
+CMP $r11, $r15
+Bcond 6, 60
+MOV $r7, $r15
+ADDI $r7, 45
+CMP $r11, $r7
+Bcond 12, 56
+MOVI $r7, -1
+STORE $r8, $r7
+MOV $r7, $r15
+ADDI $r7, 15
+CMP $r11, $r7
+Bcond 13, 7
+MOV $r7, $r15
+ADDI $r7, 30
+CMP $r11, $r7
+Bcond 13, 6
+MOVI $r7, 1
+STORE $r9, $r7
+Bcond 14, -87
+# RIGHTHITTOP
+MOVI $r7, -1
+STORE $r9, $r7
+Bcond 14, -90
+# RIGHTHITMID
+MOVI $r7, 0
+STORE $r9, $r7
+Bcond 14, -93
+# BALLTOP
+MOVI $r7, 1
+STORE $r9, $r7
+Bcond 14, -72
+# BALLBOTTOM
+MOVI $r7, -1
+STORE $r9, $r7
+Bcond 14, -75
+# P1UP
+LOAD $r1, $r10
+CMPI $r10, 10
+Bcond 13, -97
+SUBI $r10, 5
+STORE $r1, $r10
+Bcond 14, -100
+# P1DOWN
+LOAD $r1, $r10
+MOVI $r15, 13
+LSHI $r15, 5
+SUBI $r15, 1
+CMP $r10, $r15
+Bcond 7, -106
+ADDI $r10, 5
+STORE $r1, $r10
+Bcond 14, -109
+# P2UP
+LOAD $r2, $r10
+CMPI $r10, 10
+Bcond 13, -107
+SUBI $r10, 5
+STORE $r2, $r10
+Bcond 14, -110
+# BACKLOOP
+Bcond 14, -121
+# P2DOWN
+LOAD $r2, $r10
+MOVI $r15, 13
+LSHI $r15, 5
+SUBI $r15, 1
+CMP $r10, $r15
+Bcond 7, -117
+ADDI $r10, 5
+STORE $r2, $r10
+Bcond 14, -120
+# P1SCORE
+LOAD $r3, $r10
+ADDI $r10, 1
+STORE $r3, $r10
+MOVI $r10, 79
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r5, $r10
+MOVI $r10, 59
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r6, $r10
+MOVI $r10, 1
+STORE $r8, $r10
+MOVI $r10, 0
+STORE $r9, $r10
+Bcond 14, -26
+# P2SCORE
+LOAD $r4, $r10
+ADDI $r10, 1
+STORE $r4, $r10
+MOVI $r10, 79
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r5, $r10
+MOVI $r10, 59
+LSHI $r10, 2
+SUBI $r10, 1
+STORE $r6, $r10
+MOVI $r10, -1
+STORE $r8, $r10
+MOVI $r10, 0
+STORE $r9, $r10
+Bcond 14, -42
