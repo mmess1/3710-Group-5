@@ -3,12 +3,12 @@ module game_engine(
     input  wire       rst,
     input  wire [8:0] y_pos1_in,
     input  wire [8:0] y_pos2_in,
-    output reg  [8:0] y_pos1,
-    output reg  [8:0] y_pos2,
-    output reg  [9:0] ball_x,
-    output reg  [9:0] ball_y,
-    output reg  [3:0] score1,
-    output reg  [3:0] score2
+    output reg  [8:0] y_pos1,//r1
+    output reg  [8:0] y_pos2,//r3
+    output reg  [9:0] ball_x,//r6
+    output reg  [9:0] ball_y,//r7
+    output reg  [3:0] score1,//r4
+    output reg  [3:0] score2 //r5
 );
 
     // Tick rate constant for ball movement timing.
