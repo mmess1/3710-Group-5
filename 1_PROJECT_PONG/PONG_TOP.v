@@ -30,8 +30,13 @@ module PONG_TOP(
     wire reset_n;
     assign reset_n = KEY[0];
 
-    reg [4:0] cpu_div;
-    wire clk_cpu;
+    reg  [4:0] cpu_div;
+    wire       clk_cpu;
+
+    wire [8:0] mcu_pot0;
+    wire [8:0] mcu_pot1;
+    wire [8:0] adc_p1_y;
+    wire [8:0] adc_p2_y;
 
     wire [15:0] wEnable;
     wire [7:0]  opcode;
@@ -50,6 +55,7 @@ module PONG_TOP(
     wire        fsm_alu_mem_select;
     wire [15:0] ram_out;
     wire [4:0]  Flags_out;
+    wire        decoder_en;
 
     wire [15:0] mmio_addr;
     wire [15:0] mmio_wr_data;
@@ -76,11 +82,21 @@ module PONG_TOP(
 
     assign clk_cpu    = cpu_div[4];
     assign is_mmio    = (mmio_addr >= 16'hFF00);
-    assign LEDR       = 10'b0;
-    assign ADC_CS_N   = 1'b1;
-    assign ADC_DIN    = 1'b0;
-    assign ADC_SCLK   = 1'b0;
     assign VGA_SYNC_N = 1'b0;
+    assign LEDR       = {1'b0, adc_p1_y};
+
+    // keep old adc pins present for board pin compatibility
+    // this top still uses the gpio mcu adc path through ADC_reader
+    assign ADC_CS_N = 1'b1;
+    assign ADC_DIN  = 1'b0;
+    assign ADC_SCLK = 1'b0;
+
+    // jp2 gpio_1 mapping
+    assign mcu_pot0 = {GPIO_1[34], GPIO_1[32], GPIO_1[30], GPIO_1[28], GPIO_1[26],
+                       GPIO_1[27], GPIO_1[29], GPIO_1[31], GPIO_1[33]};
+
+    assign mcu_pot1 = {GPIO_1[24], GPIO_1[22], GPIO_1[20], GPIO_1[18], GPIO_1[16],
+                       GPIO_1[14], GPIO_1[12], GPIO_1[10], GPIO_1[11]};
 
     always @(posedge CLOCK_50 or negedge reset_n) begin
         if (!reset_n)
@@ -88,6 +104,15 @@ module PONG_TOP(
         else
             cpu_div <= cpu_div + 5'd1;
     end
+
+    ADC_reader adc0 (
+        .clk    (CLOCK_50),
+        .rst    (reset_n),
+        .mcu_pot0(mcu_pot0),
+        .mcu_pot1(mcu_pot1),
+        .y_pos1 (adc_p1_y),
+        .y_pos2 (adc_p2_y)
+    );
 
     always @(posedge clk_cpu or negedge reset_n) begin
         if (!reset_n) begin
@@ -104,6 +129,8 @@ module PONG_TOP(
     assign mmio_rd_data =
         (mmio_addr == 16'hFF00) ? {7'b0, reg_p1_y} :
         (mmio_addr == 16'hFF01) ? {7'b0, reg_p2_y} :
+        (mmio_addr == 16'hFF10) ? {7'b0, adc_p1_y} :
+        (mmio_addr == 16'hFF11) ? {7'b0, adc_p2_y} :
         16'h0000;
 
     pong_cpu_fsm fsm (
@@ -111,8 +138,6 @@ module PONG_TOP(
         .reset             (reset_n),
         .instr_set         (ram_out),
         .Flags_in          (Flags_out),
-        .is_mmio           (is_mmio),
-        .mmio_we           (mmio_we),
         .wEnable           (wEnable),
         .opcode            (opcode),
         .Rdest_select      (Rdest_select),
@@ -128,7 +153,9 @@ module PONG_TOP(
         .pc_mux_selct      (pc_mux_select),
         .pc_en             (pc_en),
         .fsm_alu_mem_selct (fsm_alu_mem_select),
-        .decoder_en        ()
+        .decoder_en        (decoder_en),
+        .is_mmio           (is_mmio),
+        .mmio_we           (mmio_we)
     );
 
     pong_dp #(.DATA_FILE("PONG.hex")) dp (
