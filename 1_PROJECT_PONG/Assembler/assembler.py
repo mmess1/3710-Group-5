@@ -58,7 +58,7 @@ def main():
 def clean_line(line):
     
     # Remove anything after #, /, or \
-    for symbol in ['#', '/', '\\']:
+    for symbol in ['#', '/', '\\','_', ':', "|"]:
         if symbol in line:
             line = line.split(symbol)[0]
             # Strip whitespace
