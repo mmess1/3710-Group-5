@@ -27,14 +27,39 @@ module PONG_TOP(
     output wire [7:0] VGA_B
 );
 
-    // Internal wires for MCU inputs game state and display digits.
-    wire [8:0] mcu_pot0;
-    wire [8:0] mcu_pot1;
+    wire reset_n;
+    assign reset_n = KEY[0];
 
-    wire [8:0] pot0_raw;
-    wire [8:0] pot1_raw;
-    wire [8:0] pot0_y;
-    wire [8:0] pot1_y;
+    reg [4:0] cpu_div;
+    wire clk_cpu;
+
+    wire [15:0] wEnable;
+    wire [7:0]  opcode;
+    wire [3:0]  Rdest_select;
+    wire [3:0]  Rsrc_select;
+    wire [15:0] Imm_in;
+    wire        Imm_select;
+    wire        we_a;
+    wire        en_a;
+    wire        en_b;
+    wire        ram_wen;
+    wire        lsc_mux_select;
+    wire [15:0] pc_add_k;
+    wire        pc_mux_select;
+    wire        pc_en;
+    wire        fsm_alu_mem_select;
+    wire [15:0] ram_out;
+    wire [4:0]  Flags_out;
+
+    wire [15:0] mmio_addr;
+    wire [15:0] mmio_wr_data;
+    wire [15:0] mmio_rd_data;
+    wire        mmio_we;
+    wire        is_mmio;
+
+    reg  [8:0] reg_p1_y;
+    reg  [8:0] reg_p2_y;
+
     wire [8:0] y_pos1;
     wire [8:0] y_pos2;
     wire [9:0] ball_x;
@@ -42,73 +67,127 @@ module PONG_TOP(
     wire [3:0] score1;
     wire [3:0] score2;
 
-    wire [3:0] pot0_hundreds;
-    wire [3:0] pot0_tens;
-    wire [3:0] pot0_ones;
-    wire [3:0] pot1_hundreds;
-    wire [3:0] pot1_tens;
-    wire [3:0] pot1_ones;
+    wire [3:0] p1_hundreds;
+    wire [3:0] p1_tens;
+    wire [3:0] p1_ones;
+    wire [3:0] p2_hundreds;
+    wire [3:0] p2_tens;
+    wire [3:0] p2_ones;
 
-    // top-level output ties.
-    assign VGA_SYNC_N = 1'b0;
+    assign clk_cpu    = cpu_div[4];
+    assign is_mmio    = (mmio_addr >= 16'hFF00);
     assign LEDR       = 10'b0;
+    assign ADC_CS_N   = 1'b1;
+    assign ADC_DIN    = 1'b0;
+    assign ADC_SCLK   = 1'b0;
+    assign VGA_SYNC_N = 1'b0;
 
-    // Old LTC2308 path is disabled. Keep ports tied off so existing pin assignments still compile cleanly.
-    assign ADC_CS_N = 1'b1;
-    assign ADC_DIN  = 1'b0;
-    assign ADC_SCLK = 1'b0;
+    always @(posedge CLOCK_50 or negedge reset_n) begin
+        if (!reset_n)
+            cpu_div <= 5'd0;
+        else
+            cpu_div <= cpu_div + 5'd1;
+    end
 
-    // JP2 / GPIO_1 physical pin mapping requested by wiring order:
-    assign mcu_pot0 = {GPIO_1[34], GPIO_1[32], GPIO_1[30], GPIO_1[28], GPIO_1[26],
-                       GPIO_1[27], GPIO_1[29], GPIO_1[31], GPIO_1[33]};
+    always @(posedge clk_cpu or negedge reset_n) begin
+        if (!reset_n) begin
+            reg_p1_y <= 9'd200;
+            reg_p2_y <= 9'd200;
+        end else if (mmio_we) begin
+            case (mmio_addr)
+                16'hFF00: reg_p1_y <= mmio_wr_data[8:0];
+                16'hFF01: reg_p2_y <= mmio_wr_data[8:0];
+            endcase
+        end
+    end
 
-    assign mcu_pot1 = {GPIO_1[24], GPIO_1[22], GPIO_1[20], GPIO_1[18], GPIO_1[16],
-                       GPIO_1[14], GPIO_1[12], GPIO_1[10], GPIO_1[11]};
+    assign mmio_rd_data =
+        (mmio_addr == 16'hFF00) ? {7'b0, reg_p1_y} :
+        (mmio_addr == 16'hFF01) ? {7'b0, reg_p2_y} :
+        16'h0000;
 
-    // ADC input remap and paddle position generation.
-    ADC_reader adc0 (
-        .clk(CLOCK_50),
-        .rst(KEY[0]),
-        .mcu_pot0(mcu_pot0),
-        .mcu_pot1(mcu_pot1),
-        .y_pos1(pot0_y),
-        .y_pos2(pot1_y)
+    pong_cpu_fsm fsm (
+        .clk               (clk_cpu),
+        .reset             (reset_n),
+        .instr_set         (ram_out),
+        .Flags_in          (Flags_out),
+        .is_mmio           (is_mmio),
+        .mmio_we           (mmio_we),
+        .wEnable           (wEnable),
+        .opcode            (opcode),
+        .Rdest_select      (Rdest_select),
+        .Rsrc_select       (Rsrc_select),
+        .Imm_in            (Imm_in),
+        .Imm_select        (Imm_select),
+        .we_a              (we_a),
+        .en_a              (en_a),
+        .en_b              (en_b),
+        .ram_wen           (ram_wen),
+        .lsc_mux_selct     (lsc_mux_select),
+        .pc_add_k          (pc_add_k),
+        .pc_mux_selct      (pc_mux_select),
+        .pc_en             (pc_en),
+        .fsm_alu_mem_selct (fsm_alu_mem_select),
+        .decoder_en        ()
     );
 
-    // Main game state update logic.
+    pong_dp #(.DATA_FILE("PONG.hex")) dp (
+        .clk               (clk_cpu),
+        .reset             (reset_n),
+        .ram_we            (ram_wen),
+        .wEnable           (wEnable),
+        .opcode            (opcode),
+        .Flags_out         (Flags_out),
+        .we_a              (we_a),
+        .en_a              (en_a),
+        .en_b              (en_b),
+        .lsc_mux_select    (lsc_mux_select),
+        .pc_add_k          (pc_add_k),
+        .pc_mux_select     (pc_mux_select),
+        .pc_en             (pc_en),
+        .ram_out           (ram_out),
+        .fsm_alu_mem_select(fsm_alu_mem_select),
+        .Rdest_select      (Rdest_select),
+        .Rsrc_select       (Rsrc_select),
+        .Imm_in            (Imm_in),
+        .Imm_select        (Imm_select),
+        .ls_cntrl          (mmio_addr),
+        .Rsrc_mux_out      (mmio_wr_data),
+        .mmio_rd_data      (mmio_rd_data),
+        .is_mmio           (is_mmio)
+    );
+
     game_engine game0 (
-        .clk(CLOCK_50),
-        .rst(KEY[0]),
-        .y_pos1_in(pot0_y),
-        .y_pos2_in(pot1_y),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
-        .ball_x(ball_x),
-        .ball_y(ball_y),
-        .score1(score1),
-        .score2(score2)
+        .clk       (CLOCK_50),
+        .rst       (reset_n),
+        .y_pos1_in (reg_p1_y),
+        .y_pos2_in (reg_p2_y),
+        .y_pos1    (y_pos1),
+        .y_pos2    (y_pos2),
+        .ball_x    (ball_x),
+        .ball_y    (ball_y),
+        .score1    (score1),
+        .score2    (score2)
     );
 
-    // VGA renderer for paddles ball and score.
     renderer video0 (
-        .CLOCK_50(CLOCK_50),
-        .KEY(KEY),
-        .y_pos1(y_pos1),
-        .y_pos2(y_pos2),
-        .ball_x(ball_x),
-        .ball_y(ball_y),
-        .score1(score1),
-        .score2(score2),
-        .VGA_CLK(VGA_CLK),
-        .VGA_BLANK_N(VGA_BLANK_N),
-        .VGA_VS(VGA_VS),
-        .VGA_HS(VGA_HS),
-        .VGA_R(VGA_R),
-        .VGA_G(VGA_G),
-        .VGA_B(VGA_B)
+        .CLOCK_50    (CLOCK_50),
+        .KEY         (KEY),
+        .y_pos1      (y_pos1),
+        .y_pos2      (y_pos2),
+        .ball_x      (ball_x),
+        .ball_y      (ball_y),
+        .score1      (score1),
+        .score2      (score2),
+        .VGA_CLK     (VGA_CLK),
+        .VGA_BLANK_N (VGA_BLANK_N),
+        .VGA_VS      (VGA_VS),
+        .VGA_HS      (VGA_HS),
+        .VGA_R       (VGA_R),
+        .VGA_G       (VGA_G),
+        .VGA_B       (VGA_B)
     );
 
-    // Seven-segment hex decoder function.
     function [6:0] seg7_hex;
         input [3:0] digit;
         begin
@@ -134,23 +213,19 @@ module PONG_TOP(
         end
     endfunction
 
-    // Split pot0 value into decimal digits.
-    assign pot0_hundreds = pot0_raw / 9'd100;
-    assign pot0_tens     = (pot0_raw % 9'd100) / 9'd10;
-    assign pot0_ones     = pot0_raw % 9'd10;
+    assign p1_hundreds = reg_p1_y / 9'd100;
+    assign p1_tens     = (reg_p1_y % 9'd100) / 9'd10;
+    assign p1_ones     = reg_p1_y % 9'd10;
 
-    // Split pot1 value into decimal digits.
-    assign pot1_hundreds = pot1_raw / 9'd100;
-    assign pot1_tens     = (pot1_raw % 9'd100) / 9'd10;
-    assign pot1_ones     = pot1_raw % 9'd10;
+    assign p2_hundreds = reg_p2_y / 9'd100;
+    assign p2_tens     = (reg_p2_y % 9'd100) / 9'd10;
+    assign p2_ones     = reg_p2_y % 9'd10;
 
-    // Drive HEX displays with converted pot values.
-    assign HEX0 = seg7_hex(pot0_ones);
-    assign HEX1 = seg7_hex(pot0_tens);
-    assign HEX2 = seg7_hex(pot0_hundreds);
-
-    assign HEX3 = seg7_hex(pot1_ones);
-    assign HEX4 = seg7_hex(pot1_tens);
-    assign HEX5 = seg7_hex(pot1_hundreds);
+    assign HEX0 = seg7_hex(p1_ones);
+    assign HEX1 = seg7_hex(p1_tens);
+    assign HEX2 = seg7_hex(p1_hundreds);
+    assign HEX3 = seg7_hex(p2_ones);
+    assign HEX4 = seg7_hex(p2_tens);
+    assign HEX5 = seg7_hex(p2_hundreds);
 
 endmodule
