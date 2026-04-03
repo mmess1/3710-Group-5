@@ -30,7 +30,7 @@ module PONG_TOP(
     wire reset_n;
     assign reset_n = KEY[0];
 
-    reg  [10:0] cpu_div;
+    reg  [4:0] cpu_div;
     wire       clk_cpu;
 
     wire [8:0] mcu_pot0;
@@ -79,23 +79,15 @@ module PONG_TOP(
     wire [3:0] p2_hundreds;
     wire [3:0] p2_tens;
     wire [3:0] p2_ones;
-
-    wire [9:0] ball_x_safe;
-    wire [9:0] ball_y_safe;
 	 
 	 wire [15:0] r0,  r1,  r2,  r3,  r4,  r5;
 	wire [15:0] r6,  r7,  r8,  r9,  r10;
 	wire [15:0] r11, r12, r13, r14, r15;
 
-    assign clk_cpu    = cpu_div[10];
+    assign clk_cpu    = cpu_div[4];
     assign is_mmio    = (mmio_addr >= 16'hFF00);
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = {1'b0, adc_p1_y};
-
-    assign ball_x_safe = r6[15] ? 10'd0 :
-                         (r6 > 16'd629) ? 10'd629 : r6[9:0];
-    assign ball_y_safe = r7[15] ? 10'd0 :
-                         (r7 > 16'd469) ? 10'd469 : r7[9:0];
 
     // keep old adc pins present for board pin compatibility
     // this top still uses the gpio mcu adc path through ADC_reader
@@ -112,9 +104,9 @@ module PONG_TOP(
 
     always @(posedge CLOCK_50 or negedge reset_n) begin
         if (!reset_n)
-            cpu_div <= 11'd0;
+            cpu_div <= 5'd0;
         else
-            cpu_div <= cpu_div + 11'd1;
+            cpu_div <= cpu_div + 5'd1;
     end
 
     ADC_reader adc0 (
@@ -207,8 +199,8 @@ module PONG_TOP(
         .KEY         (KEY),
         .y_pos1      (r1),
         .y_pos2      (r3),
-        .ball_x      (ball_x_safe),
-        .ball_y      (ball_y_safe),
+        .ball_x      (r6),
+        .ball_y      (r7),
         .score1      (r4),
         .score2      (r5),
         .VGA_CLK     (VGA_CLK),
