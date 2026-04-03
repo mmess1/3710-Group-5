@@ -1,0 +1,140 @@
+# register use
+    # $r1  = player 1 paddle y position
+    # $r2  = addr of const 315
+    # $r3  = player 2 paddle y position
+    # $r4  = player 1 score
+    # $r5  = player 2 score
+    # $r6  = ball x
+    # $r7  = ball y
+    # $r8  = ball dx
+    # $r9  = ball dy
+    # $r10 = temp
+    # $r11 = temp
+    # $r12 = outer delay counter
+    # $r13 = addr of const 235
+    # $r14 = temp
+    # $r15 = inner delay counter
+
+# branch codes
+    # 1 !=
+    # 6 >
+    # 7 <=
+    # 12 <
+    # 13 >=
+    # 14 jump
+
+# ram constants
+    # mem[126] = 315
+    # mem[127] = 235
+
+# setup =========================================================
+    MOVI $r2, 126     # addr of 315
+    MOVI $r13, 127    # addr of 235
+    MOVI $r4, 0       # p1 score = 0
+    MOVI $r5, 0       # p2 score = 0
+    LOAD $r2, $r6     # x = 315
+    LOAD $r13, $r7    # y = 235
+    MOVI $r8, 1       # dx = +1
+    MOVI $r9, 1       # dy = +1
+
+# main game loop ================================================
+
+# ----- frame delay ----- (8
+    MOVI $r12, 127    # delay base
+    MULI $r12, 12     # 1524 total count
+    SUBI $r12, 1      # delay--
+    Bcond 1, -1       # loop delay
+
+# ----- ball update ----- (12
+    ADD $r6, $r8      # x += dx
+    ADD $r7, $r9      # y += dy
+
+# ----- vertical collision ----- (14
+
+    # top check (14
+    CMPI $r7, 5       # top edge test
+    Bcond 13, 3       # skip clamp if y >= 5
+    MOVI $r7, 5       # clamp y to top
+    MOVI $r9, 1       # dy = +1
+
+    # bottom check (18
+    MOVI $r14, 93     # base bottom bound
+    MULI $r14, 5      # 465
+    CMP $r7, $r14     # compare to bottom
+    Bcond 7, 3        # skip clamp if y <= 465
+    MOV $r7, $r14     # clamp y to bottom
+    MOVI $r9, -1      # dy = -1
+
+    # choose horizontal path (24
+    CMPI $r8, 0       # test dx
+    Bcond 6, 15       # go right path if dx > 0
+
+# left side =====================================================
+
+# ----- left side check ----- (26
+    CMPI $r6, 40      # compare x to 40
+    Bcond 13, -19     # if x >= 40 keep playing
+
+# ----- left paddle test ----- (28
+    CMP $r7, $r1      # ball y vs p1 top
+    Bcond 12, 5       # if y < top go score check
+
+    MOV $r10, $r1     # temp = p1 y
+    ADDI $r10, 45     # temp = p1 bottom
+    CMP $r10, $r7     # bottom vs ball y
+    Bcond 13, 4       # if y in range bounce
+
+# ----- left miss ----- (34
+    CMPI $r6, 5       # passed left edge
+    Bcond 13, -27     # if not yet keep playing
+    Bcond 14, 24      # go p2 score reset
+
+# ----- left hit ----- (37
+    MOVI $r8, 1       # dx = +1
+    MOVI $r6, 40      # snap x to paddle line
+    Bcond 14, -31     # loop back
+
+# right side ====================================================
+
+# ----- right side check ----- (40
+    MOVI $r11, 120    # right base
+    MULI $r11, 5      # right hit x = 600
+    CMP $r6, $r11     # compare x to 600
+    Bcond 7, -35      # if x <= 600 keep playing
+
+# ----- right paddle test ----- (44
+    CMP $r7, $r3      # ball y vs p2 top
+    Bcond 12, 5       # if y < top go score check
+
+    MOV $r10, $r3     # temp = p2 y
+    ADDI $r10, 45     # temp = p2 bottom
+    CMP $r10, $r7     # bottom vs ball y
+    Bcond 13, 5       # if y in range bounce
+
+# ----- right miss ----- (50
+    ADDI $r11, 25     # right score x = 625
+    CMP $r6, $r11     # compare x to score bound
+    Bcond 7, -44      # if x <= 625 keep playing
+    Bcond 14, 4       # go p1 score reset
+
+# ----- right hit ----- (54
+    MOVI $r8, -1      # dx = -1
+    MOV $r6, $r11     # snap x to paddle line
+    Bcond 14, -48     # loop back
+
+# score reset ===================================================
+
+# ----- player1 score reset ----- (57
+    ADDI $r4, 1       # p1++
+    MOVI $r8, 1       # serve right
+    Bcond 14, 3       # go common reset
+
+# ----- player2 score reset ----- (60
+    ADDI $r5, 1       # p2++
+    MOVI $r8, -1      # serve left
+
+# ----- common reset ----- (62
+    LOAD $r2, $r6     # x = 315
+    LOAD $r13, $r7    # y = 235
+    MOVI $r9, 1       # serve down
+    Bcond 14, -57     # loop back
