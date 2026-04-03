@@ -33,6 +33,10 @@ module pong_dp #(parameter DATA_FILE="")
     /* MMIO */
     output wire [15:0] ls_cntrl,       // LS_cntrl mux provided memory address
     output wire [15:0] Rsrc_mux_out,   // Rsrc provides store data / MMIO wr data
+	 
+		output wire [15:0] r0,  r1,  r2,  r3,  r4,  r5,
+		output wire [15:0] r6,  r7,  r8,  r9,  r10,
+		output wire [15:0] r11, r12, r13, r14, r15,
 
     input wire [15:0] mmio_rd_data,
     input wire        is_mmio
@@ -41,11 +45,6 @@ module pong_dp #(parameter DATA_FILE="")
 /************************************************************************
                         INTERNAL WIRES
 ************************************************************************/
-
-/* Register file outputs */
-wire [15:0] r0,  r1,  r2,  r3,  r4,  r5;
-wire [15:0] r6,  r7,  r8,  r9,  r10;
-wire [15:0] r11, r12, r13, r14, r15;
 
 /* ALU result */
 wire [15:0] alu_out;
