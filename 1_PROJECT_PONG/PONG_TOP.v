@@ -79,6 +79,10 @@ module PONG_TOP(
     wire [3:0] p2_hundreds;
     wire [3:0] p2_tens;
     wire [3:0] p2_ones;
+	 
+	 wire [15:0] r0,  r1,  r2,  r3,  r4,  r5;
+	wire [15:0] r6,  r7,  r8,  r9,  r10;
+	wire [15:0] r11, r12, r13, r14, r15;
 
     assign clk_cpu    = cpu_div[4];
     assign is_mmio    = (mmio_addr >= 16'hFF00);
@@ -158,7 +162,7 @@ module PONG_TOP(
         .mmio_we           (mmio_we)
     );
 
-    pong_dp #(.DATA_FILE("PONG.hex")) dp (
+    pong_dp #(.DATA_FILE("paddle_detect_v1.bin")) dp (
         .clk               (clk_cpu),
         .reset             (reset_n),
         .ram_we            (ram_wen),
@@ -181,31 +185,24 @@ module PONG_TOP(
         .ls_cntrl          (mmio_addr),
         .Rsrc_mux_out      (mmio_wr_data),
         .mmio_rd_data      (mmio_rd_data),
-        .is_mmio           (is_mmio)
-    );
-
-    game_engine game0 (
-        .clk       (CLOCK_50),
-        .rst       (reset_n),
-        .y_pos1_in (reg_p1_y),
-        .y_pos2_in (reg_p2_y),
-        .y_pos1    (y_pos1),
-        .y_pos2    (y_pos2),
-        .ball_x    (ball_x),
-        .ball_y    (ball_y),
-        .score1    (score1),
-        .score2    (score2)
+        .is_mmio           (is_mmio),
+		  .player1_y(adc_p1_y),
+		  .player2_y(adc_p2_y),
+		  .r0 (r0),  .r1 (r1),  .r2 (r2),  .r3 (r3),
+		  .r4 (r4),  .r5 (r5),  .r6 (r6),  .r7 (r7),
+		  .r8 (r8),  .r9 (r9),  .r10(r10), .r11(r11),
+		  .r12(r12), .r13(r13), .r14(r14), .r15(r15)
     );
 
     renderer video0 (
         .CLOCK_50    (CLOCK_50),
         .KEY         (KEY),
-        .y_pos1      (y_pos1),
-        .y_pos2      (y_pos2),
-        .ball_x      (ball_x),
-        .ball_y      (ball_y),
-        .score1      (score1),
-        .score2      (score2),
+        .y_pos1      (r1),
+        .y_pos2      (r3),
+        .ball_x      (r6),
+        .ball_y      (r7),
+        .score1      (r4),
+        .score2      (r5),
         .VGA_CLK     (VGA_CLK),
         .VGA_BLANK_N (VGA_BLANK_N),
         .VGA_VS      (VGA_VS),
