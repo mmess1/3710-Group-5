@@ -27,7 +27,7 @@ module bram
 			ram[i] = 0;
 
 		if (DATA_FILE != "")
-    	$readmemh(DATA_FILE, ram);
+    	$readmemb(DATA_FILE, ram);
 	end
 
 
