@@ -162,7 +162,7 @@ module PONG_TOP(
         .mmio_we           (mmio_we)
     );
 
-    pong_dp #(.DATA_FILE("paddle_detect_v1.bin")) dp (
+    pong_dp #(.DATA_FILE("PONG.bin")) dp (
         .clk               (clk_cpu),
         .reset             (reset_n),
         .ram_we            (ram_wen),
