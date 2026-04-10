@@ -30,7 +30,6 @@ module renderer(
     localparam SCORE1_X_ONES    = 220;
     localparam SCORE1_X_TENS    = SCORE1_X_ONES - 10 * 5;
     localparam SCORE2_X_TENS    = 380;
-    localparam SCORE2_X_ONES    = (score2_tens < 0) ? (380 + 10 * 5) : 380;
 
     localparam FONT_SCALE = 8;
     localparam DIGIT_W    = 5 * FONT_SCALE;
@@ -40,6 +39,7 @@ module renderer(
     wire [3:0] score1_ones;
     wire [3:0] score2_tens;
     wire [3:0] score2_ones;
+    wire [9:0] score2_x_ones;
 
     wire [2:0] score1_row;
     wire [2:0] score1_col_ones;
@@ -65,12 +65,13 @@ module renderer(
     assign score1_ones  = score1 % 16'd10;
     assign score2_tens  = (score2 % 16'd100) / 16'd10;
     assign score2_ones  = score2 % 16'd10;
+    assign score2_x_ones = SCORE2_X_TENS + (score2_tens_visible ? DIGIT_W : 10'd0);
 
     assign in_score1_box_ones = (hcount >= SCORE1_X_ONES) && (hcount < SCORE1_X_ONES + DIGIT_W) &&
                                 (vcount >= SCORE_Y) && (vcount < SCORE_Y + DIGIT_H);
     assign in_score1_box_tens = (hcount >= SCORE1_X_TENS) && (hcount < SCORE1_X_TENS + DIGIT_W) &&
                                 (vcount >= SCORE_Y) && (vcount < SCORE_Y + DIGIT_H);
-    assign in_score2_box_ones = (hcount >= SCORE2_X_ONES) && (hcount < SCORE2_X_ONES + DIGIT_W) &&
+    assign in_score2_box_ones = (hcount >= score2_x_ones) && (hcount < score2_x_ones + DIGIT_W) &&
                                 (vcount >= SCORE_Y) && (vcount < SCORE_Y + DIGIT_H);
     assign in_score2_box_tens = (hcount >= SCORE2_X_TENS) && (hcount < SCORE2_X_TENS + DIGIT_W) &&
                                 (vcount >= SCORE_Y) && (vcount < SCORE_Y + DIGIT_H);
@@ -79,7 +80,7 @@ module renderer(
     assign score1_col_ones  = (hcount >= SCORE1_X_ONES) ? (hcount - SCORE1_X_ONES) / FONT_SCALE : 3'd0;
     assign score1_col_tens  = (hcount >= SCORE1_X_TENS) ? (hcount - SCORE1_X_TENS) / FONT_SCALE : 3'd0;
     assign score2_row       = (vcount - SCORE_Y) / FONT_SCALE;
-    assign score2_col_ones  = (hcount >= SCORE2_X_ONES) ? (hcount - SCORE2_X_ONES) / FONT_SCALE : 3'd0;
+    assign score2_col_ones  = (hcount >= score2_x_ones) ? (hcount - score2_x_ones) / FONT_SCALE : 3'd0;
     assign score2_col_tens  = (hcount >= SCORE2_X_TENS) ? (hcount - SCORE2_X_TENS) / FONT_SCALE : 3'd0;
 
     score_font left_tens (
