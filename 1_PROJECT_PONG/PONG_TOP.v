@@ -27,21 +27,17 @@ module PONG_TOP(
     output wire [7:0] VGA_B
 );
 
-    wire board_reset_n;
-    wire game_reset_n;
-    wire start_pressed;
-    wire [1:0] screen_mode;
-
-    reg  key1_d;
-    reg  game_started;
-    reg  [1:0] winner_mode;
-
-    assign board_reset_n = KEY[0];
-    assign game_reset_n  = board_reset_n && game_started;
-    assign start_pressed = key1_d && ~KEY[1];
+    wire reset_n;
+    assign reset_n = KEY[0];
 
     reg  [4:0] cpu_div;
     wire       clk_cpu;
+
+    reg        key1_d;
+    reg        game_started;
+    reg  [1:0] winner_mode;
+    wire       start_pressed;
+    wire [1:0] screen_mode;
 
     wire [8:0] mcu_pot0;
     wire [8:0] mcu_pot1;
@@ -94,7 +90,10 @@ module PONG_TOP(
 	wire [15:0] r6,  r7,  r8,  r9,  r10;
 	wire [15:0] r11, r12, r13, r14, r15;
 
-    assign clk_cpu    = cpu_div[4];
+    assign start_pressed = key1_d && ~KEY[1];
+    assign clk_cpu       = (game_started && winner_mode == 2'd0) ? cpu_div[4] : 1'b0;
+    assign screen_mode   = !game_started ? 2'd0 : winner_mode != 2'd0 ? winner_mode : 2'd1;
+
     assign is_mmio    = (mmio_addr >= 16'hFF00);
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = {1'b0, adc_p1_y};
@@ -112,48 +111,43 @@ module PONG_TOP(
     assign mcu_pot1 = {GPIO_1[24], GPIO_1[22], GPIO_1[20], GPIO_1[18], GPIO_1[16],
                        GPIO_1[14], GPIO_1[12], GPIO_1[10], GPIO_1[11]};
 
-    always @(posedge CLOCK_50 or negedge board_reset_n) begin
-        if (!board_reset_n) begin
+    always @(posedge CLOCK_50 or negedge reset_n) begin
+        if (!reset_n) begin
+            cpu_div <= 5'd0;
             key1_d <= 1'b1;
             game_started <= 1'b0;
             winner_mode <= 2'd0;
         end else begin
             key1_d <= KEY[1];
 
-            if (start_pressed)
-                game_started <= 1'b1;
-
-            if (!game_started)
+            if (!game_started) begin
+                cpu_div <= 5'd0;
                 winner_mode <= 2'd0;
-            else if (winner_mode == 2'd0 && r4 >= 16'd15)
-                winner_mode <= 2'd2;
-            else if (winner_mode == 2'd0 && r5 >= 16'd15)
-                winner_mode <= 2'd3;
+
+                if (start_pressed)
+                    game_started <= 1'b1;
+            end else if (winner_mode == 2'd0) begin
+                cpu_div <= cpu_div + 5'd1;
+
+                if (r4 >= 16'd15)
+                    winner_mode <= 2'd2;
+                else if (r5 >= 16'd15)
+                    winner_mode <= 2'd3;
+            end
         end
-    end
-
-    assign screen_mode = !game_started         ? 2'd0 :
-                         (winner_mode != 2'd0) ? winner_mode :
-                                                 2'd1;
-
-    always @(posedge CLOCK_50 or negedge game_reset_n) begin
-        if (!game_reset_n)
-            cpu_div <= 5'd0;
-        else
-            cpu_div <= cpu_div + 5'd1;
     end
 
     ADC_reader adc0 (
         .clk    (CLOCK_50),
-        .rst    (board_reset_n),
+        .rst    (reset_n),
         .mcu_pot0(mcu_pot0),
         .mcu_pot1(mcu_pot1),
         .y_pos1 (adc_p1_y),
         .y_pos2 (adc_p2_y)
     );
 
-    always @(posedge clk_cpu or negedge game_reset_n) begin
-        if (!game_reset_n) begin
+    always @(posedge clk_cpu or negedge reset_n) begin
+        if (!reset_n) begin
             reg_p1_y <= 9'd200;
             reg_p2_y <= 9'd200;
         end else if (mmio_we) begin
@@ -173,7 +167,7 @@ module PONG_TOP(
 
     pong_cpu_fsm fsm (
         .clk               (clk_cpu),
-        .reset             (game_reset_n),
+        .reset             (reset_n),
         .instr_set         (ram_out),
         .Flags_in          (Flags_out),
         .wEnable           (wEnable),
@@ -196,9 +190,9 @@ module PONG_TOP(
         .mmio_we           (mmio_we)
     );
 
-    pong_dp #(.DATA_FILE("PONG.bin")) dp (
+    pong_dp #(.DATA_FILE("paddle_detect_v1.bin")) dp (
         .clk               (clk_cpu),
-        .reset             (game_reset_n),
+        .reset             (reset_n),
         .ram_we            (ram_wen),
         .wEnable           (wEnable),
         .opcode            (opcode),
