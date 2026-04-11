@@ -32,14 +32,13 @@ module PONG_TOP(
 
     reg  [4:0] cpu_div;
     wire       clk_cpu;
+    wire       cpu_reset_n;
 
     reg        key1_d;
-    reg  [1:0] screen_mode;
-
-    localparam MODE_START  = 2'd0;
-    localparam MODE_PLAY   = 2'd1;
-    localparam MODE_P1_WIN = 2'd2;
-    localparam MODE_P2_WIN = 2'd3;
+    reg        game_started;
+    reg  [1:0] winner_mode;
+    wire       start_pressed;
+    wire [1:0] screen_mode;
 
     wire [8:0] mcu_pot0;
     wire [8:0] mcu_pot1;
@@ -92,7 +91,12 @@ module PONG_TOP(
 	wire [15:0] r6,  r7,  r8,  r9,  r10;
 	wire [15:0] r11, r12, r13, r14, r15;
 
-    assign clk_cpu    = cpu_div[4];
+    assign clk_cpu      = cpu_div[4];
+    assign start_pressed = key1_d && ~KEY[1];
+    assign cpu_reset_n  = reset_n && game_started && (winner_mode == 2'd0);
+    assign screen_mode  = !game_started ? 2'd0 :
+                          (winner_mode != 2'd0) ? winner_mode : 2'd1;
+
     assign is_mmio    = (mmio_addr >= 16'hFF00);
     assign VGA_SYNC_N = 1'b0;
     assign LEDR       = {1'b0, adc_p1_y};
@@ -114,32 +118,24 @@ module PONG_TOP(
         if (!reset_n) begin
             cpu_div <= 5'd0;
             key1_d <= 1'b1;
-            screen_mode <= MODE_START;
+            game_started <= 1'b0;
+            winner_mode <= 2'd0;
         end else begin
             cpu_div <= cpu_div + 5'd1;
             key1_d <= KEY[1];
 
-            case (screen_mode)
-                MODE_START: begin
-                    if (key1_d && ~KEY[1])
-                        screen_mode <= MODE_PLAY;
-                end
+            if (!game_started) begin
+                winner_mode <= 2'd0;
 
-                MODE_PLAY: begin
-                    if (r4 >= 16'd15)
-                        screen_mode <= MODE_P1_WIN;
-                    else if (r5 >= 16'd15)
-                        screen_mode <= MODE_P2_WIN;
-                end
-
-                MODE_P1_WIN: begin
-                    screen_mode <= MODE_P1_WIN;
-                end
-
-                MODE_P2_WIN: begin
-                    screen_mode <= MODE_P2_WIN;
-                end
-            endcase
+                if (start_pressed)
+                    game_started <= 1'b1;
+            end
+            else if (winner_mode == 2'd0) begin
+                if (r4 >= 16'd15)
+                    winner_mode <= 2'd2;
+                else if (r5 >= 16'd15)
+                    winner_mode <= 2'd3;
+            end
         end
     end
 
@@ -173,7 +169,7 @@ module PONG_TOP(
 
     pong_cpu_fsm fsm (
         .clk               (clk_cpu),
-        .reset             (reset_n),
+        .reset             (cpu_reset_n),
         .instr_set         (ram_out),
         .Flags_in          (Flags_out),
         .wEnable           (wEnable),
@@ -196,9 +192,9 @@ module PONG_TOP(
         .mmio_we           (mmio_we)
     );
 
-    pong_dp #(.DATA_FILE("paddle_detect_v1.bin")) dp (
+    pong_dp #(.DATA_FILE("PONG.bin")) dp (
         .clk               (clk_cpu),
-        .reset             (reset_n),
+        .reset             (cpu_reset_n),
         .ram_we            (ram_wen),
         .wEnable           (wEnable),
         .opcode            (opcode),

@@ -90,8 +90,8 @@ module renderer(
     wire score2_ones_pixel;
     wire score2_tens_pixel;
 
-    wire score1_tens_visible;
-    wire score2_tens_visible;
+    wire score1_tens_visible = (score1 >= 16'd10);
+    wire score2_tens_visible = (score2 >= 16'd10);
 
     wire border_on;
     wire center_on;
@@ -136,9 +136,6 @@ module renderer(
 
     wire score1_on;
     wire score2_on;
-
-    assign score1_tens_visible = (score1 >= 16'd10);
-    assign score2_tens_visible = (score2 >= 16'd10);
 
     assign score1_tens   = (score1 % 16'd100) / 16'd10;
     assign score1_ones   = score1 % 16'd10;

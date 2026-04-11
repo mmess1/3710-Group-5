@@ -1,0 +1,181 @@
+------------------------------------------------------------
+Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow 1100mV 85C Model Setup 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -31.880
+TNS   : -855.701
+
+Type  : Slow 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -23.506
+TNS   : -739.818
+
+Type  : Slow 1100mV 85C Model Setup 'cpu_div[4]'
+Slack : -19.258
+TNS   : -258236.173
+
+Type  : Slow 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.378
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'cpu_div[4]'
+Slack : 0.739
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : 0.945
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Recovery 'cpu_div[4]'
+Slack : -4.641
+TNS   : -1351.259
+
+Type  : Slow 1100mV 85C Model Removal 'cpu_div[4]'
+Slack : 1.134
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.225
+TNS   : -63.583
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'cpu_div[4]'
+Slack : -0.394
+TNS   : -9266.674
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -0.394
+TNS   : -29.643
+
+Type  : Slow 1100mV 0C Model Setup 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -32.880
+TNS   : -876.617
+
+Type  : Slow 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -24.328
+TNS   : -765.296
+
+Type  : Slow 1100mV 0C Model Setup 'cpu_div[4]'
+Slack : -18.886
+TNS   : -250249.060
+
+Type  : Slow 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.267
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'cpu_div[4]'
+Slack : 0.705
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : 0.934
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Recovery 'cpu_div[4]'
+Slack : -4.481
+TNS   : -1304.175
+
+Type  : Slow 1100mV 0C Model Removal 'cpu_div[4]'
+Slack : 1.029
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.225
+TNS   : -65.421
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'cpu_div[4]'
+Slack : -0.394
+TNS   : -10301.620
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -0.394
+TNS   : -29.459
+
+Type  : Fast 1100mV 85C Model Setup 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -16.928
+TNS   : -453.491
+
+Type  : Fast 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -11.967
+TNS   : -377.741
+
+Type  : Fast 1100mV 85C Model Setup 'cpu_div[4]'
+Slack : -11.350
+TNS   : -153223.625
+
+Type  : Fast 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.144
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'cpu_div[4]'
+Slack : 0.437
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : 0.482
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Recovery 'cpu_div[4]'
+Slack : -2.649
+TNS   : -757.778
+
+Type  : Fast 1100mV 85C Model Removal 'cpu_div[4]'
+Slack : 0.634
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -1.702
+TNS   : -35.491
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -0.036
+TNS   : -0.968
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'cpu_div[4]'
+Slack : 0.104
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Setup 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -16.083
+TNS   : -427.107
+
+Type  : Fast 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -11.345
+TNS   : -357.667
+
+Type  : Fast 1100mV 0C Model Setup 'cpu_div[4]'
+Slack : -10.181
+TNS   : -135408.675
+
+Type  : Fast 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.058
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'cpu_div[4]'
+Slack : 0.326
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : 0.447
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Recovery 'cpu_div[4]'
+Slack : -2.304
+TNS   : -659.905
+
+Type  : Fast 1100mV 0C Model Removal 'cpu_div[4]'
+Slack : 0.424
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -1.702
+TNS   : -35.500
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'renderer:video0|clk_divider:clk_div|div_clk'
+Slack : -0.002
+TNS   : -0.006
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'cpu_div[4]'
+Slack : 0.086
+TNS   : 0.000
+
+------------------------------------------------------------

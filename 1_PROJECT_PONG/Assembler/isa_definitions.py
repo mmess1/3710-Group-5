@@ -28,7 +28,7 @@ OPCODES = {
     'XOR':   ('0000', '0011'),
     'NOT':   ('0000', '0100'),
     'LSH':   ('0000', '1100'),
-    'LSHI':  ('1000', '0000'),
+    'LSHI':  ('1100', '0000'),
     'RSH':   ('0000', '1000'),
     'RSHI':  ('1000', '0000'),
     'ARSH':  ('0000', '1111'),
@@ -275,7 +275,7 @@ def build_instruction(line):
         if imm_operand['type'] != 'immediate':
             raise ValueError(f"Second operand must be an immediate value, got {operands[1]}")
         imm_high, imm_low = split_immediate_to_nibbles_signed(imm_operand['value'])
-        instruction = opcode + rdest + imm_high + imm_low
+        instruction = opcode + rdest + imm_high + imm_high
     elif is_immediate_instr:
         # Format: OPCODE + RDEST + OPEXT + IMM(8 bits)
         if len(operands) < 2:

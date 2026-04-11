@@ -48,7 +48,8 @@ module alu(
     localparam [7:0] NOT   = 8'b0000_0100;
 
     localparam [7:0] LSH   = 8'b0000_1100;
-    localparam [7:0] LSHI = 8'b1000_0000;
+    localparam [7:0] LSHI  = 8'b1100_0000;
+
     localparam [7:0] RSH   = 8'b0000_1000;
     localparam [7:0] RSHI  = 8'b1000_0000;
 

@@ -1,0 +1,16 @@
+
+State Machine - |PONG_TOP|winner_mode
+Name winner_mode.10 winner_mode.00 winner_mode.11 
+winner_mode.00 0 0 0 
+winner_mode.10 1 1 0 
+winner_mode.11 0 1 1 
+
+State Machine - |PONG_TOP|pong_cpu_fsm:fsm|PS
+Name PS.S6_BRANCH PS.S5_DOUT PS.S4_LOAD PS.S3_STORE PS.S2_EXECUTE PS.S1_DECODE PS.S0_FETCH 
+PS.S0_FETCH 0 0 0 0 0 0 0 
+PS.S1_DECODE 0 0 0 0 0 1 1 
+PS.S2_EXECUTE 0 0 0 0 1 0 1 
+PS.S3_STORE 0 0 0 1 0 0 1 
+PS.S4_LOAD 0 0 1 0 0 0 1 
+PS.S5_DOUT 0 1 0 0 0 0 1 
+PS.S6_BRANCH 1 0 0 0 0 0 1 
