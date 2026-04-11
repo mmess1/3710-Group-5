@@ -28,10 +28,11 @@
     # mem[127] = 235
 
 # setup =========================================================
+    
     MOVI $r2, 126     # addr of 315
     MOVI $r13, 127    # addr of 235
-    MOVI $r4, 0       # p1 score = 0
-    MOVI $r5, 0       # p2 score = 0
+    MOVI $r4, 5       # p1 score = 0
+    MOVI $r5, 6       # p2 score = 0
     LOAD $r2, $r6     # x = 315
     LOAD $r13, $r7    # y = 235
     MOVI $r8, 1       # dx = +1
