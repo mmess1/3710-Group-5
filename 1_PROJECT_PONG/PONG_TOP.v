@@ -32,6 +32,7 @@ module PONG_TOP(
 
     reg  [4:0] cpu_div;
     wire       clk_cpu;
+    wire       cpu_reset_n;
 
     reg        key1_d;
     reg        game_started;
@@ -90,9 +91,11 @@ module PONG_TOP(
 	wire [15:0] r6,  r7,  r8,  r9,  r10;
 	wire [15:0] r11, r12, r13, r14, r15;
 
+    assign clk_cpu      = cpu_div[4];
     assign start_pressed = key1_d && ~KEY[1];
-    assign clk_cpu       = (game_started && winner_mode == 2'd0) ? cpu_div[4] : 1'b0;
-    assign screen_mode   = !game_started ? 2'd0 : winner_mode != 2'd0 ? winner_mode : 2'd1;
+    assign cpu_reset_n  = reset_n && game_started && (winner_mode == 2'd0);
+    assign screen_mode  = !game_started ? 2'd0 :
+                          (winner_mode != 2'd0) ? winner_mode : 2'd1;
 
     assign is_mmio    = (mmio_addr >= 16'hFF00);
     assign VGA_SYNC_N = 1'b0;
@@ -118,17 +121,16 @@ module PONG_TOP(
             game_started <= 1'b0;
             winner_mode <= 2'd0;
         end else begin
+            cpu_div <= cpu_div + 5'd1;
             key1_d <= KEY[1];
 
             if (!game_started) begin
-                cpu_div <= 5'd0;
                 winner_mode <= 2'd0;
 
                 if (start_pressed)
                     game_started <= 1'b1;
-            end else if (winner_mode == 2'd0) begin
-                cpu_div <= cpu_div + 5'd1;
-
+            end
+            else if (winner_mode == 2'd0) begin
                 if (r4 >= 16'd15)
                     winner_mode <= 2'd2;
                 else if (r5 >= 16'd15)
@@ -167,7 +169,7 @@ module PONG_TOP(
 
     pong_cpu_fsm fsm (
         .clk               (clk_cpu),
-        .reset             (reset_n),
+        .reset             (cpu_reset_n),
         .instr_set         (ram_out),
         .Flags_in          (Flags_out),
         .wEnable           (wEnable),
@@ -192,7 +194,7 @@ module PONG_TOP(
 
     pong_dp #(.DATA_FILE("paddle_detect_v1.bin")) dp (
         .clk               (clk_cpu),
-        .reset             (reset_n),
+        .reset             (cpu_reset_n),
         .ram_we            (ram_wen),
         .wEnable           (wEnable),
         .opcode            (opcode),
