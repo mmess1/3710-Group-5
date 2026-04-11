@@ -242,7 +242,7 @@ module renderer(
     );
 
     glyph_rom #(
-        .DATA_FILE("Glyphs/Pong_logo_new.hex"),
+        .DATA_FILE("Pong_logo_new.hex"),
         .ADDR_WIDTH(7),
         .DEPTH(120)
     ) logo_rom (
@@ -251,7 +251,7 @@ module renderer(
     );
 
     glyph_rom #(
-        .DATA_FILE("Glyphs/Press_to_start.hex"),
+        .DATA_FILE("Press_to_start.hex"),
         .ADDR_WIDTH(11),
         .DEPTH(1744)
     ) start_rom (
@@ -260,7 +260,7 @@ module renderer(
     );
 
     glyph_rom #(
-        .DATA_FILE("Glyphs/Press_to_restart.hex"),
+        .DATA_FILE("Press_to_restart.hex"),
         .ADDR_WIDTH(11),
         .DEPTH(1984)
     ) restart_rom (
@@ -269,7 +269,7 @@ module renderer(
     );
 
     glyph_rom #(
-        .DATA_FILE("Glyphs/PLAYER_1_WINS.hex"),
+        .DATA_FILE("PLAYER_1_WINS.hex"),
         .ADDR_WIDTH(9),
         .DEPTH(432)
     ) p1_win_rom (
@@ -278,7 +278,7 @@ module renderer(
     );
 
     glyph_rom #(
-        .DATA_FILE("Glyphs/PLAYER_2_WINS.hex"),
+        .DATA_FILE("PLAYER_2_WINS.hex"),
         .ADDR_WIDTH(9),
         .DEPTH(432)
     ) p2_win_rom (
