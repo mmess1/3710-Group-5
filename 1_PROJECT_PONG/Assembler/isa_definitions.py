@@ -275,7 +275,7 @@ def build_instruction(line):
         if imm_operand['type'] != 'immediate':
             raise ValueError(f"Second operand must be an immediate value, got {operands[1]}")
         imm_high, imm_low = split_immediate_to_nibbles_signed(imm_operand['value'])
-        instruction = opcode + rdest + imm_high + imm_high
+        instruction = opcode + rdest + imm_high + imm_low
     elif is_immediate_instr:
         # Format: OPCODE + RDEST + OPEXT + IMM(8 bits)
         if len(operands) < 2:
@@ -319,6 +319,3 @@ def build_instruction(line):
     if len(instruction) != 16:
         raise ValueError(f"Error: Insturction is not 16-bits")
     return instruction
-
-
-
