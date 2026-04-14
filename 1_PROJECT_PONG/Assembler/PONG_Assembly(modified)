@@ -1,0 +1,243 @@
+# register use
+    # $r1  = player 1 paddle y position
+    # $r2  = Ball vector speed
+    # $r3  = player 2 paddle y position
+    # $r4  = player 1 score
+    # $r5  = player 2 score
+    # $r6  = ball x
+    # $r7  = ball y
+    # $r8  = ball dx
+    # $r9  = ball dy
+    # $r10 = temp
+    # $r11 = temp
+    # $r12 = outer delay counter
+    # $r13 = unused
+    # $r14 = temp
+    # $r15 = inner delay counter
+
+# branch codes
+    # 1 !=
+    # 6 >
+    # 7 <=
+    # 12 <
+    # 13 >=
+    # 14 jump
+
+# ram constants
+    # none in this version
+    # x start is built inline as 315
+    # y start is built inline as 235
+
+# setup =========================================================
+
+    MOVI $r4, 0       # p1 score = 0
+    MOVI $r5, 0       # p2 score = 0
+
+    MOVI $r10, 5      # build x start
+    MOVI $r6, 10
+    LSH $r6, $r10     # 10 << 5 = 320
+    SUBI $r6, 5       # x = 315
+
+    MOVI $r11, 4      # build y start
+    MOVI $r7, 15
+    LSH $r7, $r11     # 15 << 4 = 240
+    SUBI $r7, 5       # y = 235
+
+    MOVI $r2, 1      
+    MOV $r8, $r2       # dx = +1
+    MOV $r9, $r2      # dy = +1
+
+# main game loop ================================================
+
+# ----- frame delay -----
+    MOVI $r12, 12     # outer delay count
+
+    MOVI $r10, 4      # build inner delay
+    MOVI $r15, 7
+    LSH $r15, $r10    # 7 << 4 = 112
+    ADDI $r15, 15     # inner delay = 127
+
+    SUBI $r15, 1      # inner--
+    CMPI $r15, 0      # compare inner delay to zero
+    Bcond 1, -2       # loop inner while != 0
+
+    SUBI $r12, 1      # outer--
+    CMPI $r12, 0      # compare outer delay to zero
+    Bcond 1, -9       # loop outer while != 0
+
+# -- +11 --- ball update -----
+   
+    ADD $r6, $r8      # x += dx
+    ADD $r7, $r9      # y += dy
+
+# --- +2 -- vertical collision -----
+
+    # top check
+    CMPI $r7, 5       # (14) top edge test 
+    Bcond 13, 10      # Jump top clamp (if y >= 5)
+
+ # --- +2 -- bottom check. ---------
+    MOVI $r10, 5      # build bottom bound
+    MOVI $r14, 15
+    LSH $r14, $r10    # 15 << 5 = 480
+    SUBI $r14, 15     # bottom = 465
+
+    CMP $r7, $r14     # compare y to bottom
+    Bcond 7, 7        # Jump to bottom clamp (if y <= 465)
+
+# -- +6 --- choose horizontal path -----
+    CMPI $r8, 0       # test dx
+    Bcond 6, 10       # Jump to left side check  (dx > 0)
+    Bcond 7, 40       # Jump to right side check (if dx <= 0)
+
+# --- +3 -- top clamp -----
+    MOVI $r7, 5       # clamp y to top (25)
+    MOV $r9, $r2       # dy = positive
+    Bcond 14, -5      # go to choose horizontal path (continue)
+
+# -- +3 --- bottom clamp -----
+    MOV $r7, $r14     # clamp y to bottom (28)
+    MOV $r9, $r2      
+    SUBI $r9, 1       # deal with add 1
+    NOT $r9, $r2      # dy Negatvie
+    Bcond 14, -10      # go to choose horizontal path (continue)
+
+# left side =====================================================
+
+# -- +5 ---- left side check -----
+    MOVI $r10, 3      # build left hit x (33)
+    MOVI $r11, 5
+    LSH $r11, $r10    # left hit x = 40
+
+    CMP $r6, $r11     # compare x to 40
+    Bcond 13, 2       # if x >= 40 test paddle
+    Bcond 14, -37     # Jump to Fram Delay
+
+# --- +6 -- left paddle test -----
+    MOVI $r10, 1      # build paddle height (39)
+    MOVI $r14, 15
+    LSH $r14, $r10    # 30
+    ADDI $r14, 15     # height = 45
+
+    MOV $r10, $r7     # temp = ball y
+    ADDI $r10, 9      # temp = ball center y
+    CMP $r10, $r1     # center vs p1 top
+    Bcond 6, 14        # Jump Left Miss
+
+    MOV $r10, $r1     # temp = p1 top
+    ADD $r10, $r14    # temp = p1 bottom
+    CMP $r7, $r10     # ball y vs p1 bottom
+    Bcond 12, 10       # Jump left left miss
+
+# --- +12 -- left hit ----- 
+    ADDI $r2, 1       # increase vector (51)
+    MOV $r8, $r2       # dx = +1
+    MOV $r9, $r2       # dx = +1
+    CMPI $r9, 0
+    Bcond 12, 3        # Jump y vector Neg
+    MOV $r6, $r11     # snap x to left line
+    Bcond 14, -56     # Jump frame Delay
+
+    NOT $r9, $r2       # Y vector is Neg
+    Bcond 14, -3 
+
+# --- +9 -- left miss -----
+    CMPI $r6, 5       # passed left score line (60)
+    Bcond 13, 53      # if x >= 5 go p2 score reset
+    Bcond 14, -61     # Jump frame Delay
+
+# right side ====================================================
+
+# --- + 3-- right side check -----
+    MOVI $r10, 5      # build 480 (63)
+    MOVI $r11, 15
+    LSH $r11, $r10    # 480
+
+    MOVI $r10, 3      # build 120
+    MOVI $r14, 15
+    LSH $r14, $r10    # 120
+
+    ADD $r11, $r14    # right hit x = 600
+    CMP $r6, $r11     # compare x to 600
+    Bcond 7, 2        # if x <= 600 test paddle
+    Bcond 14, -71     # else keep playing
+
+# --- +10 -- right paddle test -----
+    MOVI $r10, 1      # build paddle height
+    MOVI $r14, 15
+    LSH $r14, $r10    # 30
+    ADDI $r14, 15     # height = 45
+
+    MOV $r10, $r7     # temp = ball y
+    ADDI $r10, 9      # temp = ball center y
+    CMP $r10, $r3     # center vs p2 top
+    Bcond 6, 15       # Jump right miss
+
+    MOV $r10, $r3     # temp = p2 top
+    ADD $r10, $r14    # temp = p2 bottom
+    CMP $r7, $r10     # ball y vs p2 bottom
+    Bcond 12, 6       # Jump right miss
+
+# --- +12 -- right hit ----- (84)
+    ADDI $r2, 1       # increase vector
+    NOT $r8, $r2      # dx = -(vector speed) => - (vector speed + 1)
+    ADDI $r8, 1      # set to vector 
+    CMPI $r9, 0
+    Bcond 12, 4
+    MOV $r9, $r2
+
+    MOV $r6, $r11     # snap x to right line
+    Bcond 14, -91     # Jump Fram Delay
+
+    MOV $r9, $r8       # dy vector Negatvie
+    Bcond 14, -3 
+
+# --- +10 -- right miss ----- (94)
+    MOVI $r10, 6      # build right score x 
+    MOVI $r11, 10
+    LSH $r11, $r10    # 640
+    SUBI $r11, 15     # right score x = 625
+
+    CMP $r6, $r11     # compare x to 625
+    Bcond 7, 2        # if x <= 625 go p1 score reset
+    Bcond 14, -100     # else keep playing
+
+# score reset ===================================================
+
+# --- +7 -- player1 score reset -----
+    ADDI $r4, 1       # p1++ 
+
+    MOVI $r10, 5      # rebuild x start
+    MOVI $r6, 10
+    LSH $r6, $r10     # 320
+    SUBI $r6, 5       # x = 315
+
+    MOVI $r11, 4      # rebuild y start
+    MOVI $r7, 15
+    LSH $r7, $r11     # 240
+    SUBI $r7, 5       # y = 235
+
+    MOVI $r8, 1       # serve right
+    MOVI $r9, 1       # serve down
+    MOVI $r2, 1
+    Bcond 14, -113     # loop back
+
+# --- +13 -- player2 score reset -----
+    ADDI $r5, 1       # p2++
+
+    MOVI $r10, 5      # rebuild x start
+    MOVI $r6, 10
+    LSH $r6, $r10     # 320
+    SUBI $r6, 5       # x = 315
+
+    MOVI $r11, 4      # rebuild y start
+    MOVI $r7, 15
+    LSH $r7, $r11     # 240
+    SUBI $r7, 5       # y = 235
+
+    MOV $r8, $r0      # clear dx
+    NOT $r8, $r0      # dx = -1
+    MOVI $r9, 1       # serve down
+
+    MOVI $r2, 1
+    Bcond 14, -127    # loop back
