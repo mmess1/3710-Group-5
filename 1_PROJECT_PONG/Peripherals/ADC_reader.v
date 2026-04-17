@@ -7,9 +7,9 @@ module ADC_reader(
     output reg  [8:0] y_pos2
 );
 
-    localparam [8:0] Y_TOP         = 9'd10;
+    localparam [8:0] Y_TOP         = 9'd5;
     localparam [8:0] PADDLE_HEIGHT = 9'd45;
-    localparam [8:0] Y_BOTTOM      = 9'd470 - PADDLE_HEIGHT - 9'd10;
+    localparam [8:0] Y_BOTTOM      = 9'd430;
     localparam [8:0] Y_RANGE       = Y_BOTTOM - Y_TOP;
     localparam [8:0] POT_MAX       = 9'd511;
 

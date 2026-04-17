@@ -1,0 +1,519 @@
+
+# PONG CPU ASSEMBLY - 16-bit ISA Game Logic
+
+# register use
+    # $r1 = player 1 paddle y
+    # $r2 = unused
+    # $r3 = player 2 paddle y
+    # $r4 = player 1 score
+    # $r5 = player 2 score
+    # $r6 = ball x
+    # $r7 = ball y
+    # $r8 = ball dx
+    # $r9 = ball dy
+    # $r10 = temp
+    # $r11 = temp
+    # $r12 = outer delay counter
+    # $r13 = unused
+    # $r14 = temp
+    # $r15 = inner delay counter
+
+# branch codes
+    # 1 !=
+    # 6 >
+    # 7 <=
+    # 12 <
+    # 13 >=
+    # 14 jump
+
+# setup
+
+# MAIN GAME LOOP =====================================
+
+# ===== FRAME TIMING: Speed Tier Selection =====
+# Cascade comparison structure to select frame delay based on rally count
+# Each tier check compares rally >= threshold and branches if exceeded
+
+    CMPI $r2, 1                              # rally > 1?                           addr 13
+    BCOND 12, 3                              # if yes, skip this tier               addr 14
+    MOVI $r12, 60                            # tier 1: delay = 60 cycles            addr 15
+    BCOND 14, 30                             # skip to frame delay loop             addr 16
+
+    CMPI $r2, 3                              # rally > 3?                           addr 17
+    BCOND 12, 3                              # if yes, skip                         addr 18
+    MOVI $r12, 80                            # tier 2: delay = 80 cycles            addr 19
+    BCOND 14, 26                             # skip to frame delay loop             addr 20
+
+    CMPI $r2, 5                              # rally > 5?                           addr 21
+    BCOND 12, 3                              # if yes, skip                         addr 22
+    MOVI $r12, 90                            # tier 3: delay = 90 cycles            addr 23
+    BCOND 14, 22                             # skip to frame delay loop             addr 24
+
+    CMPI $r2, 7                              # rally > 7?                           addr 25
+    BCOND 12, 3                              # if yes, skip                         addr 26
+    MOVI $r12, 96                            # tier 4: delay = 96 cycles            addr 27
+    BCOND 14, 18                             # skip to frame delay loop             addr 28
+
+    CMPI $r2, 9                              # rally > 9?                           addr 29
+    BCOND 12, 3                              # if yes, skip                         addr 30
+    MOVI $r12, 100                           # tier 5: delay = 100 cycles           addr 31
+    BCOND 14, 14                             # skip to frame delay loop             addr 32
+
+    CMPI $r2, 11                             # rally > 11?                          addr 33
+    BCOND 12, 3                              # if yes, skip                         addr 34
+    MOVI $r12, 103                           # tier 6: delay = 103 cycles           addr 35
+    BCOND 14, 10                             # skip to frame delay loop             addr 36
+
+    CMPI $r2, 13                             # rally > 13?                          addr 37
+    BCOND 12, 3                              # if yes, skip                         addr 38
+    MOVI $r12, 90                            # overflow: delay = 90 cycles          addr 39
+    BCOND 14, 6                              # skip to frame delay loop             addr 40
+
+    CMPI $r2, 15                             # rally > 15?                          addr 41
+    BCOND 12, 3                              # if yes, skip                         addr 42
+    MOVI $r12, 80                            # default: delay = 80 cycles           addr 43
+    BCOND 14, 2                              # skip to frame delay loop             addr 44
+
+    MOVI $r12, 80                            # final fallback delay                 addr 45
+
+# ===== FRAME TIMING: Triple-Nested Delay Loop =====
+# Triple-nested loop structure creates software delay of ~12*6*112*6 cycles
+# Controls frame rate by slowing CPU execution accordingly
+
+    MOVI $r14, 6                             # outer counter = 6                    addr 46
+    MOVI $r15, 112                           # inner counter = 112                  addr 47
+
+loop_frame_inner:
+    SUBI $r15, 1                             # inner--                              addr 48
+    CMPI $r15, 0                             # check if zero                        addr 49
+    BCOND 1, -2                              # if not zero, loop back               addr 50
+
+loop_frame_middle:
+    SUBI $r14, 1                             # outer--                              addr 51
+    CMPI $r14, 0                             # check if zero                        addr 52
+    BCOND 1, -6                              # if not zero, restart inner+reset     addr 53
+
+loop_frame_outer:
+    SUBI $r12, 1                             # main counter--                       addr 54
+    CMPI $r12, 0                             # check if zero                        addr 55
+    BCOND 1, -10                             # if not zero, restart all loops       addr 56
+
+# ===== PHYSICS ENGINE: Ball Update =====
+# Integrate velocity into position each frame
+
+    ADD $r6, $r8                             # x += dx  (horizontal movement)       addr 57
+    ADD $r7, $r9                             # y += dy  (vertical movement)         addr 58
+
+# ===== COLLISION DETECTION: Vertical Walls (Top/Bottom) =====
+# Test if ball crossed boundaries: top at y=5, bottom at y=226
+# Reflect ball downward at top, upward at bottom
+
+    CMPI $r7, 5                              # y < 5 (above top)?                   addr 59
+    BCOND 13, 10                             # if y <= 5, skip to bottom test       addr 60
+
+    # Calculate bottom boundary: 15 << 4 - 14 = 226
+    MOVI $r10, 5                             # shift constant                       addr 61
+    MOVI $r14, 15                            # base value                           addr 62
+    LSH $r14, $r10                           # 15 << 5 = 480                        addr 63
+    SUBI $r14, 14                            # 480 - 14 = 466 (boundary)            addr 64
+
+    CMP $r7, $r14                            # y > 466 (below bottom)?              addr 65
+    BCOND 7, 9                               # if y >= 466, skip bounce             addr 66
+
+    # Determine which paddle to service based on direction
+    CMPI $r8, 0                              # dx < 0 (moving left)?                addr 67
+    BCOND 6, 12                              # if dx < 0, go to left side           addr 68
+    BCOND 7, 70                              # if dx >= 0, go to right side         addr 69
+
+    # Top wall collision: clamp y and flip dy
+    MOVI $r7, 5                              # clamp y to top = 5                   addr 70
+    MOV $r10, $r9                            # save dy                              addr 71
+    MOV $r9, $r0                             # dy = 0                               addr 72
+    SUB $r9, $r10                            # dy = -dy (flip sign)                 addr 73
+    BCOND 14, -7                             # back to direction check              addr 74
+
+    # Bottom wall collision: clamp y and flip dy
+    MOV $r7, $r14                            # clamp y to bottom                    addr 75
+    MOV $r10, $r9                            # save dy                              addr 76
+    MOV $r9, $r0                             # dy = 0                               addr 77
+    SUB $r9, $r10                            # dy = -dy (flip sign)                 addr 78
+    BCOND 14, -12                            # back to direction check              addr 79
+
+# LEFT PADDLE COLLISION =====================================
+
+# ===== BOUNDARY CHECK: Left Side =====
+# Test if ball x-position is to the left of play area (x < 40)
+
+    MOVI $r10, 3                             # shift factor for calc                addr 80
+    MOVI $r11, 5                             # base for boundary: 5 << 3 = 40       addr 81
+    LSH $r11, $r10                           # shift to get left edge = 40          addr 82
+    CMP $r6, $r11                            # x < 40?                              addr 83
+    BCOND 12, -71                            # if x >= 40, skip to right side       addr 84
+
+# ===== BOUNDARY CROSSING TEST: Entered from Right =====
+# Check that ball just crossed the left boundary this frame
+
+    MOV $r10, $r6                            # get current x                        addr 85
+    SUB $r10, $r8                            # prev_x = x - dx                      addr 86
+    CMP $r10, $r11                           # prev_x >= 40 (was outside)?          addr 87
+    BCOND 13, 12                             # if prev_x <= 40, may have hit        addr 88
+
+# ===== HIT TEST: Paddle Y Range =====
+# Check if ball is vertically aligned with paddle
+
+    MOV $r10, $r7                            # get ball y                           addr 89
+    ADDI $r10, 8                             # center adjust y + 8                  addr 90
+    CMP $r10, $r1                            # y+8 < p1_y (above paddle)?           addr 91
+    BCOND 6, 8                               # if above, miss high                  addr 92
+
+    MOV $r10, $r1                            # get paddle top y                     addr 93
+    ADDI $r10, 44                            # paddle_bottom = p1_y + 44            addr 94
+    CMP $r7, $r10                            # y > paddle_bottom (below)?           addr 95
+    BCOND 12, 4                              # if below, miss low                   addr 96
+
+# ===== HIT! Execute Bounce =====
+# Ball hit left paddle, prepare bounce calculation
+
+    MOV $r14, $r1                            # save paddle_y for gradient           addr 97
+    MOVI $r13, 0                             # direction = 0 (left hit)             addr 98
+    BCOND 14, 41                             # jump to shared bounce handler        addr 99
+
+# ===== MISS: Out of Bounds Left =====
+# Ball passed the paddle area without hitting
+
+    MOV $r10, $r6                            # how far left did it go?              addr 100
+    ADDI $r10, 8                             # plus radius                          addr 101
+    CMPI $r10, 30                            # x too far (< 30)?                    addr 102
+    BCOND 6, 32                              # if too far, award point              addr 103
+
+    CMPI $r6, 39                             # x in play region (>= 40 - 1)?        addr 104
+    BCOND 12, 30                             # if x > 39, stay in play              addr 105
+
+# ===== MISS: Reflection Logic =====
+# Rare case where ball barely grazes paddle edge
+
+    CMPI $r9, 0                              # dy positive?                         addr 106
+    BCOND 13, 14                             # if dy <= 0, skip reflection          addr 107
+
+    MOV $r10, $r7                            # ball near paddle still?              addr 108
+    ADDI $r10, 8                             # adjust for radius                    addr 109
+    SUB $r10, $r9                            # account for movement                 addr 110
+    CMP $r10, $r1                            # compare to paddle top                addr 111
+    BCOND 7, 9                               # if >= paddle, reflect downward       addr 112
+
+    MOV $r10, $r7                            # recheck position                     addr 113
+    ADDI $r10, 8                             # radius adjustment                    addr 114
+    CMP $r10, $r1                            # vs paddle position                   addr 115
+    BCOND 6, 5                               # if less than, flip dy                addr 116
+
+    MOV $r10, $r9                            # negate dy                            addr 117
+    MOV $r9, $r0                             # clear dy                             addr 118
+    SUB $r9, $r10                            # dy = -origin_dy                      addr 119
+    BCOND 14, -107                           # return to flow                       addr 120
+
+# ===== MISS: Deep Reflection Check =====
+# Secondary reflection if needed near paddle bottom
+
+    CMPI $r9, 0                              # dy check                             addr 121
+    BCOND 7, 13                              # if dy >= 0, skip                     addr 122
+
+    MOV $r11, $r1                            # get paddle position                  addr 123
+    ADDI $r11, 44                            # add paddle height                    addr 124
+    MOV $r10, $r7                            # ball y                               addr 125
+    SUB $r10, $r9                            # y - dy                               addr 126
+    CMP $r10, $r11                           # check vs paddle bottom               addr 127
+    BCOND 13, 7                              # if <= bottom, continue               addr 128
+
+    CMP $r7, $r11                            # final boundary                       addr 129
+    BCOND 12, 5                              # if y > bottom, reflect               addr 130
+
+    MOV $r10, $r9                            # negate dy                            addr 131
+    MOV $r9, $r0                             # = 0                                  addr 132
+    SUB $r9, $r10                            # negate                               addr 133
+    BCOND 14, -121                           # return                               addr 134
+
+# ===== MISS: Final Position Check =====
+# Verify ball is in valid play region
+
+    CMPI $r6, 5                              # x in bounds (>= 5)?                  addr 135
+    BCOND 13, 40                             # if x <= 5, continue                  addr 136
+    BCOND 14, -124                           # go back to check                     addr 137
+    BCOND 14, -125                           # back further                         addr 138
+    BCOND 14, 61                             # jump to right side                   addr 139
+
+# BALL VELOCITY: Speed Tier for DX ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Cascade structure to select ball dx magnitude based on rally count
+# Mirrors frame delay tier selection but sets dx instead
+
+    ADDI $r2, 1                              # increment rally counter              addr 140
+
+    CMPI $r2, 1                              # rally > 1?                           addr 141
+    BCOND 12, 3                              # if yes, skip                         addr 142
+    MOVI $r8, 1                              # tier 1: dx = 1                       addr 143
+    BCOND 14, 33                             # skip ahead                           addr 144
+
+    CMPI $r2, 3                              # rally > 3?                           addr 145
+    BCOND 12, 3                              # if yes, skip                         addr 146
+    MOVI $r8, 2                              # tier 2: dx = 2                       addr 147
+    BCOND 14, 29                             # skip ahead                           addr 148
+
+    CMPI $r2, 5                              # rally > 5?                           addr 149
+    BCOND 12, 3                              # if yes, skip                         addr 150
+    MOVI $r8, 3                              # tier 3: dx = 3                       addr 151
+    BCOND 14, 25                             # skip ahead                           addr 152
+
+    CMPI $r2, 7                              # rally > 7?                           addr 153
+    BCOND 12, 3                              # if yes, skip                         addr 154
+    MOVI $r8, 4                              # tier 4: dx = 4                       addr 155
+    BCOND 14, 21                             # skip ahead                           addr 156
+
+    CMPI $r2, 9                              # rally > 9?                           addr 157
+    BCOND 12, 3                              # if yes, skip                         addr 158
+    MOVI $r8, 5                              # tier 5: dx = 5                       addr 159
+    BCOND 14, 17                             # skip ahead                           addr 160
+
+    CMPI $r2, 11                             # rally > 11?                          addr 161
+    BCOND 12, 3                              # if yes, skip                         addr 162
+    MOVI $r8, 6                              # tier 6: dx = 6                       addr 163
+    BCOND 14, 13                             # skip ahead                           addr 164
+
+    CMPI $r2, 13                             # rally > 13?                          addr 165
+    BCOND 12, 3                              # if yes, skip                         addr 166
+    MOVI $r8, 6                              # overflow 1: dx = 6 (capped)          addr 167
+    BCOND 14, 9                              # skip ahead                           addr 168
+
+    CMPI $r2, 15                             # rally > 15?                          addr 169
+    BCOND 12, 3                              # if yes, use default                  addr 170
+    MOVI $r8, 6                              # overflow 2: dx = 6 (capped)          addr 171
+    BCOND 14, 5                              # skip ahead                           addr 172
+
+    MOVI $r8, 6                              # final overflow: dx = 6               addr 173
+    BCOND 14, 3                              # continue to execute                  addr 174
+    BCOND 14, -37                            # back to main loop start              addr 175
+
+# BOUNCE HANDLER: Gradient Calculation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Core physics: compute dy = (center_offset * dx * 3) >> 6
+# Creates angle based on where ball hit paddle (edge vs center)
+# Result: smooth angle gradient from -45° to +45°
+
+    BCOND 14, 105                            # save return address here             addr 176
+
+    # Calculate ball offset from paddle center
+    MOV $r10, $r7                            # ball y position                      addr 177
+    ADDI $r10, 4                             # add radius/2 for center              addr 178
+    SUB $r10, $r14                           # - paddle_y (offset from top)         addr 179
+    SUBI $r10, 22                            # - 22 (half paddle height ~44/2)      addr 180
+
+    MOV $r15, $r10                           # preserve offset for sign logic       addr 181
+    MUL $r10, $r8                            # offset * dx                          addr 182
+    MULI $r10, 3                             # * 3 (angle scale factor)             addr 183
+    ARSHI $r10, 6                            # >> 6 (divide by 64)                  addr 184
+    MOV $r9, $r10                            # dy = result                          addr 185
+
+    # Edge case: computed dy is zero
+    CMPI $r9, 0                              # dy == 0?                             addr 186
+    BCOND 1, 7                               # if dy != 0, skip sign fixup          addr 187
+
+    CMPI $r15, 0                             # offset == 0 (perfect center)?        addr 188
+    BCOND 0, 5                               # if offset==0, done (dy stays 0)      addr 189
+    BCOND 6, 3                               # if offset < 0, done (dy stays 0)     addr 190
+
+    # Offset > 0 but dy computed as 0: force minimum dy = 1
+    MOVI $r9, 1                              # dy = +1 (downward)                   addr 191
+    BCOND 14, 2                              # skip negate                          addr 192
+
+    # Offset < 0: force dy = -1
+    NOT $r9, $r0                             # NOT(0) = -1 (upward)                 addr 193
+
+    # Handle right vs left hit
+    CMPI $r13, 0                             # direction == 0 (left)?               addr 194
+    BCOND 0, 4                               # if left, dx unchanged, return        addr 195
+
+    # Hit from right: flip dx sign
+    MOV $r10, $r8                            # save current dx                      addr 196
+    MOV $r8, $r0                             # dx = 0                               addr 197
+    SUB $r8, $r10                            # dx = 0 - old_dx = -old_dx (flip)     addr 198
+    BCOND 14, -24                            # return to main loop                  addr 199
+
+# RIGHT PADDLE COLLISION =====================================~
+
+# ===== BOUNDARY CALCULATION: Right Side =====
+# Compute right paddle edge: (15 << 5) + (15 << 3) + 10 = 600
+
+    MOVI $r10, 5                             # outer shift factor                   addr 200
+    MOVI $r11, 15                            # base value                           addr 201
+    LSH $r11, $r10                           # 15 << 5 = 480                        addr 202
+
+    MOVI $r10, 3                             # inner shift factor                   addr 203
+    MOVI $r14, 15                            # base value                           addr 204
+    LSH $r14, $r10                           # 15 << 3 = 120                        addr 205
+
+    ADD $r11, $r14                           # 480 + 120 = 600                      addr 206
+    ADDI $r11, 10                            # 600 + 10 = 610 (right play edge)     addr 207
+
+# ===== BOUNDARY CHECK: Right Side =====
+# Test if ball x-position is to the right of play area (x > 600)
+
+    MOV $r10, $r6                            # get ball x                           addr 208
+    ADDI $r10, 8                             # add radius                           addr 209
+    CMP $r10, $r11                           # x+8 < 610?                           addr 210
+    BCOND 6, 52                              # if x+8 < 610, loop back              addr 211
+
+# ===== BOUNDARY CROSSING TEST: Entered from Left =====
+# Check that ball just crossed the right boundary this frame
+
+    SUB $r10, $r8                            # prev_x = (x+8) - dx                  addr 212
+    CMP $r10, $r11                           # prev_x >= 610?                       addr 213
+    BCOND 7, 12                              # if prev_x >= 610, may have hit       addr 214
+
+# ===== HIT TEST: Paddle Y Range =====
+# Check if ball is vertically aligned with right paddle
+
+    MOV $r10, $r7                            # get ball y                           addr 215
+    ADDI $r10, 8                             # add radius                           addr 216
+    CMP $r10, $r3                            # y+8 < p2_y (above paddle)?           addr 217
+    BCOND 6, 8                               # if above, miss high                  addr 218
+
+    MOV $r10, $r3                            # get paddle top y                     addr 219
+    ADDI $r10, 44                            # paddle_bottom = p2_y + 44            addr 220
+    CMP $r7, $r10                            # y > paddle_bottom (below)?           addr 221
+    BCOND 12, 4                              # if below, miss low                   addr 222
+
+# ===== HIT! Execute Bounce =====
+# Ball hit right paddle, prepare bounce calculation
+
+    MOV $r14, $r3                            # save paddle_y for gradient           addr 223
+    MOVI $r13, 1                             # direction = 1 (right hit)            addr 224
+    BCOND 14, -85                            # jump to shared bounce handler        addr 225
+
+# ===== MISS: Out of Bounds Right =====
+# Ball passed the paddle area without hitting
+
+    MOV $r15, $r11                           # load right edge                      addr 226
+    ADDI $r15, 9                             # boundary + 9                         addr 227
+
+    MOV $r10, $r6                            # how far right did it go?             addr 228
+    ADDI $r10, 8                             # plus radius                          addr 229
+    CMP $r10, $r11                           # x+8 < 610?                           addr 230
+    BCOND 6, 32                              # if too far, award point              addr 231
+
+    CMP $r6, $r15                            # x vs far boundary                    addr 232
+    BCOND 12, 30                             # if x > boundary, continue            addr 233
+
+# ===== MISS: Reflection Logic =====
+# Rare case where ball barely grazes right paddle edge
+
+    CMPI $r9, 0                              # dy positive?                         addr 234
+    BCOND 13, 14                             # if dy <= 0, skip reflection          addr 235
+
+    MOV $r10, $r7                            # ball near paddle still?              addr 236
+    ADDI $r10, 8                             # adjust for radius                    addr 237
+    SUB $r10, $r9                            # account for movement                 addr 238
+    CMP $r10, $r3                            # compare to paddle top                addr 239
+    BCOND 7, 9                               # if >= paddle, reflect                addr 240
+
+    MOV $r10, $r7                            # recheck position                     addr 241
+    ADDI $r10, 8                             # radius adjustment                    addr 242
+    CMP $r10, $r3                            # vs paddle position                   addr 243
+    BCOND 6, 5                               # if less than, flip dy                addr 244
+
+    MOV $r10, $r9                            # negate dy                            addr 245
+    MOV $r9, $r0                             # clear dy                             addr 246
+    SUB $r9, $r10                            # dy = -origin_dy                      addr 247
+    BCOND 14, -73                            # return to flow                       addr 248
+
+# ===== MISS: Deep Reflection Check =====
+# Secondary reflection if needed near paddle bottom
+
+    CMPI $r9, 0                              # dy check                             addr 249
+    BCOND 7, 13                              # if dy >= 0, skip                     addr 250
+
+    MOV $r15, $r3                            # get paddle position                  addr 251
+    ADDI $r15, 44                            # add paddle height                    addr 252
+    MOV $r10, $r7                            # ball y                               addr 253
+    SUB $r10, $r9                            # y - dy                               addr 254
+    CMP $r10, $r15                           # check vs paddle bottom               addr 255
+    BCOND 13, 7                              # if <= bottom, continue               addr 256
+
+    CMP $r7, $r15                            # final boundary                       addr 257
+    BCOND 12, 5                              # if y > bottom, reflect               addr 258
+
+    MOV $r10, $r9                            # negate dy                            addr 259
+    MOV $r9, $r0                             # = 0                                  addr 260
+    SUB $r9, $r10                            # negate                               addr 261
+    BCOND 14, -87                            # return                               addr 262
+
+# ===== MISS: Final Position Check =====
+# Verify ball is in valid play region before next frame
+
+    MOV $r10, $r11                           # load right edge                      addr 263
+    ADDI $r10, 16                            # plus offset                          addr 264
+    CMP $r6, $r10                            # x vs boundary                        addr 265
+    BCOND 7, 2                               # if x >= boundary, ready              addr 266
+    BCOND 14, -92                            # continue to main loop                addr 267
+
+# SCORE MANAGEMENT AND RESET ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ===== SCORE: Player 1 Scores Point =====
+# Ball went out the right side → Player 1 scores, reset game state
+
+    ADDI $r4, 1                              # p1 score++                           addr 268
+    MOVI $r2, 0                              # rally counter = 0 (reset speed)      addr 269
+
+    # Reset ball to center with initial velocity serving right
+    MOVI $r10, 5                             # shift factor for x                   addr 270
+    MOVI $r6, 10                             # x base = 10                          addr 271
+    LSH $r6, $r10                            # 10 << 5 = 320                        addr 272
+    SUBI $r6, 5                              # 320 - 5 = 315                        addr 273
+
+    MOVI $r11, 4                             # shift factor for y                   addr 274
+    MOVI $r7, 15                             # y base = 15                          addr 275
+    LSH $r7, $r11                            # 15 << 4 = 240                        addr 276
+    SUBI $r7, 5                              # 240 - 5 = 235                        addr 277
+
+    MOVI $r8, 1                              # dx = 1 (serve right)                 addr 278
+    MOVI $r9, 1                              # dy = 1 (down)                        addr 279
+    BCOND 14, -105                           # back to main game loop               addr 280
+
+# ===== SCORE: Player 2 Scores Point =====
+# Ball went out the left side → Player 2 scores, reset game state
+
+    ADDI $r5, 1                              # p2 score++                           addr 281
+    MOVI $r2, 0                              # rally counter = 0 (reset speed)      addr 282
+
+    # Reset ball to center with initial velocity serving left
+    MOVI $r10, 5                             # shift factor for x                   addr 283
+    MOVI $r6, 10                             # x base = 10                          addr 284
+    LSH $r6, $r10                            # 10 << 5 = 320                        addr 285
+    SUBI $r6, 5                              # 320 - 5 = 315                        addr 286
+
+    MOVI $r11, 4                             # shift factor for y                   addr 287
+    MOVI $r7, 15                             # y base = 15                          addr 288
+    LSH $r7, $r11                            # 15 << 4 = 240                        addr 289
+    SUBI $r7, 5                              # 240 - 5 = 235                        addr 290
+
+    MOV $r8, $r0                             # dx = 0 (will be set to -1)           addr 291
+    NOT $r8, $r0                             # NOT(0) = -1 (serve left)             addr 292
+    MOVI $r9, 1                              # dy = 1 (down)                        addr 293
+    BCOND 14, -119                           # back to main game loop               addr 294
+
+
+# PROGRAM SUMMARY
+
+
+    Total Instructions:   295 (addresses 0-294)
+    Program Size:         590 bytes (at 2 bytes/instruction per word)
+
+    Execution Statistics:
+        Initialization:              13 instr  (startup)
+        Speed tier selection loop:   33 instr  (variable per frame)
+        Frame delay loop:            11 instr  (fixed ~6,720 cycles)
+        Ball physics + collision:   157 instr  (per frame evaluation)
+        Ball velocity tiers:         35 instr  (variable per bounce)
+        Bounce handler:              24 instr  (shared logic)
+        Score management:            27 instr  (reset logic)
+
+    Main Execution Loop: Addresses 13-294 (~282 instructions per frame)
+    Return: Unconditional branch back to frame delay selection (BCOND at addr 280/294)
+
+

@@ -25,7 +25,7 @@ module renderer(
     localparam PADDLE_HEIGHT = 45;
     localparam PLAYER1_X     = 30;
     localparam PLAYER2_X     = 610;
-    localparam BALL_SIZE     = 10;
+    localparam BALL_SIZE     = 9;
 
     localparam SCORE_Y          = 40;
     localparam SCORE1_X_ONES    = 220;

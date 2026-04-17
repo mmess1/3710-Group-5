@@ -62,7 +62,7 @@ PADDLE_W = 10
 PADDLE_H = 45
 PLAYER1_X = 30
 PLAYER2_X = 610
-BALL_SIZE = 10
+BALL_SIZE = 9
 
 MODE_START = 0
 MODE_PLAY = 1
@@ -449,10 +449,8 @@ class LiveWindow:
         self.cpu_div = max(1, int(cpu_div))
         self.max_chunk_instr = max(1000, int(max_chunk_instr))
         self.paused = False
-        self.left_up = False
-        self.left_down = False
-        self.right_up = False
-        self.right_down = False
+        self.mouse_x = VISIBLE_W // 2
+        self.mouse_y = VISIBLE_H // 2
         self.wall_last = time.perf_counter()
         self.cycle_last = self.sim.cycle
 
@@ -488,20 +486,13 @@ class LiveWindow:
         self.msg_text = self.canvas.create_text(VISIBLE_W * s // 2, VISIBLE_H * s // 2, text="", fill="white", font=("Courier", 20 * s // 1, "bold"))
 
         self.root.bind("<KeyPress>", self.on_key_press)
-        self.root.bind("<KeyRelease>", self.on_key_release)
+        self.canvas.bind("<Motion>", self.on_mouse_move)
+        self.canvas.bind("<Enter>", self.on_mouse_move)
         self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
 
     def on_key_press(self, event: tk.Event) -> None:
         k = event.keysym.lower()
-        if k == "w":
-            self.left_up = True
-        elif k == "s":
-            self.left_down = True
-        elif k == "up":
-            self.right_up = True
-        elif k == "down":
-            self.right_down = True
-        elif k == "space":
+        if k == "space":
             self.sim.start_game()
         elif k == "p":
             self.paused = not self.paused
@@ -519,16 +510,10 @@ class LiveWindow:
                 self.sim.step_retired_fast()
                 self.redraw()
 
-    def on_key_release(self, event: tk.Event) -> None:
-        k = event.keysym.lower()
-        if k == "w":
-            self.left_up = False
-        elif k == "s":
-            self.left_down = False
-        elif k == "up":
-            self.right_up = False
-        elif k == "down":
-            self.right_down = False
+    def on_mouse_move(self, event: tk.Event) -> None:
+        # Convert canvas pixels back to game-space coordinates.
+        self.mouse_x = max(0, min(VISIBLE_W - 1, int(event.x / self.scale)))
+        self.mouse_y = max(0, min(VISIBLE_H - 1, int(event.y / self.scale)))
 
     def clamp_paddle(self, y: int) -> int:
         return max(0, min(VISIBLE_H - PADDLE_H, int(y)))
@@ -536,9 +521,14 @@ class LiveWindow:
     def ai_target(self) -> int:
         return self.clamp_paddle(int(self.sim.regs[7]) - PADDLE_H // 2)
 
+    def mouse_target(self) -> int:
+        return self.clamp_paddle(self.mouse_y - PADDLE_H // 2)
+
     def apply_inputs(self) -> None:
         p1 = self.sim.p1_input
         p2 = self.sim.p2_input
+        mouse_target = self.mouse_target()
+        both_human = (self.left_mode == "human") and (self.right_mode == "human")
 
         if self.left_mode == "ai":
             target = self.ai_target()
@@ -547,10 +537,8 @@ class LiveWindow:
             elif p1 > target:
                 p1 = max(target, p1 - self.paddle_speed)
         else:
-            if self.left_up and not self.left_down:
-                p1 -= self.paddle_speed
-            elif self.left_down and not self.left_up:
-                p1 += self.paddle_speed
+            if (not both_human) or (self.mouse_x < (VISIBLE_W // 2)):
+                p1 = mouse_target
 
         if self.right_mode == "ai":
             target = self.ai_target()
@@ -559,10 +547,8 @@ class LiveWindow:
             elif p2 > target:
                 p2 = max(target, p2 - self.paddle_speed)
         else:
-            if self.right_up and not self.right_down:
-                p2 -= self.paddle_speed
-            elif self.right_down and not self.right_up:
-                p2 += self.paddle_speed
+            if (not both_human) or (self.mouse_x >= (VISIBLE_W // 2)):
+                p2 = mouse_target
 
         self.sim.set_inputs(self.clamp_paddle(p1), self.clamp_paddle(p2))
 
