@@ -1,0 +1,297 @@
+# register use
+    # $r1  = player 1 paddle y position
+    # $r2  = rally hit counter
+    # $r3  = player 2 paddle y position
+    # $r4  = player 1 score
+    # $r5  = player 2 score
+    # $r6  = ball x
+    # $r7  = ball y
+    # $r8  = ball dx
+    # $r9  = ball dy
+    # $r10 = temp
+    # $r11 = temp
+    # $r12 = current frame delay value
+    # $r13 = side flag
+    # $r14 = temp
+    # $r15 = temp
+
+# branch codes
+    # 0  =
+    # 1  !=
+    # 6  >
+    # 7  <=
+    # 12 <
+    # 13 >=
+    # 14 jump
+
+# ram constants
+    # none in this version
+    # x start is built inline as 315
+    # y start is built inline as 235
+
+# setup =========================================================
+
+    MOVI $r4, 0       # p1 score = 0
+    MOVI $r5, 0       # p2 score = 0
+    MOVI $r8, 1       # start with dx = +1
+    Bcond 14, 122     # jump down into shared reset path
+
+# main game loop ================================================
+
+# ----- frame delay select -----
+    MOVI $r12, 80     # default delay tier
+
+    CMPI $r2, 1       # compare rally count to 1
+    Bcond 13, 18      # if hits >= 1 keep moving through speed table
+
+    CMPI $r2, 5       # compare rally count to 5
+    Bcond 12, 4       # if hits < 5 branch inside this tier block
+    CMPI $r2, 3       # compare rally count to 3
+    Bcond 12, 16      # if hits < 3 branch to another tier choice
+    Bcond 14, 18      # otherwise jump ahead
+
+    CMPI $r2, 9       # compare rally count to 9
+    Bcond 12, 5       # if hits < 9 branch inside this tier block
+    CMPI $r2, 7       # compare rally count to 7
+    Bcond 12, 13      # if hits < 7 branch to another tier choice
+    MOVI $r12, 96     # select this delay tier
+    Bcond 14, 12      # jump past later delay choices
+
+    CMPI $r2, 13      # compare rally count to 13
+    Bcond 12, 10      # if hits < 13 branch inside this tier block
+    CMPI $r2, 11      # compare rally count to 11
+    Bcond 12, 5       # if hits < 11 branch to another tier choice
+    MOVI $r12, 103    # select this delay tier
+    Bcond 14, 6       # jump past remaining choices
+
+    MOVI $r12, 60     # fastest delay tier used here
+    Bcond 14, 4       # jump over next choices
+    MOVI $r12, 90     # middle delay tier
+    Bcond 14, 2       # jump over last choice
+    MOVI $r12, 100    # slowest delay tier in this table
+
+# ----- frame delay loop -----
+    MOVI $r14, 6      # outer spin count
+    MOVI $r15, 2      # inner spin count
+
+    SUBI $r15, 1      # inner--
+    CMPI $r15, 0      # compare inner counter to zero
+    Bcond 1, -2       # loop inner while != 0
+
+    SUBI $r14, 1      # outer--
+    CMPI $r14, 0      # compare outer counter to zero
+    Bcond 1, -6       # loop outer while != 0
+
+    SUBI $r12, 1      # delay tier countdown--
+    CMPI $r12, 0      # compare delay tier to zero
+    Bcond 1, -10      # keep looping until full delay is done
+
+# ----- ball update -----
+    ADD $r6, $r8      # x += dx
+    ADD $r7, $r9      # y += dy
+
+# ----- vertical collision -----
+
+    # top check
+    CMPI $r7, 5       # compare y to top wall
+    Bcond 13, 9       # if y >= 5 skip top clamp work
+
+    # bottom check
+    MOVI $r14, 93     # build 93
+    MULI $r14, 5      # 93 * 5 = 465
+    ADDI $r14, 1      # bottom bound = 466
+
+    CMP $r7, $r14     # compare y to bottom wall
+    Bcond 7, 6        # if y <= bottom skip bottom clamp work
+
+# ----- choose horizontal path -----
+    CMPI $r8, 0       # test sign of dx
+    Bcond 6, 7        # if dx > 0 use left-to-right path
+    Bcond 7, 16       # if dx <= 0 use right-to-left path
+
+# ----- top clamp -----
+    MOVI $r7, 5       # clamp y back to top edge
+    Bcond 14, 2       # jump past bottom clamp instructions
+
+# ----- bottom clamp -----
+    MOV $r7, $r14     # clamp y back to bottom edge
+    MULI $r9, -1      # flip dy when ball hits bottom wall
+    Bcond 14, -7      # jump back to continue game flow
+
+# side handling =================================================
+
+# ----- left side setup -----
+    MOVI $r11, 40     # left paddle hit x = 40
+    MOV $r14, $r1     # load p1 paddle top into temp
+    MOVI $r13, 0      # side flag = left side
+
+    CMP $r6, $r11     # compare current x to left hit line
+    Bcond 12, 6       # if x < left line branch into left-side window logic
+
+    MOV $r10, $r6     # copy current x
+    SUB $r10, $r8     # back up one step to previous x
+    CMP $r10, $r11    # compare previous x to left hit line
+    Bcond 13, 29      # if previous x >= line use left-side handling
+    Bcond 14, 12      # otherwise skip over to right-side setup
+
+# ----- right side setup -----
+    MOVI $r11, 61     # build 61
+    MULI $r11, 10     # right paddle hit x = 610
+    MOV $r14, $r3     # load p2 paddle top into temp
+    MOVI $r13, 1      # side flag = right side
+
+    MOV $r10, $r6     # copy current x
+    ADDI $r10, 8      # move to ball right edge
+    CMP $r10, $r11    # compare right edge to right hit line
+    Bcond 6, 54       # if edge > line branch into right-side window logic
+
+    SUB $r10, $r8     # back up one x-step from that edge
+    CMP $r10, $r11    # compare previous edge to right hit line
+    Bcond 7, 17       # if previous edge <= line use right-side handling
+
+# ----- paddle overlap test -----
+    MOV $r10, $r7     # copy ball y
+    ADDI $r10, 8      # move to ball vertical middle
+    CMP $r10, $r14    # compare center to paddle top
+    Bcond 6, 13       # if center > top keep checking
+
+    MOV $r10, $r14    # copy paddle top
+    ADDI $r10, 44     # build paddle bottom
+    CMP $r7, $r10     # compare ball y to paddle bottom
+    Bcond 12, 9       # if ball y < bottom it is inside paddle range
+    Bcond 14, 49      # otherwise jump to shared bounce path
+
+# ----- left miss window -----
+    MOV $r10, $r6     # copy current x
+    ADDI $r10, 8      # move to ball right edge
+    CMPI $r10, 30     # compare edge to left score threshold
+    Bcond 6, 42       # if edge > 30 go deeper into left miss logic
+
+    CMPI $r6, 39      # compare x to left near-wall value
+    Bcond 12, 40      # if x < 39 branch into scoring path
+    Bcond 14, 7       # otherwise keep following miss logic
+
+    CMPI $r13, 0      # check which side flag is active
+    Bcond 0, -8       # if side flag says left jump back into left path
+
+    MOV $r15, $r11    # copy current right-side line
+    ADDI $r15, 9      # push to right score threshold
+    CMP $r6, $r15     # compare x to that threshold
+    Bcond 12, 29      # if x < threshold branch to right scoring logic
+
+# ----- top edge helper -----
+    CMPI $r9, 0       # test dy sign
+    Bcond 13, 12      # if dy >= 0 skip this upward-edge helper
+
+    MOV $r10, $r7     # copy y
+    ADDI $r10, 8      # move to ball center
+    SUB $r10, $r9     # reconstruct previous center y
+    CMP $r10, $r14    # compare previous center to paddle top
+    Bcond 7, 7        # if previous center <= top skip bounce flip
+
+    MOV $r10, $r7     # copy y again
+    ADDI $r10, 8      # move to current center
+    CMP $r10, $r14    # compare center to paddle top
+    Bcond 6, 3        # if center > top keep going
+    MULI $r9, -1      # flip dy on this edge case
+    Bcond 14, 22      # jump to shared bounce path
+
+# ----- bottom edge helper -----
+    CMPI $r9, 0       # test dy sign
+    Bcond 7, 12       # if dy <= 0 skip this downward-edge helper
+
+    MOV $r15, $r14    # copy paddle top
+    ADDI $r15, 44     # build paddle bottom
+    MOV $r10, $r7     # copy ball y
+    SUB $r10, $r9     # reconstruct previous y
+    CMP $r10, $r15    # compare previous y to paddle bottom
+    Bcond 13, 6       # if previous y >= bottom skip bounce flip
+
+    CMP $r7, $r15     # compare current y to paddle bottom
+    Bcond 12, 4       # if current y < bottom keep going
+    MULI $r9, -1      # flip dy on this edge case
+    Bcond 14, 10      # jump to shared bounce path
+
+    Bcond 14, 43      # fall through to reset/scoring region
+
+# score / bounce dispatch =======================================
+
+# ----- choose score side -----
+    CMPI $r13, 0      # test side flag
+    Bcond 0, 5        # if left side branch to left score check
+
+    ADDI $r11, 16     # extend right-side line to score line
+    CMP $r6, $r11     # compare x to right score line
+    Bcond 7, 33       # if x <= line branch to p1 score reset
+    Bcond 14, -127    # otherwise jump back to main loop
+
+# ----- left score check -----
+    CMPI $r6, 5       # compare x to left score line
+    Bcond 13, 33      # if x >= 5 branch to p2 score reset
+    Bcond 14, -3      # otherwise jump back
+
+# shared bounce =================================================
+
+# ----- bounce speed update -----
+    ADDI $r2, 1       # rally count++
+    MOV $r8, $r2      # copy rally count into dx temp
+    ADDI $r8, 2       # bias it upward
+    ARSHI $r8, 1      # divide by 2 to get new speed tier
+    CMPI $r8, 6       # cap speed at 6
+    Bcond 13, 2       # if dx >= 6 skip clamp write
+    MOVI $r8, 6       # clamp dx magnitude to 6
+
+# ----- bounce angle update -----
+    MOV $r10, $r7     # copy ball y
+    ADDI $r10, 4      # move toward ball vertical middle
+    SUB $r10, $r14    # subtract paddle top to get local offset
+    SUBI $r10, 22     # shift so paddle center is near zero
+    MOV $r15, $r10    # save center offset for zero-dy fixup
+
+    MUL $r10, $r8     # scale offset by dx magnitude
+    MULI $r10, 3      # multiply numerator by 3
+    ARSHI $r10, 6     # divide by 64 for final dy
+    MOV $r9, $r10     # store new dy
+
+# ----- zero-dy fixup -----
+    CMPI $r9, 0       # check if computed dy is zero
+    Bcond 1, 7        # if dy != 0 skip fixup
+
+    CMPI $r15, 0      # check if paddle offset was exactly centered
+    Bcond 0, 5        # if offset == 0 keep dy as zero
+    Bcond 6, 3        # if offset > 0 use positive dy
+    MOVI $r9, 1       # force dy = +1
+    Bcond 14, 2       # skip negative case
+    NOT $r9, $r0      # force dy = -1
+
+# ----- horizontal direction fix -----
+    CMPI $r13, 0      # test side flag again
+    Bcond 0, -26      # if left side keep dx positive
+    MULI $r8, -1      # if right side flip dx negative
+    Bcond 14, -28     # jump back to main loop
+
+# score reset ===================================================
+
+# ----- player1 score reset -----
+    ADDI $r4, 1       # p1++
+    MOVI $r8, 1       # next serve goes right
+    Bcond 14, 3       # jump into shared reset body
+
+# ----- player2 score reset -----
+    ADDI $r5, 1       # p2++
+    MOVI $r8, -1      # next serve goes left
+
+# ----- shared reset body -----
+    MOVI $r2, 0       # reset rally counter to 0
+
+    MOVI $r6, 63      # build x start base
+    MULI $r6, 5       # x = 315
+
+    MOVI $r7, 47      # build y start base
+    MULI $r7, 5       # y = 235
+
+    CMPI $r9, 0       # look at previous dy sign
+    MOVI $r9, 1       # default new dy = +1
+    Bcond 7, 2        # if old dy <= 0 keep +1
+    MOVI $r9, -1      # otherwise flip serve dy to -1
+    Bcond 14, -43     # jump back to main loop

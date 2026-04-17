@@ -3,66 +3,52 @@
 init:
     MOVI $r4, 0
     MOVI $r5, 0
-    MOVI $r2, 0
-
-    MOVI $r6, 63
-    MULI $r6, 5
-    MOVI $r7, 47
-    MULI $r7, 5
-
     MOVI $r8, 1
-    MOVI $r9, 1
+    BCOND 14, init_to_reset_mid
 
 main_loop:
-    CMPI $r2, 1
-    BCOND 12, delay_tier2
-    MOVI $r12, 60
-    BCOND 14, frame_delay_setup
-
-delay_tier2:
-    CMPI $r2, 3
-    BCOND 12, delay_tier3
     MOVI $r12, 80
-    BCOND 14, frame_delay_setup
+    CMPI $r2, 1
+    BCOND 13, delay_set_60
 
-delay_tier3:
     CMPI $r2, 5
-    BCOND 12, delay_tier4
-    MOVI $r12, 90
+    BCOND 12, delay_gt5
+    CMPI $r2, 3
+    BCOND 12, delay_set_90
     BCOND 14, frame_delay_setup
 
-delay_tier4:
+delay_gt5:
+    CMPI $r2, 9
+    BCOND 12, delay_gt9
     CMPI $r2, 7
-    BCOND 12, delay_tier5
+    BCOND 12, delay_set_100
     MOVI $r12, 96
     BCOND 14, frame_delay_setup
 
-delay_tier5:
-    CMPI $r2, 9
-    BCOND 12, delay_tier6
-    MOVI $r12, 100
-    BCOND 14, frame_delay_setup
-
-delay_tier6:
+delay_gt9:
+    CMPI $r2, 13
+    BCOND 12, frame_delay_setup
     CMPI $r2, 11
-    BCOND 12, delay_tier7
+    BCOND 12, delay_set_90
     MOVI $r12, 103
     BCOND 14, frame_delay_setup
 
-delay_tier7:
-    CMPI $r2, 13
-    BCOND 12, delay_default
+delay_set_60:
+    MOVI $r12, 60
+    BCOND 14, frame_delay_setup
+
+delay_set_90:
     MOVI $r12, 90
     BCOND 14, frame_delay_setup
 
-delay_default:
-    MOVI $r12, 80
+delay_set_100:
+    MOVI $r12, 100
 
 frame_delay_setup:
     MOVI $r14, 6
 
 frame_delay_reset_inner:
-    MOVI $r15, 112
+    MOVI $r15, 2
 
 frame_delay_inner:
     SUBI $r15, 1
@@ -99,40 +85,53 @@ direction_dispatch:
 
 top_collision:
     MOVI $r7, 5
-    MULI $r9, -1
-    BCOND 14, direction_dispatch
+    BCOND 14, wall_flip
 
 bottom_collision:
     MOV $r7, $r14
+wall_flip:
     MULI $r9, -1
     BCOND 14, direction_dispatch
 
 left_side:
     MOVI $r11, 40
+    MOV $r14, $r1
     CMP $r6, $r11
     BCOND 12, right_side
 
     MOV $r10, $r6
     SUB $r10, $r8
     CMP $r10, $r11
-    BCOND 13, left_miss
+    BCOND 13, side_miss
+    BCOND 14, side_hit_test
 
+right_side:
+    MOVI $r11, 61
+    MULI $r11, 10
+    MOV $r14, $r3
+
+    MOV $r10, $r6
+    ADDI $r10, 8
+    CMP $r10, $r11
+    BCOND 6, right_post_check
+
+    SUB $r10, $r8
+    CMP $r10, $r11
+    BCOND 7, side_miss
+
+side_hit_test:
     MOV $r10, $r7
     ADDI $r10, 8
-    CMP $r10, $r1
-    BCOND 6, left_miss
+    CMP $r10, $r14
+    BCOND 6, side_miss
 
-    MOV $r10, $r1
+    MOV $r10, $r14
     ADDI $r10, 44
     CMP $r7, $r10
-    BCOND 12, left_miss
-
-left_hit:
-    MOV $r14, $r1
-    MOVI $r13, 0
+    BCOND 12, side_miss
     BCOND 14, apply_hit_speed
 
-left_miss:
+left_miss_pre:
     MOV $r10, $r6
     ADDI $r10, 8
     CMPI $r10, 30
@@ -140,52 +139,76 @@ left_miss:
 
     CMPI $r6, 39
     BCOND 12, left_post_check
+    BCOND 14, shared_reflect
 
+side_miss:
+    CMPI $r8, 0
+    BCOND 6, left_miss_pre
+
+right_miss_pre:
+    MOV $r15, $r11
+    ADDI $r15, 9
+    CMP $r6, $r15
+    BCOND 12, right_post_check
+
+shared_reflect:
     CMPI $r9, 0
-    BCOND 13, left_deep_reflect
+    BCOND 13, shared_deep_reflect
 
     MOV $r10, $r7
     ADDI $r10, 8
     SUB $r10, $r9
-    CMP $r10, $r1
-    BCOND 7, left_deep_reflect
+    CMP $r10, $r14
+    BCOND 7, shared_deep_reflect
 
     MOV $r10, $r7
     ADDI $r10, 8
-    CMP $r10, $r1
-    BCOND 6, left_deep_reflect
+    CMP $r10, $r14
+    BCOND 6, shared_deep_reflect
 
-left_flip_dy:
     MULI $r9, -1
     BCOND 14, main_loop_far
 
-left_deep_reflect:
+shared_deep_reflect:
     CMPI $r9, 0
-    BCOND 7, left_post_check
+    BCOND 7, post_check_dispatch
 
-    MOV $r11, $r1
-    ADDI $r11, 44
+    MOV $r15, $r14
+    ADDI $r15, 44
     MOV $r10, $r7
     SUB $r10, $r9
-    CMP $r10, $r11
-    BCOND 13, left_post_check
+    CMP $r10, $r15
+    BCOND 13, post_check_dispatch
 
-    CMP $r7, $r11
-    BCOND 12, left_post_check
+    CMP $r7, $r15
+    BCOND 12, post_check_dispatch
 
     MULI $r9, -1
     BCOND 14, main_loop_far
+
+init_to_reset_mid:
+    BCOND 14, reset_after_score
+
+post_check_dispatch:
+    CMPI $r8, 0
+    BCOND 6, left_post_check
+right_post_check:
+    ADDI $r11, 16
+    CMP $r6, $r11
+    BCOND 7, score_p1
+main_loop_mid:
+    BCOND 14, main_loop
 
 left_post_check:
     CMPI $r6, 5
     BCOND 13, score_p2
-    BCOND 14, main_loop_far
 
 main_loop_far:
-    BCOND 14, main_loop
+    BCOND 14, main_loop_mid
 
 apply_hit_speed:
     ADDI $r2, 1
+    MOV $r13, $r8
 
     MOV $r8, $r2
     ADDI $r8, 2
@@ -221,91 +244,9 @@ bounce_set_neg:
 
 bounce_dir:
     CMPI $r13, 0
-    BCOND 0, main_loop_far
+    BCOND 6, main_loop_far
 
     MULI $r8, -1
-    BCOND 14, main_loop_far
-
-right_side:
-    MOVI $r11, 61
-    MULI $r11, 10
-
-    MOV $r10, $r6
-    ADDI $r10, 8
-    CMP $r10, $r11
-    BCOND 6, right_post_check
-
-    SUB $r10, $r8
-    CMP $r10, $r11
-    BCOND 7, right_miss
-
-    MOV $r10, $r7
-    ADDI $r10, 8
-    CMP $r10, $r3
-    BCOND 6, right_miss
-
-    MOV $r10, $r3
-    ADDI $r10, 44
-    CMP $r7, $r10
-    BCOND 12, right_miss
-
-right_hit:
-    MOV $r14, $r3
-    MOVI $r13, 1
-    BCOND 14, apply_hit_speed
-
-right_miss:
-    MOV $r15, $r11
-    ADDI $r15, 9
-
-    MOV $r10, $r6
-    ADDI $r10, 8
-    CMP $r10, $r11
-    BCOND 6, right_post_check
-
-    CMP $r6, $r15
-    BCOND 12, right_post_check
-
-    CMPI $r9, 0
-    BCOND 13, right_deep_reflect
-
-    MOV $r10, $r7
-    ADDI $r10, 8
-    SUB $r10, $r9
-    CMP $r10, $r3
-    BCOND 7, right_deep_reflect
-
-    MOV $r10, $r7
-    ADDI $r10, 8
-    CMP $r10, $r3
-    BCOND 6, right_deep_reflect
-
-right_flip_dy:
-    MULI $r9, -1
-    BCOND 14, main_loop_far
-
-right_deep_reflect:
-    CMPI $r9, 0
-    BCOND 7, right_post_check
-
-    MOV $r15, $r3
-    ADDI $r15, 44
-    MOV $r10, $r7
-    SUB $r10, $r9
-    CMP $r10, $r15
-    BCOND 13, right_post_check
-
-    CMP $r7, $r15
-    BCOND 12, right_post_check
-
-    MULI $r9, -1
-    BCOND 14, main_loop_far
-
-right_post_check:
-    MOV $r10, $r11
-    ADDI $r10, 16
-    CMP $r6, $r10
-    BCOND 7, score_p1
     BCOND 14, main_loop_far
 
 score_p1:
@@ -319,11 +260,14 @@ score_p2:
 
 reset_after_score:
     MOVI $r2, 0
-
     MOVI $r6, 63
     MULI $r6, 5
     MOVI $r7, 47
     MULI $r7, 5
 
+    CMPI $r9, 0
     MOVI $r9, 1
+    BCOND 7, serve_angle_done
+    MOVI $r9, -1
+serve_angle_done:
     BCOND 14, main_loop_far

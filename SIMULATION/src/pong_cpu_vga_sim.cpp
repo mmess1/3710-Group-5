@@ -65,7 +65,15 @@ constexpr int PADDLE_W = 10;
 constexpr int PADDLE_H = 45;
 constexpr int PLAYER1_X = 30;
 constexpr int PLAYER2_X = 610;
-constexpr int BALL_SIZE = 10;
+constexpr int BALL_SIZE = 9;
+
+constexpr int SCORE_Y = 40;
+constexpr int SCORE1_X_ONES = 220;
+constexpr int SCORE1_X_TENS = SCORE1_X_ONES - 10 * 5;
+constexpr int SCORE2_X_TENS = 380;
+constexpr int DIGIT_SCALE = 8;
+constexpr int DIGIT_W = 5 * DIGIT_SCALE;
+constexpr int DIGIT_H = 5 * DIGIT_SCALE;
 
 constexpr int MODE_START = 0;
 constexpr int MODE_PLAY = 1;
@@ -630,6 +638,35 @@ void drawText(SDL_Renderer* renderer, int x, int y, const std::string& text, int
     }
 }
 
+constexpr std::uint8_t SCORE_DIGITS[10][5] = {
+    {0b11111, 0b10001, 0b10001, 0b10001, 0b11111},
+    {0b00100, 0b01100, 0b00100, 0b00100, 0b01110},
+    {0b11111, 0b00001, 0b11111, 0b10000, 0b11111},
+    {0b11111, 0b00001, 0b01110, 0b00001, 0b11111},
+    {0b10001, 0b10001, 0b11111, 0b00001, 0b00001},
+    {0b11111, 0b10000, 0b11111, 0b00001, 0b11111},
+    {0b11111, 0b10000, 0b11111, 0b10001, 0b11111},
+    {0b11111, 0b00001, 0b00010, 0b00100, 0b00100},
+    {0b11111, 0b10001, 0b11111, 0b10001, 0b11111},
+    {0b11111, 0b10001, 0b11111, 0b00001, 0b11111},
+};
+
+bool scoreDigitPixel(int digit, int row, int col) {
+    if (digit < 0 || digit > 9) return false;
+    return ((SCORE_DIGITS[digit][row] >> (4 - col)) & 1u) != 0u;
+}
+
+void drawScoreDigit(SDL_Renderer* renderer, int x, int y, int digit) {
+    const Rgba c{255, 255, 255, 255};
+    for (int row = 0; row < 5; ++row) {
+        for (int col = 0; col < 5; ++col) {
+            if (scoreDigitPixel(digit, row, col)) {
+                fillRect(renderer, x + col * DIGIT_SCALE, y + row * DIGIT_SCALE, DIGIT_SCALE, DIGIT_SCALE, c);
+            }
+        }
+    }
+}
+
 std::string padLeft(const std::string& s, std::size_t width) {
     if (s.size() >= width) return s;
     return std::string(width - s.size(), ' ') + s;
@@ -819,11 +856,14 @@ private:
 
     void renderPlayfield() {
         fillRect(renderer_, 0, 0, VISIBLE_W, VISIBLE_H, {0, 0, 0, 255});
-        drawRect(renderer_, 0, 0, VISIBLE_W, VISIBLE_H, {255, 255, 255, 255});
+        fillRect(renderer_, 0, 0, 5, VISIBLE_H, {255, 255, 255, 255});
+        fillRect(renderer_, VISIBLE_W - 5, 0, 5, VISIBLE_H, {255, 255, 255, 255});
+        fillRect(renderer_, 0, 0, VISIBLE_W, 5, {255, 255, 255, 255});
+        fillRect(renderer_, 0, VISIBLE_H - 5, VISIBLE_W, 5, {255, 255, 255, 255});
 
         if (sim_.screenMode() == MODE_PLAY) {
             for (int y = 0; y < VISIBLE_H; y += 20) {
-                fillRect(renderer_, 319, y, 2, 10, {220, 220, 220, 255});
+                fillRect(renderer_, 320, y, 1, 10, {255, 255, 255, 255});
             }
 
             int p1y = sim_.clampPaddle(sim_.regs()[1]);
@@ -832,19 +872,33 @@ private:
             int by = std::clamp<int>(sim_.regs()[7], 0, VISIBLE_H - BALL_SIZE);
             fillRect(renderer_, PLAYER1_X, p1y, PADDLE_W, PADDLE_H, {255, 255, 255, 255});
             fillRect(renderer_, PLAYER2_X, p2y, PADDLE_W, PADDLE_H, {255, 255, 255, 255});
-            fillRect(renderer_, bx, by, BALL_SIZE, BALL_SIZE, {255, 122, 0, 255});
+            fillRect(renderer_, bx, by, BALL_SIZE, BALL_SIZE, {240, 100, 0, 255});
 
-            std::string score = std::to_string(static_cast<int>(sim_.regs()[4])) + "     " + std::to_string(static_cast<int>(sim_.regs()[5]));
-            drawText(renderer_, 240, 24, score, 4, {255, 255, 255, 255});
+            int score1 = static_cast<int>(sim_.regs()[4]);
+            int score2 = static_cast<int>(sim_.regs()[5]);
+            int score1_tens = score1 / 10;
+            int score1_ones = score1 % 10;
+            int score2_tens = score2 / 10;
+            int score2_ones = score2 % 10;
+            int score2_ones_x = SCORE2_X_TENS + (score2_tens ? DIGIT_W : 0);
+
+            if (score1 >= 10) {
+                drawScoreDigit(renderer_, SCORE1_X_TENS, SCORE_Y, score1_tens);
+            }
+            drawScoreDigit(renderer_, SCORE1_X_ONES, SCORE_Y, score1_ones);
+            if (score2 >= 10) {
+                drawScoreDigit(renderer_, SCORE2_X_TENS, SCORE_Y, score2_tens);
+            }
+            drawScoreDigit(renderer_, score2_ones_x, SCORE_Y, score2_ones);
         } else if (sim_.screenMode() == MODE_START) {
-            drawText(renderer_, 160, 180, "PRESS SPACE TO START", 5, {255, 255, 255, 255});
-            drawText(renderer_, 140, 240, "MOUSE LEFT   UP/DOWN RIGHT", 4, {200, 200, 200, 255});
+            drawText(renderer_, 102, 300, "PRESS SPACE TO START", 4, {255, 255, 255, 255});
+            drawText(renderer_, 110, 360, "MOUSE LEFT   UP/DOWN RIGHT", 3, {200, 200, 200, 255});
         } else if (sim_.screenMode() == MODE_P1_WIN) {
-            drawText(renderer_, 190, 180, "PLAYER 1 WINS", 5, {255, 255, 255, 255});
-            drawText(renderer_, 195, 240, "PRESS R TO RESET", 4, {200, 200, 200, 255});
+            drawText(renderer_, 104, 180, "PLAYER 1 WINS", 5, {255, 255, 255, 255});
+            drawText(renderer_, 94, 240, "PRESS R TO RESET", 4, {200, 200, 200, 255});
         } else if (sim_.screenMode() == MODE_P2_WIN) {
-            drawText(renderer_, 190, 180, "PLAYER 2 WINS", 5, {255, 255, 255, 255});
-            drawText(renderer_, 195, 240, "PRESS R TO RESET", 4, {200, 200, 200, 255});
+            drawText(renderer_, 104, 180, "PLAYER 2 WINS", 5, {255, 255, 255, 255});
+            drawText(renderer_, 94, 240, "PRESS R TO RESET", 4, {200, 200, 200, 255});
         }
     }
 
