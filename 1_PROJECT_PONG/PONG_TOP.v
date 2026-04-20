@@ -224,13 +224,18 @@ module PONG_TOP(
 		  .r12(r12), .r13(r13), .r14(r14), .r15(r15)
     );
 
+    wire [9:0] ball_x_clamped = (r6[15] == 1'b1) ? 10'd0 :
+                                (r6[9:0] > 10'd630) ? 10'd630 : r6[9:0];
+    wire [9:0] ball_y_clamped = (r7[15] == 1'b1) ? 10'd0 :
+                                (r7[9:0] > 10'd471) ? 10'd471 : r7[9:0];
+
     renderer video0 (
         .CLOCK_50    (CLOCK_50),
         .KEY         (KEY),
-        .y_pos1      (r1),
-        .y_pos2      (r3),
-        .ball_x      (r6),
-        .ball_y      (r7),
+        .y_pos1      (r1[8:0]),
+        .y_pos2      (r3[8:0]),
+        .ball_x      (ball_x_clamped),
+        .ball_y      (ball_y_clamped),
         .score1      (r4),
         .score2      (r5),
         .screen_mode (screen_mode),
